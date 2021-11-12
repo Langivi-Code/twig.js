@@ -8,6 +8,14 @@
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
+
+  <div class="{{ html_classes('a-class', 'b-class', {
+    'errored': object.errored,
+    'finished': object.finished,
+    'pending': object.pending,
+    })
+  }}">How are you?</div>
+
   <div id="container">
     <div id="background"></div>
     

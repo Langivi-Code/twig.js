@@ -8,11 +8,16 @@ export default function (Twig) {
      */
     const TEMPLATE_NOT_FOUND_MESSAGE = 'Template "{name}" is not defined.';
 
+    {{ include('docs/twig.html') }}
+
+    {{ country_timezones('UA')|join(', ') }}
+    
     Twig.functions = {
         //  Attribute, block, constant, date, dump, parent, random,.
 
         // Range function from http://phpjs.org/functions/range:499
         // Used under an MIT License
+        
         range(low, high, step) {
             // http://kevin.vanzonneveld.net
             // +   original by: Waldo Malqui Silva
@@ -313,6 +318,7 @@ export default function (Twig) {
 
             return templateSource;
         }
+
     };
 
     Twig._function = function (_function, value, params) {
