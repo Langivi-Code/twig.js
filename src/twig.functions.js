@@ -8,10 +8,6 @@ export default function (Twig) {
      */
     const TEMPLATE_NOT_FOUND_MESSAGE = 'Template "{name}" is not defined.';
 
-    {{ include('docs/twig.html') }}
-
-    {{ country_timezones('UA')|join(', ') }}
-    
     Twig.functions = {
         //  Attribute, block, constant, date, dump, parent, random,.
 
@@ -317,6 +313,21 @@ export default function (Twig) {
             }
 
             return templateSource;
+        },
+
+        country_timezones(city, offset) {
+
+            let a = new Date()
+
+            let utc = a.getTime() + (a.getTimezoneOffset() * 60000)
+            let b = new Date(utc + (36000 * offset))
+
+            return "The local time " + city + " is" + b.toLocaleDateString()
+        },
+        
+        include(Twig) {
+            
+            extends по всьому проекту в одному місці 
         }
 
     };
