@@ -325,9 +325,18 @@ export default function (Twig) {
             return "The local time " + city + " is" + b.toLocaleDateString()
         },
         
-        include(Twig) {
-            
-            extends по всьому проекту в одному місці 
+        include(file) {
+            let filetype = file.split('.').pop()
+
+            var reader = new FileReader()
+
+            if(filetype != "twig") {
+                return false
+            } else {
+                return reader.onload = () => reader.result
+            }
+
+            return filetype
         }
 
     };
