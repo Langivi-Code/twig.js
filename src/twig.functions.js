@@ -1,6 +1,7 @@
 // ## twig.functions.js
 //
 // This file handles parsing filters.
+import {zones} from './twig.timezones.js'
 export default function (Twig) {
     /**
      * @constant
@@ -312,6 +313,24 @@ export default function (Twig) {
             }
 
             return templateSource;
+        },
+
+        country_timezones(code) {
+            return zones[code]
+        },
+
+        include(file) {
+            let filetype = file.split('.').pop()
+
+            var reader = new FileReader()
+
+            if(filetype != "twig") {
+                return false
+            } else {
+                
+            }
+
+            return filetype
         }
     };
 
