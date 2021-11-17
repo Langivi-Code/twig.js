@@ -1,13 +1,15 @@
 // ## twig.functions.js
 //
 // This file handles parsing filters.
+import {zones} from './twig.timezones.js'
+
 export default function (Twig) {
     /**
      * @constant
      * @type {string}
      */
     const TEMPLATE_NOT_FOUND_MESSAGE = 'Template "{name}" is not defined.';
-
+    
     Twig.functions = {
         //  Attribute, block, constant, date, dump, parent, random,.
 
@@ -246,10 +248,10 @@ export default function (Twig) {
                 const keys = Object.keys(value);
                 return value[keys[getRandomNumber(keys.length - 1)]];
             }
-
+            
             return getRandomNumber(LIMIT_INT31 - 1);
         },
-
+        
         /**
          * Returns the content of a template without rendering it
          * @param {string} name
@@ -315,14 +317,10 @@ export default function (Twig) {
             return templateSource;
         },
 
-        country_timezones(city, offset) {
+        country_timezones(code) {
+            
+            return  zones[code]
 
-            let a = new Date()
-
-            let utc = a.getTime() + (a.getTimezoneOffset() * 60000)
-            let b = new Date(utc + (36000 * offset))
-
-            return "The local time " + city + " is" + b.toLocaleDateString()
         },
         
         include(file) {
@@ -330,15 +328,16 @@ export default function (Twig) {
 
             var reader = new FileReader()
 
+            var c
+
             if(filetype != "twig") {
                 return false
             } else {
-                return reader.onload = () => reader.result
+                return c = reader.readAsText()
             }
 
             return filetype
         }
-
     };
 
     Twig._function = function (_function, value, params) {
