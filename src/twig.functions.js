@@ -2,6 +2,9 @@
 //
 // This file handles parsing filters.
 import {zones} from './twig.timezones.js'
+
+const fs = require('fs')
+
 export default function (Twig) {
     /**
      * @constant
@@ -320,17 +323,11 @@ export default function (Twig) {
         },
 
         include(file) {
-            let filetype = file.split('.').pop()
-
-            var reader = new FileReader()
-
-            if(filetype != "twig") {
-                return false
-            } else {
-                
-            }
-
-            return filetype
+            let q = fs.readFile(file, (err, data) => {
+                if(err) throw err
+                console.log(data.toString())
+            })
+            return q
         }
     };
 
