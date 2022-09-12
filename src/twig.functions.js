@@ -61,6 +61,19 @@ export default function (Twig) {
             const pos = i % arr.length;
             return arr[pos];
         },
+        country_timezones(arg){
+            if(is("string",arg)){
+                const clm = require('country-locale-map');
+                const country = clm.getCountryByAlpha2(arg);
+                if(country){
+                    return `${country.region}/${country.name}`;
+                }else{
+                    throw new Error("Country not exist");
+                }
+            }else{
+                throw new Error("Argument must be a string")
+            }
+        },
         constant(...arg){
             if(!globalThis.globalConst){
                 globalThis.globalConst = {};
