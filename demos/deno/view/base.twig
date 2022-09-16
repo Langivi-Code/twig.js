@@ -16,7 +16,9 @@
     {# {{ constant("RSS","NEW CONSTANT")}} #}
    <p class="{{ html_classes('a-class', 'another-class') }}">How are you doing?</p>
    {# {{ constant("RSS") }} #}
-   {{ min([1,2,3]) }}
+  {% set arr = [1,2,3,45,6,7,8,12]%}
+    {{arr}}
+    {{country_timezones("FR")}}
 </main>
 
 </body>

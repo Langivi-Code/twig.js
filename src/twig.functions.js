@@ -62,11 +62,11 @@ export default function (Twig) {
             return arr[pos];
         },
         country_timezones(arg){
-            if(is("string",arg)){
-                const clm = require('country-locale-map');
+            if(typeof arg === 'string'){
+                const clm = Twig.lib.clm;
                 const country = clm.getCountryByAlpha2(arg);
                 if(country){
-                    return `${country.region}/${country.name}`;
+                    return `${country.name}/${country.alpha2}`;
                 }else{
                     throw new Error("Country not exist");
                 }
