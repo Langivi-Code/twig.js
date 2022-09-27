@@ -16,6 +16,7 @@ export class TwigFilters {
        filters[filterName] = definition;
     }
     // String Filters
+
     country_name(value){
         if(typeof value !== 'string'){
             return value;
@@ -401,6 +402,84 @@ export class TwigFilters {
         const date = this.Twig.functions.date(value);
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return this.Twig.lib.date(format.replace(/\\\\/g, '\\'), date);
+    }
+    format_date(value,[formatdate,local,timezone]){
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if(local){
+            date = date.setLocale(local);
+        } else if(timezone){
+            date = date.toZonedTime(timezone);
+        }
+        switch (formatdate){
+            case "none":
+                break;
+            case "short":
+                formate += "dd/MM/YYYY";
+                break;
+            case "full":
+                formate += "wwww d MMMM YYYY"
+        }
+        
+        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+        return resultDate;
+    }
+    format_datetime(value,[formatdate,formattime,local,timezone]){
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if(local){
+            date = date.setLocale(local);
+        } else if(timezone){
+            date = date.toZonedTime(timezone);
+        }
+        switch (formatdate){
+            case "none":
+                break;
+            case "short":
+                formate += "dd/MM/YYYY";
+                break;
+            case "full":
+                formate += "wwww d MMMM YYYY"
+        }
+        switch (formattime){
+            case "none":
+                break;
+            case "short":
+                formate += " HH:mm";
+                break;
+            case "full":
+                formate += "HH:mm:ss ZZZ"
+                break;
+        }
+        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+        return resultDate;
+    } 
+
+    format_time(value,[formattime,local,timezone]){
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if(local){
+            date = date.setLocale(local);
+        } else if(timezone){
+            date = date.toZonedTime(timezone);
+        }
+        switch (formattime){
+            case "none":
+                break;
+            case "short":
+                formate += " HH:mm";
+                break;
+            case "full":
+                formate += "HH:mm:ss ZZZ"
+                break;
+        }
+        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+        return resultDate;
+
+    }
+    html_to_markdown(value,params){
+        console.log("value html",value);
+        console.log("params", params);
     }
     /* eslint-disable-next-line camelcase */
     date_modify(value, params) {

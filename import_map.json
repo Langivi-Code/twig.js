@@ -7,6 +7,7 @@
     "currenciesMap": "https://cdn.skypack.dev/currencies-map",
     "datauris": "https://deno.land/x/datauri/mod.ts",
     "lookup": "https://deno.land/x/media_types@v2.3.0/mod.ts",
-    "fromUint8Array": "https://deno.land/x/base64@v0.2.0/mod.ts"
+    "fromUint8Array": "https://deno.land/x/base64@v0.2.0/mod.ts",
+    "datetime":"https://deno.land/x/ptera/mod.ts"
   }
 }

@@ -29,8 +29,9 @@
    {# {{ '100000000'|format_currency('EUR', {fraction_digit: 3}) }}
    {{ '<b>foobar</b>'|data_uri }} #}
     {# {% set a = 1 %} #}
-    {{ [1,2,3,4,5,6]|filter(a => a>2)}};
-
+    {# {{ [1,2,3,4,5,6]|filter(a => a>2)}}; #}
+    {{ include('error.twig')|html_to_markdown }}
+    {{ '2019-08-07 23:39:12'|format_datetime() }}
 </main>
 
 </body>
