@@ -159,6 +159,14 @@ export class TwigFilters {
             return value;
         }
     }
+    filter(value,params){
+        console.log("value type",is("Function",params[0]) ); 
+        if(!is("Array",value) || !is("Function",params[0])){
+            return;
+        }
+    return value.filter(params[0]);
+
+    }
     keys(value) {
         if (value === undefined || value === null) {
             return;
@@ -214,6 +222,19 @@ export class TwigFilters {
         result = result.replace('\'', '%27');
         return result;
     }
+    data_uri(value){
+        if(!value){
+            return;
+        }
+        if(value.match(/<[^<>]+>/g)){
+            return`data:"text/html";base64,${btoa(value)}`;
+        } else {
+            const content = Deno.readFileSync(value);
+            const data = `data:${this.Twig.lib.lookup(value)};base64,${this.Twig.lib.fromUint8Array(content)}`;
+            return data;
+        }
+    }
+
     join(value, params) {
         if (value === undefined || value === null) {
             return;
@@ -431,6 +452,12 @@ export class TwigFilters {
         }
 
         return this.Twig.lib.vsprintf(value, params);
+    }
+    format_currency(value,params){
+        if (value === undefined || value === null) {
+            return;
+        }
+        return  new Intl.NumberFormat('en-US',{style: 'currency', currency:params[0], ...params[1]}).format(value);
     }
 
     striptags(value, allowed) {

@@ -5,6 +5,8 @@
     "module": "https://deno.land/std@0.129.0/node/module.ts",
     "countryLocaleMap": "https://cdn.skypack.dev/country-locale-map/index.js",
     "currenciesMap": "https://cdn.skypack.dev/currencies-map",
-    "dauria": "https://cdn.skypack.dev/dauria"
+    "datauris": "https://deno.land/x/datauri/mod.ts",
+    "lookup": "https://deno.land/x/media_types@v2.3.0/mod.ts",
+    "fromUint8Array": "https://deno.land/x/base64@v0.2.0/mod.ts"
   }
 }

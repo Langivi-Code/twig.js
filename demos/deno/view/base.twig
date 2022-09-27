@@ -19,9 +19,17 @@
    {# {{ [1,2,3,"anton","nastya"]|join }}
    {{ "StringTest"|convert_encoding('UTF-8', 'buf')}} #}
    {# {{ "path-seg*ment"|url_encode }} #}
-   {{ 'FR'|country_name }}
+   {# {{ 'FR'|country_name }}
    {{ 'EUR'|currency_name }}
-   {{ 'JPY'|currency_name }}
+   {{ 'JPY'|currency_name }} #}
+   {# {{ './newImage.png'|data_uri }} #}
+   {# {{ [1,2,34,5]|filter({{v=>v>5}})}}; #}
+   {# {{ '12.345'|format_currency('EUR') }}
+   {{ '12.345'|format_currency('EUR', {rounding_mode: 'floor'}) }} #}
+   {# {{ '100000000'|format_currency('EUR', {fraction_digit: 3}) }}
+   {{ '<b>foobar</b>'|data_uri }} #}
+    {# {% set a = 1 %} #}
+    {{ [1,2,3,4,5,6]|filter(a => a>2)}};
 
 </main>
 
