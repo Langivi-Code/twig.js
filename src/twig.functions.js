@@ -61,6 +61,55 @@ export default function (Twig) {
             const pos = i % arr.length;
             return arr[pos];
         },
+        country_timezones(arg){
+            if(typeof arg === 'string'){
+                const clm = Twig.lib.clm;
+                const country = clm.getCountryByAlpha2(arg);
+                if(country){
+                    return `${country.name}/${country.alpha2}`;
+                }else{
+                    throw new Error("Country not exist");
+                }
+            }else{
+                throw new Error("Argument must be a string")
+            }
+        },
+        constant(...arg){
+            if(!globalThis.globalConst){
+                globalThis.globalConst = {};
+            }
+            if(arg.length == 1){
+                if(globalThis.globalConst[arg]){
+                    return globalThis.globalConst[arg]
+                }else{
+                    throw `${arg} constant does not exist`;
+                }
+            }else if (arg.length == 2){
+                globalThis.globalConst[arg[0]]= arg[1];
+                return  globalThis.globalConst[arg[0]];
+            }
+        },
+        html_classes(...args){
+            const classes = [];
+            args.forEach(element => {
+                if(typeof element === 'string' || element instanceof String){
+                    classes.push(element);
+                }else if(Array.isArray(element)) {
+                    element.forEach(item => {
+                        if(typeof item !== "string"){
+                            throw new Error(`The html_classes function argument ${item} should be a string` )
+                        }
+                        classes.push(item);
+                    });
+
+                }else{
+                    throw new Error(`The html_classes function argument ${element} should be either a string or an array`)
+                }
+                
+            });
+            return classes.join(" ");
+
+        },
         dump(...args) {
             // Don't pass arguments to `Array.slice`, that is a performance killer
 
