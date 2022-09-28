@@ -14,7 +14,9 @@ import { datauri } from "datauris";
 import { lookup } from "lookup";
 import { fromUint8Array } from "fromUint8Array";
 import {datetime} from "datetime";
+import turndown from "turndown";
+import { DOMParser } from "DOMParser";
 
 const require = createRequire(Deno.realPathSync("."));
-export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, CurrenciesMap, datauri,lookup,fromUint8Array,datetime }
+export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser }
 export default require;

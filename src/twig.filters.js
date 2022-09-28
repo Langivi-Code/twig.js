@@ -477,9 +477,16 @@ export class TwigFilters {
         return resultDate;
 
     }
-    html_to_markdown(value,params){
-        console.log("value html",value);
-        console.log("params", params);
+    html_to_markdown(value){
+        if(!is("String",value)){
+            return;
+        }
+        const parseString = new this.Twig.lib.domParser();
+        const TurndownService = new this.Twig.lib.turndown();
+        const domDoc = parseString.parseFromString(value,'text/html');
+        if (!domDoc) { throw `failed to parse doc`}
+        const mark = TurndownService.turndown(domDoc);
+        return mark;
     }
     /* eslint-disable-next-line camelcase */
     date_modify(value, params) {
