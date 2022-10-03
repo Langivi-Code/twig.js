@@ -45,6 +45,8 @@ class TwigLib {
                 return (typeof obj === 'number' || obj instanceof Number);
             case 'Function':
                 return (typeof obj === 'function');
+            case 'Boolean':
+                return (typeof obj === "boolean" || obj instanceof Boolean);
             case 'Object':
                 return obj instanceof Object;
             default:

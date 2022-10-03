@@ -12,7 +12,10 @@
 </head>
 <body>
 <main>
-    <p>New temlate !</p>
+{{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)}}
+
+{# {{ source("view/header.twig") }} #}
+    <p>New temlate {{cool}} !</p>
     {# {{ constant("RSS","NEW CONSTANT")}} #}
    {# <p class="{{ html_classes('a-class', 'another-class') }}">How are you doing?</p>
    {# {{ constant("RSS") }} #}
@@ -37,6 +40,5 @@
     </html>
 {% endapply %}
 </main>
-
 </body>
 </html>
