@@ -161,11 +161,10 @@ export class TwigFilters {
         }
     }
     filter(value,params){
-        console.log("value type",is("Function",params[0]) ); 
         if(!is("Array",value) || !is("Function",params[0])){
             return;
         }
-    return value.filter(params[0]);
+        return value.filter(params[0]);
 
     }
     keys(value) {
