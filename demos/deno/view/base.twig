@@ -34,11 +34,24 @@
     {# {% set a = 1 %} #}
     {# {{ [1,2,3,4,5,6]|filter(a => a>2)}}; #}
     {{ '2019-08-07 23:39:12'|format_datetime() }}
-    {% apply html_to_markdown %}
+   {{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)|html_to_markdown }}
+   {% apply inline_css %}
     <html>
-        <h1>Hello!</h1>
+        <head>
+            <style>
+                p { color: red; }
+            </style>
+        </head>
+        <body>
+            <p>Hello CSS!</p>
+        </body>
     </html>
 {% endapply %}
+
+{{ 'fr'|language_name }}
+{{ 'de'|language_name('fr') }}
+
+{{ 'fr_CA'|language_name('fr_FR') }} 
 </main>
 </body>
 </html>

@@ -12,29 +12,29 @@ export class TwigFilters {
     constructor(Twig) {
         this.Twig = Twig;
     }
-    static addFilter(filters, filterName, definition){
-       filters[filterName] = definition;
+    static addFilter(filters, filterName, definition) {
+        filters[filterName] = definition;
     }
     // String Filters
 
-    country_name(value){
-        if(typeof value !== 'string'){
+    country_name(value) {
+        if (typeof value !== 'string') {
             return value;
         }
         const country = this.Twig.lib.clm.getCountryByAlpha2(value);
         return country.name;
     }
 
-    currency_name(value){
-        if(typeof value !== 'string'){
+    currency_name(value) {
+        if (typeof value !== 'string') {
             return value;
         }
         const currency = this.Twig.lib.currenciesMap.names.get(value);
         return currency;
     }
 
-    currency_symbol(value){
-        if(typeof value !== 'string'){
+    currency_symbol(value) {
+        if (typeof value !== 'string') {
             return value;
         }
         const symbol = this.Twig.lib.currenciesMap.symbols.get(value);
@@ -85,12 +85,11 @@ export class TwigFilters {
 
         return 0;
     }
-    convert_encoding(value,params){
-        if(params.length != 2){
+    convert_encoding(value, params) {
+        if (params.length != 2) {
             throw new this.Twig.Error("Two parameters expected");
         }
-        const encode = this.Twig.lib.encode(value,params[1]);
-        console.log("Encode",encode);
+        const encode = this.Twig.lib.encode(value, params[1]);
         return encode.toString();
     }
 
@@ -160,8 +159,8 @@ export class TwigFilters {
             return value;
         }
     }
-    filter(value,params){
-        if(!is("Array",value) || !is("Function",params[0])){
+    filter(value, params) {
+        if (!is("Array", value) || !is("Function", params[0])) {
             return;
         }
         return value.filter(params[0]);
@@ -222,12 +221,12 @@ export class TwigFilters {
         result = result.replace('\'', '%27');
         return result;
     }
-    data_uri(value){
-        if(!value){
+    data_uri(value) {
+        if (!value) {
             return;
         }
-        if(value.match(/<[^<>]+>/g)){
-            return`data:"text/html";base64,${btoa(value)}`;
+        if (value.match(/<[^<>]+>/g)) {
+            return `data:"text/html";base64,${btoa(value)}`;
         } else {
             const content = Deno.readFileSync(value);
             const data = `data:${this.Twig.lib.lookup(value)};base64,${this.Twig.lib.fromUint8Array(content)}`;
@@ -322,12 +321,12 @@ export class TwigFilters {
         if (is('Array', value)) {
             params.forEach(param => {
                 if (!is('Array', param)) {
-                    obj = { };
+                    obj = {};
                 }
             });
         } else {
             // Create obj as an Object
-            obj = { };
+            obj = {};
         }
 
         if (!is('Array', obj)) {
@@ -402,15 +401,15 @@ export class TwigFilters {
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return this.Twig.lib.date(format.replace(/\\\\/g, '\\'), date);
     }
-    format_date(value,[formatdate,local,timezone]){
+    format_date(value, [formatdate, local, timezone]) {
         let date = this.Twig.lib.datetime(value);
         let formate = "";
-        if(local){
+        if (local) {
             date = date.setLocale(local);
-        } else if(timezone){
+        } else if (timezone) {
             date = date.toZonedTime(timezone);
         }
-        switch (formatdate){
+        switch (formatdate) {
             case "none":
                 break;
             case "short":
@@ -419,19 +418,19 @@ export class TwigFilters {
             case "full":
                 formate += "wwww d MMMM YYYY"
         }
-        
-        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+
+        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
         return resultDate;
     }
-    format_datetime(value,[formatdate,formattime,local,timezone]){
+    format_datetime(value, [formatdate, formattime, local, timezone]) {
         let date = this.Twig.lib.datetime(value);
         let formate = "";
-        if(local){
+        if (local) {
             date = date.setLocale(local);
-        } else if(timezone){
+        } else if (timezone) {
             date = date.toZonedTime(timezone);
         }
-        switch (formatdate){
+        switch (formatdate) {
             case "none":
                 break;
             case "short":
@@ -440,7 +439,7 @@ export class TwigFilters {
             case "full":
                 formate += "wwww d MMMM YYYY"
         }
-        switch (formattime){
+        switch (formattime) {
             case "none":
                 break;
             case "short":
@@ -450,19 +449,19 @@ export class TwigFilters {
                 formate += "HH:mm:ss ZZZ"
                 break;
         }
-        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
         return resultDate;
-    } 
+    }
 
-    format_time(value,[formattime,local,timezone]){
+    format_time(value, [formattime, local, timezone]) {
         let date = this.Twig.lib.datetime(value);
         let formate = "";
-        if(local){
+        if (local) {
             date = date.setLocale(local);
-        } else if(timezone){
+        } else if (timezone) {
             date = date.toZonedTime(timezone);
         }
-        switch (formattime){
+        switch (formattime) {
             case "none":
                 break;
             case "short":
@@ -472,18 +471,18 @@ export class TwigFilters {
                 formate += "HH:mm:ss ZZZ"
                 break;
         }
-        const resultDate = formate.length ? date.format(formate) : date.format( "MMM d, YYYY, hh:mm:ss a ");
+        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
         return resultDate;
 
     }
-    html_to_markdown(value){
-        if(!is("String",value)){
+    html_to_markdown(value) {
+        if (!is("String", value)) {
             return;
         }
         const parseString = new this.Twig.lib.domParser();
         const TurndownService = new this.Twig.lib.turndown();
-        const domDoc = parseString.parseFromString(value,'text/html');
-        if (!domDoc) { throw `failed to parse doc`}
+        const domDoc = parseString.parseFromString(value, 'text/html');
+        if (!domDoc) { throw `failed to parse doc` }
         const mark = TurndownService.turndown(domDoc);
         return mark;
     }
@@ -538,11 +537,11 @@ export class TwigFilters {
 
         return this.Twig.lib.vsprintf(value, params);
     }
-    format_currency(value,params){
+    format_currency(value, params) {
         if (value === undefined || value === null) {
             return;
         }
-        return  new Intl.NumberFormat('en-US',{style: 'currency', currency:params[0], ...params[1]}).format(value);
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: params[0], ...params[1] }).format(value);
     }
 
     striptags(value, allowed) {
@@ -552,7 +551,7 @@ export class TwigFilters {
 
         return this.Twig.lib.stripTags(value, allowed);
     }
-
+    
     escape(value, params) {
         if (value === undefined || value === null || value === '') {
             return;
@@ -944,6 +943,16 @@ export class TwigFilters {
         }
 
         return result;
+    }
+    language_name(value, params) {
+        if (!params && this.Twig.lib.is("String", value)) {
+            return this.Twig.lib.getLanguageName(value);
+        } else if (value.match(/_/)&& this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
+            const lang = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/,"-"), params[0].split("_")[0],false);
+           return lang.languageName + lang.countryName ;
+        } else if (this.Twig.lib.is("String", params[0])) {
+            return this.Twig.lib.getLanguageName(value, params[0])
+        }
     }
     round(value, params) {
         params = params || [];
