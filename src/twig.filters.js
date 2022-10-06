@@ -494,6 +494,16 @@ export class TwigFilters {
         const mark = TurndownService.turndown(domDoc);
         return mark;
     }
+    markdown_to_html(value){
+        const converter = new this.Twig.lib.showdown.Converter();
+        const html = converter.makeHtml(value);
+        if(html){
+            return html;
+        }else {
+            return;
+        }
+
+    }
     /* eslint-disable-next-line camelcase */
     date_modify(value, params) {
         if (value === undefined || value === null) {
