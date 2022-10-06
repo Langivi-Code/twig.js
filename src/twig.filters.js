@@ -185,6 +185,14 @@ export class TwigFilters {
         });
         return output;
     }
+    map(value, params) {
+        if (this.Twig.lib.is("Array", value) && this.Twig.lib.is("Function", params[0])) {
+            const arr = value.map(params[0]);
+            return arr;
+        } else {
+            return;
+        }
+    }
     /* eslint-disable-next-line camelcase */
     url_encode(value) {
         if (value === undefined || value === null) {
@@ -551,7 +559,7 @@ export class TwigFilters {
 
         return this.Twig.lib.stripTags(value, allowed);
     }
-    
+
     escape(value, params) {
         if (value === undefined || value === null || value === '') {
             return;
@@ -947,13 +955,24 @@ export class TwigFilters {
     language_name(value, params) {
         if (!params && this.Twig.lib.is("String", value)) {
             return this.Twig.lib.getLanguageName(value);
-        } else if (value.match(/_/)&& this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
-            const lang = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/,"-"), params[0].split("_")[0],false);
-           return lang.languageName + lang.countryName ;
+        } else if (value.match(/_/) && this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
+            const lang = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0], false);
+            return lang.languageName + lang.countryName;
         } else if (this.Twig.lib.is("String", params[0])) {
             return this.Twig.lib.getLanguageName(value, params[0])
         }
     }
+    locale_name(value, params) {
+        if (this.Twig.lib.is("String", value) && !params) {
+            return this.Twig.lib.getLanguageNameWithCountry(value).languageName;
+        } else if (this.Twig.lib.is("String", value) && value.match(/_/) && this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
+            const { countryName, languageName } = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0]);
+            return languageName + "(" + countryName + ")";
+        } else if (this.Twig.lib.is("String", value) && this.Twig.lib.is("String", params[0])) {
+            return this.Twig.lib.getLanguageNameWithCountry(value, params[0]).languageName;
+        }
+    }
+
     round(value, params) {
         params = params || [];
 

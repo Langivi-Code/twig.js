@@ -35,7 +35,7 @@
     {# {{ [1,2,3,4,5,6]|filter(a => a>2)}}; #}
     {{ '2019-08-07 23:39:12'|format_datetime() }}
    {{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)|html_to_markdown }}
-   {% apply inline_css %}
+   {# {% apply inline_css %}
     <html>
         <head>
             <style>
@@ -46,12 +46,21 @@
             <p>Hello CSS!</p>
         </body>
     </html>
-{% endapply %}
+{% endapply %} #}
 
-{{ 'fr'|language_name }}
+{# {{ 'fr'|language_name }}
 {{ 'de'|language_name('fr') }}
 
 {{ 'fr_CA'|language_name('fr_FR') }} 
+<p>
+{{ 'fr_CA'|locale_name('fr_FR') }}#}
+{% set people = [
+    {first:"Bob", last:"Smith"},
+    {first:"Alic", last:"Dupond"},
+]%} 
+{{ people|map(p => `${p.first} ${p.last}`)|join(', ')}}
+{# {{ people|map((value, key) => `${key} ${value}`) }} #}
+</p>
 </main>
 </body>
 </html>

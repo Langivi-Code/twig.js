@@ -833,13 +833,13 @@ export default function (Twig) {
         {
             type: Twig.expression.type.variable,
             // Match any letter or _, then any number of letters, numbers, _ or -
-            regex: /^\w*\s{0,4}=>\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|^[a-zA-Z_]\w*/g,
+            regex: /(^\w*\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])|^[a-zA-Z_]\w*)/g,
             next: Twig.expression.set.operationsExtended.concat([
                 Twig.expression.type.parameter.start
             ]),
             compile: Twig.expression.fn.compile.push,
             validate(match) {
-                if ((/^\w*\s{0,4}=>\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*/g).test(match)) {
+                if ((/^\w*\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])/g).test(match)) {
                     return true;
                 } else {
                     return (!Twig.expression.reservedWords.includes(match[0]));
@@ -848,7 +848,7 @@ export default function (Twig) {
             parse(token, stack, context) {
                 const state = this;
                 // Get the variable from the context
-                if ((/^\w*\s{0,4}=>\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*/g).test(token.value)) {
+                if ((/^\w*\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])/g).test(token.value)) {
                     return stack.push(eval(token.value));
                 }
                     return Twig.expression.resolveAsync.call(state, context[token.value], context)
