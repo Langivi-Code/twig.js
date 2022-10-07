@@ -20,8 +20,10 @@ import {langToLang} from "languageName";
 import {getLanguageName} from "languageName";
 import {getLanguageNameWithCountry} from "languageName";
 import showdown from "showdown";
+import slug from "slug";
+import timeZoneName from "timeZoneName"
 
 
 const require = createRequire(Deno.realPathSync("."));
-export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown}
+export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName}
 export default require;

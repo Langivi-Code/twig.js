@@ -11,6 +11,9 @@
     "datetime":"https://deno.land/x/ptera/mod.ts",
     "turndown": "https://cdn.skypack.dev/turndown@7.1.1",
     "DOMParser":"https://github.com/b-fuze/deno-dom/raw/188d7240e5371caf1b4add8bb7183933d142337e/deno-dom-wasm.ts",
-    "languageName": "https://cdn.skypack.dev/language-name-to-language-name"
+    "languageName": "https://cdn.skypack.dev/language-name-to-language-name",
+    "showdown":"https://cdn.skypack.dev/showdown",
+    "slug":"https://cdn.skypack.dev/slugify",
+    "timeZoneName":"https://cdn.skypack.dev/spacetime-informal"
   }
 }

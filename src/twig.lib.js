@@ -5,7 +5,7 @@
 // Copies of the licenses for the code included here can be found in the
 // LICENSES.md file.
 //
-import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName, getLanguageNameWithCountry, showdown} from './twig.deps.js';
+import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName, getLanguageNameWithCountry, showdown, slug, timeZoneName} from './twig.deps.js';
 
 
 class TwigLib {
@@ -31,6 +31,8 @@ class TwigLib {
         this.getLanguageName = getLanguageName;
         this.getLanguageNameWithCountry = getLanguageNameWithCountry;
         this.showdown = showdown;
+        this.slug = slug;
+        this.timeZoneName = timeZoneName;
     }
 
     is(type, obj) {

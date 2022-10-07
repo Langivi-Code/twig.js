@@ -60,7 +60,18 @@
 ]%} 
 {{ people|map(p => `${p.first} ${p.last}`)|join(', ')}}
 {# {{ people|map((value, key) => `${key} ${value}`) }} #}
+{% apply markdown_to_html %}
+Title
+======
+
+Hello!
+{% endapply %}
 </p>
+<p>{{ 'Wôrķšƥáçè sèťtïñğš'|slug }}</p>
+<p>{{ 'Wôrķšƥáçè sèťtïñğš'|slug('/') }}</p>
+<p>{{ 'Wôrķšƥáçè sèťtïñğš'|slug('/', 'ko') }}</p>
+<p>{{ 'Europe/Paris'|timezone_name }}</p>
+{{ 'America/Los_Angeles'|timezone_name }}
 </main>
 </body>
 </html>

@@ -1,6 +1,8 @@
 // ## twig.filters.js
 //
 // This file handles parsing filters.
+
+
 // Determine object type
 function is(type, obj) {
     const clas = Object.prototype.toString.call(obj).slice(8, -1);
@@ -494,12 +496,12 @@ export class TwigFilters {
         const mark = TurndownService.turndown(domDoc);
         return mark;
     }
-    markdown_to_html(value){
+    markdown_to_html(value) {
         const converter = new this.Twig.lib.showdown.Converter();
         const html = converter.makeHtml(value);
-        if(html){
+        if (html) {
             return html;
-        }else {
+        } else {
             return;
         }
 
@@ -547,7 +549,15 @@ export class TwigFilters {
 
         return value;
     }
-
+    slug(value, params) {
+        if (this.Twig.lib.is("String", value) && params[0] && params[1]) {
+            return this.Twig.lib.slug(value, { replecement: params[0], locale: params[1] });
+        } else if (this.Twig.lib.is("String", value) && params[0]) {
+            return this.Twig.lib.slug(value, { replacement: params[0] })
+        } else if (this.Twig.lib.is("String",value)) {
+            return this.Twig.lib.slug(value);
+        }
+    }
     format(value, params) {
         if (value === undefined || value === null) {
             return;
@@ -981,6 +991,14 @@ export class TwigFilters {
         } else if (this.Twig.lib.is("String", value) && this.Twig.lib.is("String", params[0])) {
             return this.Twig.lib.getLanguageNameWithCountry(value, params[0]).languageName;
         }
+    }
+    timezone_name(value) {
+        if(!this.Twig.lib.is("String",value)){
+            return;
+        }
+        const local = this.Twig.lib.timeZoneName.display(value);
+        const country = value.split("/");
+        return local.standard.name.replace("Standard","")+` (${country[1].replace("_"," ")})`;
     }
 
     round(value, params) {
