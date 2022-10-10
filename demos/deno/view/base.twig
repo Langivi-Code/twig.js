@@ -12,10 +12,10 @@
 </head>
 <body>
 <main>
-{{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)}}
+{# {{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)}} #}
 
 {# {{ source("view/header.twig") }} #}
-    <p>New temlate {{cool}} !</p>
+    {# <p>New temlate {{cool}} !</p> #}
     {# {{ constant("RSS","NEW CONSTANT")}} #}
    {# <p class="{{ html_classes('a-class', 'another-class') }}">How are you doing?</p>
    {# {{ constant("RSS") }} #}
@@ -33,8 +33,8 @@
    {{ '<b>foobar</b>'|data_uri }} #}
     {# {% set a = 1 %} #}
     {# {{ [1,2,3,4,5,6]|filter(a => a>2)}}; #}
-    {{ '2019-08-07 23:39:12'|format_datetime() }}
-   {{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)|html_to_markdown }}
+    {# {{ '2019-08-07 23:39:12'|format_datetime() }}
+   {{ include("view/header.twig",{value:"NEW Value", cool:"Coool"},false)|html_to_markdown }} #}
    {# {% apply inline_css %}
     <html>
         <head>
@@ -57,10 +57,15 @@
 {% set people = [
     {first:"Bob", last:"Smith"},
     {first:"Alic", last:"Dupond"},
-]%} 
-{{ people|map(p => `${p.first} ${p.last}`)|join(', ')}}
-{# {{ people|map((value, key) => `${key} ${value}`) }} #}
-{% apply markdown_to_html %}
+]%}  
+{{ people|map(p => `${p.first} ${p.last}`)}}
+{% set peoples = {
+    "Bob": "Smith",
+    "Alice": "Dupond",
+} %}
+?????
+{{ peoples|map(([key, value]) => `${value} ${key}`)|join(', ') }}
+{# {% apply markdown_to_html %}
 Title
 ======
 
@@ -71,7 +76,7 @@ Hello!
 <p>{{ 'Wôrķšƥáçè sèťtïñğš'|slug('/') }}</p>
 <p>{{ 'Wôrķšƥáçè sèťtïñğš'|slug('/', 'ko') }}</p>
 <p>{{ 'Europe/Paris'|timezone_name }}</p>
-{{ 'America/Los_Angeles'|timezone_name }}
+{{ 'America/Los_Angeles'|timezone_name }} #}
 </main>
 </body>
 </html>

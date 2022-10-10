@@ -190,6 +190,13 @@ export class TwigFilters {
     map(value, params) {
         if (this.Twig.lib.is("Array", value) && this.Twig.lib.is("Function", params[0])) {
             const arr = value.map(params[0]);
+            console.info(arr);
+            return arr;
+        } else if(this.Twig.lib.is("Object",value) && this.Twig.lib.is("Function",params[0])){
+            if(Object.hasOwn(value,"_keys")){
+                delete value._keys;
+            }
+            const arr = Object.entries(value).map(params[0]);
             return arr;
         } else {
             return;
