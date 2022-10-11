@@ -369,10 +369,10 @@ export default function (Twig) {
              * Match a subexpression set start.
              */
             type: Twig.expression.type.subexpression.start,
-            regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,4}=>\s{0,4}[`\{$].*[`\}$]|^\(/,
+            regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
             next: Twig.expression.set.expressions.concat([Twig.expression.type.subexpression.end]),
             validate(match,tokens){
-                if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,4}=>\s{0,4}[`\{$].*[`\}$]/.test(match)){
+                if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
                 }else {
                     return true;
@@ -493,10 +493,10 @@ export default function (Twig) {
              * Match a parameter set start.
              */
             type: Twig.expression.type.parameter.start,
-            regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,4}=>\s{0,4}[`\{$].*[`\}$]|^\(/,
+            regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
             next: Twig.expression.set.expressions.concat([Twig.expression.type.parameter.end]),
             validate(match, tokens) {
-                if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,4}=>\s{0,4}[`\{$].*[`\}$]/.test(match)){
+                if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
                 }
                 const lastToken = tokens[tokens.length - 1];
@@ -844,13 +844,13 @@ export default function (Twig) {
         {
             type: Twig.expression.type.variable,
             // Match any letter or _, then any number of letters, numbers, _ or -
-            regex: /((^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])|^[a-zA-Z_]\w*)/g,
+            regex: /((^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$]\s{0,2}\w*)|^[a-zA-Z_]\w*)/g,
             next: Twig.expression.set.operationsExtended.concat([
                 Twig.expression.type.parameter.start
             ]),
             compile: Twig.expression.fn.compile.push,
             validate(match) {
-                if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])/g).test(match)) {
+                if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$]\s{0,2}\w*)/g).test(match)) {
                     return true;
                 } else {
                     return (!Twig.expression.reservedWords.includes(match[0]));
@@ -859,7 +859,7 @@ export default function (Twig) {
             parse(token, stack, context) {
                 const state = this;
                 // Get the variable from the context
-                if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,4}=>(\s{0,4}\w*[+,-,==,===,!==,!=,>,<,=>,<=]\w*|\s{0,4}[{`$]{0,1}.*[+,-,*,\/,==,!==,!=,===]{0,1}.*[}`])/g).test(token.value)) {
+                if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$]\s{0,2}\w*)/g).test(token.value)) {
                     return stack.push(eval(token.value));
                 }
                     return Twig.expression.resolveAsync.call(state, context[token.value], context)
