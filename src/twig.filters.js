@@ -189,18 +189,26 @@ export class TwigFilters {
     }
     map(value, params) {
         if (this.Twig.lib.is("Array", value) && this.Twig.lib.is("Function", params[0])) {
-            const arr = value.map(params[0]);
-            console.info(arr);
-            return arr;
-        } else if(this.Twig.lib.is("Object",value) && this.Twig.lib.is("Function",params[0])){
-            if(Object.hasOwn(value,"_keys")){
+            return value.map(params[0]);
+        } else if (this.Twig.lib.is("Object", value) && this.Twig.lib.is("Function", params[0])) {
+            if (Object.hasOwn(value, "_keys")) {
                 delete value._keys;
             }
-            const arr = Object.entries(value).map(params[0]);
-            return arr;
+            return Object.entries(value).map(params[0]);
         } else {
             return;
         }
+    }
+    reduce(value, params) {
+        if (!this.Twig.lib.is("Array", value)) {
+            return;
+        }
+        if (this.Twig.lib.is("Function", params[0]) && params[1]) {
+            return value.reduce(params[0], params[1]);
+        } else if (this.Twig.lib.is("Function", params[0])) {
+            return value.reduce(params[0])
+        }
+
     }
     /* eslint-disable-next-line camelcase */
     url_encode(value) {
@@ -561,7 +569,7 @@ export class TwigFilters {
             return this.Twig.lib.slug(value, { replecement: params[0], locale: params[1] });
         } else if (this.Twig.lib.is("String", value) && params[0]) {
             return this.Twig.lib.slug(value, { replacement: params[0] })
-        } else if (this.Twig.lib.is("String",value)) {
+        } else if (this.Twig.lib.is("String", value)) {
             return this.Twig.lib.slug(value);
         }
     }
@@ -1000,12 +1008,12 @@ export class TwigFilters {
         }
     }
     timezone_name(value) {
-        if(!this.Twig.lib.is("String",value)){
+        if (!this.Twig.lib.is("String", value)) {
             return;
         }
         const local = this.Twig.lib.timeZoneName.display(value);
         const country = value.split("/");
-        return local.standard.name.replace("Standard","")+` (${country[1].replace("_"," ")})`;
+        return local.standard.name.replace("Standard", "") + ` (${country[1].replace("_", " ")})`;
     }
 
     round(value, params) {
