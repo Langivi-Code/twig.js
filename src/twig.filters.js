@@ -426,7 +426,7 @@ export class TwigFilters {
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return this.Twig.lib.date(format.replace(/\\\\/g, '\\'), date);
     }
-    format_date(value, [formatdate, local, timezone]) {
+    format_date(value, [formatdate, timezone, local]) {
         let date = this.Twig.lib.datetime(value);
         let formate = "";
         if (local) {
@@ -478,7 +478,7 @@ export class TwigFilters {
         return resultDate;
     }
 
-    format_time(value, [formattime, local, timezone]) {
+    format_time(value, [formattime, timezone, local]) {
         let date = this.Twig.lib.datetime(value);
         let formate = "";
         if (local) {
@@ -496,7 +496,7 @@ export class TwigFilters {
                 formate += "HH:mm:ss ZZZ"
                 break;
         }
-        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
+        const resultDate = formate.length ? date.format(formate) : date.format("hh:mm:ss a ");
         return resultDate;
 
     }
@@ -512,8 +512,11 @@ export class TwigFilters {
         return mark;
     }
     markdown_to_html(value) {
+        if(!this.Twig.lib.is("String",value)){
+            return;
+        }
         const converter = new this.Twig.lib.showdown.Converter();
-        const html = converter.makeHtml(value);
+        const html = converter.makeHtml(value.trim());
         if (html) {
             return html;
         } else {
@@ -585,6 +588,12 @@ export class TwigFilters {
             return;
         }
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: params[0], ...params[1] }).format(value);
+    }
+    format_number(value,params) {
+        if (value === undefined || value === null) {
+            return;
+        }
+        return new Intl.NumberFormat('en-US', params[0]).format(value);
     }
 
     striptags(value, allowed) {
@@ -1001,7 +1010,7 @@ export class TwigFilters {
             return this.Twig.lib.getLanguageName(value);
         } else if (value.match(/_/) && this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
             const lang = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0], false);
-            return lang.languageName + lang.countryName;
+            return lang.languageName + " " + lang.countryName;
         } else if (this.Twig.lib.is("String", params[0])) {
             return this.Twig.lib.getLanguageName(value, params[0])
         }

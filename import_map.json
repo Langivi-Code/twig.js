@@ -3,6 +3,7 @@
     "path/": "https://deno.land/std@0.129.0/path/",
     "locutus/": "https://cdn.skypack.dev/locutus/",
     "module": "https://deno.land/std@0.129.0/node/module.ts",
+    "iconv":"https://deno.land/x/iconv_lite@v1.0.0/mod.ts",
     "countryLocaleMap": "https://cdn.skypack.dev/country-locale-map/index.js",
     "currenciesMap": "https://cdn.skypack.dev/currencies-map",
     "datauris": "https://deno.land/x/datauri/mod.ts",

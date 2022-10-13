@@ -9,6 +9,7 @@ import strtotime from 'locutus/php/datetime/strtotime.js';
 import date from 'locutus/php/datetime/date.js';
 import boolval from 'locutus/php/var/boolval.js';
 import clm from 'countryLocaleMap';
+import {encode} from "iconv";
 import { Currencies as CurrenciesMap } from 'currenciesMap';
 import { datauri } from "datauris";
 import { lookup } from "lookup";
@@ -25,5 +26,5 @@ import timeZoneName from "timeZoneName"
 
 
 const require = createRequire(Deno.realPathSync("."));
-export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName}
+export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, encode, CurrenciesMap, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName}
 export default require;
