@@ -876,6 +876,15 @@ export class TwigFilters {
             return value.slice(0, 1);
         }
     }
+    column(items,params){
+        if(params === null || params === undefined ){
+            return;
+        }
+        if(!Array.isArray(items)){
+            throw new this.Twig.Error("Item is not array");
+        }
+        return items.map(element => element[params])
+    }
 
     split(value, params) {
         if (value === undefined || value === null) {
