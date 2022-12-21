@@ -1,6 +1,8 @@
 // ## twig.filters.js
 //
 // This file handles parsing filters.
+
+
 // Determine object type
 function is(type, obj) {
     const clas = Object.prototype.toString.call(obj).slice(8, -1);
@@ -12,10 +14,34 @@ export class TwigFilters {
     constructor(Twig) {
         this.Twig = Twig;
     }
-    static addFilter(filters, filterName, definition){
-       filters[filterName] = definition;
+    static addFilter(filters, filterName, definition) {
+        filters[filterName] = definition;
     }
     // String Filters
+
+    country_name(value) {
+        if (typeof value !== 'string') {
+            return value;
+        }
+        const country = this.Twig.lib.clm.getCountryByAlpha2(value);
+        return country.name;
+    }
+
+    currency_name(value) {
+        if (typeof value !== 'string') {
+            return value;
+        }
+        const currency = this.Twig.lib.currenciesMap.names.get(value);
+        return currency;
+    }
+
+    currency_symbol(value) {
+        if (typeof value !== 'string') {
+            return value;
+        }
+        const symbol = this.Twig.lib.currenciesMap.symbols.get(value);
+        return symbol;
+    }
     upper(value) {
         if (typeof value !== 'string') {
             return value;
@@ -60,6 +86,13 @@ export class TwigFilters {
         }
 
         return 0;
+    }
+    convert_encoding(value, params) {
+        if (params.length != 2) {
+            throw new this.Twig.Error("Two parameters expected");
+        }
+        const encode = this.Twig.lib.encode(value, params[1]);
+        return encode.toString();
     }
 
     // Array/Object Filters
@@ -128,6 +161,13 @@ export class TwigFilters {
             return value;
         }
     }
+    filter(value, params) {
+        if (!is("Array", value) || !is("Function", params[0])) {
+            return;
+        }
+        return value.filter(params[0]);
+
+    }
     keys(value) {
         if (value === undefined || value === null) {
             return;
@@ -146,6 +186,29 @@ export class TwigFilters {
             }
         });
         return output;
+    }
+    map(value, params) {
+        if (this.Twig.lib.is("Array", value) && this.Twig.lib.is("Function", params[0])) {
+            return value.map(params[0]);
+        } else if (this.Twig.lib.is("Object", value) && this.Twig.lib.is("Function", params[0])) {
+            if (Object.hasOwn(value, "_keys")) {
+                delete value._keys;
+            }
+            return Object.entries(value).map(params[0]);
+        } else {
+            return;
+        }
+    }
+    reduce(value, params) {
+        if (!this.Twig.lib.is("Array", value)) {
+            return;
+        }
+        if (this.Twig.lib.is("Function", params[0]) && params[1]) {
+            return value.reduce(params[0], params[1]);
+        } else if (this.Twig.lib.is("Function", params[0])) {
+            return value.reduce(params[0])
+        }
+
     }
     /* eslint-disable-next-line camelcase */
     url_encode(value) {
@@ -183,6 +246,19 @@ export class TwigFilters {
         result = result.replace('\'', '%27');
         return result;
     }
+    data_uri(value) {
+        if (!value) {
+            return;
+        }
+        if (value.match(/<[^<>]+>/g)) {
+            return `data:"text/html";base64,${btoa(value)}`;
+        } else {
+            const content = Deno.readFileSync(value);
+            const data = `data:${this.Twig.lib.lookup(value)};base64,${this.Twig.lib.fromUint8Array(content)}`;
+            return data;
+        }
+    }
+
     join(value, params) {
         if (value === undefined || value === null) {
             return;
@@ -270,12 +346,12 @@ export class TwigFilters {
         if (is('Array', value)) {
             params.forEach(param => {
                 if (!is('Array', param)) {
-                    obj = { };
+                    obj = {};
                 }
             });
         } else {
             // Create obj as an Object
-            obj = { };
+            obj = {};
         }
 
         if (!is('Array', obj)) {
@@ -350,6 +426,104 @@ export class TwigFilters {
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return this.Twig.lib.date(format.replace(/\\\\/g, '\\'), date);
     }
+    format_date(value, [formatdate, timezone, local]) {
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if (local) {
+            date = date.setLocale(local);
+        } else if (timezone) {
+            date = date.toZonedTime(timezone);
+        }
+        switch (formatdate) {
+            case "none":
+                break;
+            case "short":
+                formate += "dd/MM/YYYY";
+                break;
+            case "full":
+                formate += "wwww d MMMM YYYY"
+        }
+
+        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
+        return resultDate;
+    }
+    format_datetime(value, [formatdate, formattime, local, timezone]) {
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if (local) {
+            date = date.setLocale(local);
+        } else if (timezone) {
+            date = date.toZonedTime(timezone);
+        }
+        switch (formatdate) {
+            case "none":
+                break;
+            case "short":
+                formate += "dd/MM/YYYY";
+                break;
+            case "full":
+                formate += "wwww d MMMM YYYY"
+        }
+        switch (formattime) {
+            case "none":
+                break;
+            case "short":
+                formate += " HH:mm";
+                break;
+            case "full":
+                formate += "HH:mm:ss ZZZ"
+                break;
+        }
+        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
+        return resultDate;
+    }
+
+    format_time(value, [formattime, timezone, local]) {
+        let date = this.Twig.lib.datetime(value);
+        let formate = "";
+        if (local) {
+            date = date.setLocale(local);
+        } else if (timezone) {
+            date = date.toZonedTime(timezone);
+        }
+        switch (formattime) {
+            case "none":
+                break;
+            case "short":
+                formate += " HH:mm";
+                break;
+            case "full":
+                formate += "HH:mm:ss ZZZ"
+                break;
+        }
+        const resultDate = formate.length ? date.format(formate) : date.format("hh:mm:ss a ");
+        return resultDate;
+
+    }
+    html_to_markdown(value) {
+        if (!is("String", value)) {
+            return;
+        }
+        const parseString = new this.Twig.lib.domParser();
+        const TurndownService = new this.Twig.lib.turndown();
+        const domDoc = parseString.parseFromString(value, 'text/html');
+        if (!domDoc) { throw `failed to parse doc` }
+        const mark = TurndownService.turndown(domDoc);
+        return mark;
+    }
+    markdown_to_html(value) {
+        if(!this.Twig.lib.is("String",value)){
+            return;
+        }
+        const converter = new this.Twig.lib.showdown.Converter();
+        const html = converter.makeHtml(value.trim());
+        if (html) {
+            return html;
+        } else {
+            return;
+        }
+
+    }
     /* eslint-disable-next-line camelcase */
     date_modify(value, params) {
         if (value === undefined || value === null) {
@@ -393,13 +567,33 @@ export class TwigFilters {
 
         return value;
     }
-
+    slug(value, params) {
+        if (this.Twig.lib.is("String", value) && params[0] && params[1]) {
+            return this.Twig.lib.slug(value, { replecement: params[0], locale: params[1] });
+        } else if (this.Twig.lib.is("String", value) && params[0]) {
+            return this.Twig.lib.slug(value, { replacement: params[0] })
+        } else if (this.Twig.lib.is("String", value)) {
+            return this.Twig.lib.slug(value);
+        }
+    }
     format(value, params) {
         if (value === undefined || value === null) {
             return;
         }
 
         return this.Twig.lib.vsprintf(value, params);
+    }
+    format_currency(value, params) {
+        if (value === undefined || value === null) {
+            return;
+        }
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: params[0], ...params[1] }).format(value);
+    }
+    format_number(value,params) {
+        if (value === undefined || value === null) {
+            return;
+        }
+        return new Intl.NumberFormat('en-US', params[0]).format(value);
     }
 
     striptags(value, allowed) {
@@ -811,6 +1005,35 @@ export class TwigFilters {
 
         return result;
     }
+    language_name(value, params) {
+        if (!params && this.Twig.lib.is("String", value)) {
+            return this.Twig.lib.getLanguageName(value);
+        } else if (value.match(/_/) && this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
+            const lang = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0], false);
+            return lang.languageName + " " + lang.countryName;
+        } else if (this.Twig.lib.is("String", params[0])) {
+            return this.Twig.lib.getLanguageName(value, params[0])
+        }
+    }
+    locale_name(value, params) {
+        if (this.Twig.lib.is("String", value) && !params) {
+            return this.Twig.lib.getLanguageNameWithCountry(value).languageName;
+        } else if (this.Twig.lib.is("String", value) && value.match(/_/) && this.Twig.lib.is("String", params[0]) && params[0].match(/_/)) {
+            const { countryName, languageName } = this.Twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0]);
+            return languageName + "(" + countryName + ")";
+        } else if (this.Twig.lib.is("String", value) && this.Twig.lib.is("String", params[0])) {
+            return this.Twig.lib.getLanguageNameWithCountry(value, params[0]).languageName;
+        }
+    }
+    timezone_name(value) {
+        if (!this.Twig.lib.is("String", value)) {
+            return;
+        }
+        const local = this.Twig.lib.timeZoneName.display(value);
+        const country = value.split("/");
+        return local.standard.name.replace("Standard", "") + ` (${country[1].replace("_", " ")})`;
+    }
+
     round(value, params) {
         params = params || [];
 

@@ -1,5 +1,6 @@
 // ## twig.functions.js
 //
+
 // This file handles parsing filters.
 export default function (Twig) {
     /**
@@ -220,6 +221,83 @@ export default function (Twig) {
                 return block.render(state, state.context);
             }
         },
+        include(name, secondArg, thirdArg) {
+            let paramsInclude;
+            let ignoreMissing;
+            let templateTwig;
+            let templateFound = false;
+            const isNodeEnvironment = typeof module !== 'undefined' && typeof module.exports !== 'undefined' && typeof window === 'undefined' || typeof Deno !== "undefined";
+            let loader;
+            const path = name;
+            const state = this;
+           
+            if (Twig.lib.is("Object", secondArg)) {
+                paramsInclude = secondArg;
+            }else if (Twig.lib.is("Boolean",secondArg)){
+                 ignoreMissing = secondArg;
+            }
+
+            if(Twig.lib.is("Boolean",thirdArg)){
+                ignoreMissing = thirdArg;
+            }
+            // If we are running in a node.js environment, set the loader to 'fs'.
+            if (isNodeEnvironment) {
+                loader = 'fs';
+            } else {
+                loader = 'ajax';
+            }
+
+            // Build the params object
+            const paramsLoad = {
+                id: name,
+                path,
+                method: loader,
+                parser: 'twig',
+                async: false,
+                fetchTemplateSource: true
+            };
+
+            // Default ignoreMissing to false
+            if (typeof ignoreMissing === 'undefined') {
+                ignoreMissing = false;
+            }
+
+            // Try to load the remote template
+            //
+            // on exception, log it
+            try {
+                templateTwig = Twig.Templates.loadRemote(name, paramsLoad);
+
+                // If the template is undefined or null, set the template to an empty string and do NOT flip the
+                // boolean indicating we found the template
+                //
+                // else, all is good! flip the boolean indicating we found the template
+                if (typeof templateTwig === 'undefined' || templateTwig === null) {
+                    templateTwig = '';
+                } else {
+                    templateFound = true;
+                }
+            } catch (error) {
+                Twig.log.debug('Twig.functions.source: ', 'Problem loading template  ', error);
+            }
+
+            // If the template was NOT found AND we are not ignoring missing templates, return the same message
+            // that is returned by the PHP implementation of the twig source() function
+            //
+            // else, return the template source
+            if (!templateFound && !ignoreMissing) {
+                return TEMPLATE_NOT_FOUND_MESSAGE.replace('{name}', name);
+            } else if (!templateFound && ignoreMissing) {
+                return;
+            }
+            const params = this.context;
+            templateTwig.options = { ...this.options };
+            if(Twig.lib.is("Object",paramsInclude)){
+                state.context = {...state.context, ...paramsInclude};
+            }
+
+            return templateTwig.render(state.context);
+        },
         parent() {
             const state = this;
 
@@ -307,10 +385,9 @@ export default function (Twig) {
         source(name, ignoreMissing) {
             let templateSource;
             let templateFound = false;
-            const isNodeEnvironment = typeof module !== 'undefined' && typeof module.exports !== 'undefined' && typeof window === 'undefined';
+            const isNodeEnvironment = typeof module !== 'undefined' && typeof module.exports !== 'undefined' && typeof window === 'undefined' || typeof Deno !== 'undefined';
             let loader;
             const path = name;
-
             // If we are running in a node.js environment, set the loader to 'fs'.
             if (isNodeEnvironment) {
                 loader = 'fs';
@@ -359,7 +436,6 @@ export default function (Twig) {
             if (!templateFound && !ignoreMissing) {
                 return TEMPLATE_NOT_FOUND_MESSAGE.replace('{name}', name);
             }
-
             return templateSource;
         }
     };

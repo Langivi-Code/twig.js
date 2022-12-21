@@ -1,5 +1,5 @@
 import opine from "https://deno.land/x/opine@2.1.3/mod.ts";
-import {renderToString} from "../../mod.js";
+import {renderToString} from "../../src/twig.js";
 const app = opine();
 
 app.engine('twig', renderToString);

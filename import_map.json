@@ -3,6 +3,18 @@
     "path/": "https://deno.land/std@0.129.0/path/",
     "locutus/": "https://cdn.skypack.dev/locutus/",
     "module": "https://deno.land/std@0.129.0/node/module.ts",
-    "countryLocaleMap/": "https://cdn.skypack.dev/country-locale-map/"
+    "iconv":"https://deno.land/x/iconv_lite@v1.0.0/mod.ts",
+    "countryLocaleMap": "https://cdn.skypack.dev/country-locale-map/index.js",
+    "currenciesMap": "https://cdn.skypack.dev/currencies-map",
+    "datauris": "https://deno.land/x/datauri/mod.ts",
+    "lookup": "https://deno.land/x/media_types@v2.3.0/mod.ts",
+    "fromUint8Array": "https://deno.land/x/base64@v0.2.0/mod.ts",
+    "datetime":"https://deno.land/x/ptera/mod.ts",
+    "turndown": "https://cdn.skypack.dev/turndown@7.1.1",
+    "DOMParser":"https://github.com/b-fuze/deno-dom/raw/188d7240e5371caf1b4add8bb7183933d142337e/deno-dom-wasm.ts",
+    "languageName": "https://cdn.skypack.dev/language-name-to-language-name",
+    "showdown":"https://cdn.skypack.dev/showdown",
+    "slug":"https://cdn.skypack.dev/slugify",
+    "timeZoneName":"https://cdn.skypack.dev/spacetime-informal"
   }
 }
