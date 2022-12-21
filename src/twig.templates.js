@@ -153,13 +153,17 @@ export class TwigTemplates {
      *
      * @param {Twig.Template} template   The twig.js template to store.
      */
-    save(template) {
+    async save(template) {
         if (template.id === undefined) {
-            throw new this.#twig.Error('Unable to save template with no id');
+            throw new this.#twig.Error("Unable to save template with no id");
         }
-
-        this.registry[template.id] = template;
-    };
+        const jsonTemplate = JSON.stringify(template);
+        if (await this.#twig.cacher.findCacheFile(template.id)) {
+            return;
+        } else {
+            await this.#twig.cacher.setCache(template.id,jsonTemplate);
+        }
+    }
 
     /**
      * Load a previously saved template from the store.
@@ -196,16 +200,24 @@ export class TwigTemplates {
      *
      *
      */
-    loadRemote(location, params, callback, errorCallback) {
+    async loadRemote(location, params, callback, errorCallback) {
         // Default to the URL so the template is cached.
-        const id = typeof params.id === 'undefined' ? location : params.id;
-        const cached = this.registry[id];
-
-        // Check for existing template
-        if (this.#twig.cache && typeof cached !== 'undefined') {
+        const id =
+            typeof params.id === "undefined"
+                ? this.#twig.lib
+                      .hasher("md5")
+                      .update(location)
+                      .toString()
+                : params.id;
+        let cached;
+        if(await this.#twig.cacher.findCacheFile(id)){
+            cached = await this.#twig.cacher.getCache(id);
+        }
+        if (cached) {
             // A template is already saved with the given id.
-            if (typeof callback === 'function') {
-                callback(cached);
+            if (typeof callback === "function") {
+                const template = await this.#twig.cacher.buildTemplateForCache(cached);
+                callback(template);
             }
             // TODO: if async, return deferred promise
 

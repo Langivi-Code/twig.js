@@ -14,6 +14,7 @@ export class Twig {
     lib;
     path;
     Templates;
+    cacher;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -52,6 +53,10 @@ export class Twig {
 
     setTestsClass(testssSetter) {
         this.tests = testssSetter(this);
+        return this;
+    }
+    setCacheClass(cacherSetter) {
+        this.cacher = cacherSetter(this);
         return this;
     }
 

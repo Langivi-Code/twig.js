@@ -24,6 +24,7 @@ import {Twig} from "./twig.exports.js";
 import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
 import {TwigTemplates} from "./twig.templates.js";
+import { TwigCache } from "./twig.cache.js";
 
 
 function factory() {
@@ -35,6 +36,7 @@ function factory() {
     twig.setPathClass((t) => new TwigPath(t));
     twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
+    twig.setCacheClass((t)=>new TwigCache(t));
     functions(twig);
     expression(twig);
     logic(twig);

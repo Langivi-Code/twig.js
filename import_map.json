@@ -3,6 +3,7 @@
     "path/": "https://deno.land/std@0.129.0/path/",
     "locutus/": "https://cdn.skypack.dev/locutus/",
     "module": "https://deno.land/std@0.129.0/node/module.ts",
-    "countryLocaleMap/": "https://cdn.skypack.dev/country-locale-map/"
+    "countryLocaleMap/": "https://cdn.skypack.dev/country-locale-map/",
+    "hasher": "https://deno.land/std@0.91.0/hash/mod.ts"
   }
 }
