@@ -1,20 +1,28 @@
 {
   "imports": {
     "path/": "https://deno.land/std@0.129.0/path/",
-    "locutus/": "https://cdn.skypack.dev/locutus/",
+    "sprintf": "npm:locutus@^2.0.16/php/strings/sprintf.js",
+    "vsprintf": "npm:locutus@^2.0.16/php/strings/vsprintf.js",
+    "strip_tags": "npm:locutus@^2.0.16/php/strings/strip_tags.js",
+    "round":"npm:locutus@^2.0.16/php/math/round.js",
+    "max":"npm:locutus@^2.0.16/php/math/max.js",
+    "min":"npm:locutus@^2.0.16/php/math/min.js",
+    "strtotime":"npm:locutus@^2.0.16/php/datetime/strtotime.js",
+    "date":"npm:locutus@^2.0.16/php/datetime/date.js",
+    "boolval":"npm:locutus@^2.0.16/php/var/boolval.js",
     "module": "https://deno.land/std@0.129.0/node/module.ts",
     "iconv":"https://deno.land/x/iconv_lite@v1.0.0/mod.ts",
-    "countryLocaleMap": "https://cdn.skypack.dev/country-locale-map/index.js",
+    "countryLocaleMap": "npm:country-locale-map@^1.8.11",
     "currenciesMap": "https://cdn.skypack.dev/currencies-map",
     "datauris": "https://deno.land/x/datauri/mod.ts",
     "lookup": "https://deno.land/x/media_types@v2.3.0/mod.ts",
     "fromUint8Array": "https://deno.land/x/base64@v0.2.0/mod.ts",
     "datetime":"https://deno.land/x/ptera/mod.ts",
-    "turndown": "https://cdn.skypack.dev/turndown@7.1.1",
+    "turndown": "npm:turndown@^7.1.1",
     "DOMParser":"https://github.com/b-fuze/deno-dom/raw/188d7240e5371caf1b4add8bb7183933d142337e/deno-dom-wasm.ts",
-    "languageName": "https://cdn.skypack.dev/language-name-to-language-name",
-    "showdown":"https://cdn.skypack.dev/showdown",
-    "slug":"https://cdn.skypack.dev/slugify",
-    "timeZoneName":"https://cdn.skypack.dev/spacetime-informal"
+    "languageName": "npm:language-name-to-language-name@^0.5.1",
+    "showdown":"npm:showdown@^2.1.0",
+    "slug":"npm:slugify@^1.6.5",
+    "timeZoneName":"npm:spacetime-informal@^0.6.1"
   }
 }
