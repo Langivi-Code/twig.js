@@ -5,7 +5,8 @@
 // Copies of the licenses for the code included here can be found in the
 // LICENSES.md file.
 //
-import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, createHash} from './twig.deps.js';
+
+import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName, getLanguageNameWithCountry, showdown, slug, timeZoneName, encode, createHash} from './twig.deps.js';
 
 
 class TwigLib {
@@ -19,8 +20,22 @@ class TwigLib {
         this.strtotime = strtotime;
         this.date = date;
         this.boolval = boolval;
+        this.encode = encode;
         this.clm = clm;
         this.hasher = createHash;
+        this.currenciesMap = Currencies;
+        this.datauri = datauri;
+        this.lookup = lookup;
+        this.fromUint8Array = fromUint8Array;
+        this.datetime = datetime;
+        this.turndown = turndown;
+        this.domParser = DOMParser;
+        this.languageName = langToLang;
+        this.getLanguageName = getLanguageName;
+        this.getLanguageNameWithCountry = getLanguageNameWithCountry;
+        this.showdown = showdown;
+        this.slug = slug;
+        this.timeZoneName = timeZoneName;
     }
 
     is(type, obj) {
@@ -39,6 +54,8 @@ class TwigLib {
                 return (typeof obj === 'number' || obj instanceof Number);
             case 'Function':
                 return (typeof obj === 'function');
+            case 'Boolean':
+                return (typeof obj === "boolean" || obj instanceof Boolean);
             case 'Object':
                 return obj instanceof Object;
             default:
