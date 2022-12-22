@@ -200,7 +200,7 @@ export class TwigTemplates {
      *
      *
      */
-    async loadRemote(location, params, callback, errorCallback) {
+    async loadRemote(location, params) {
         // Default to the URL so the template is cached.
         const id =
             typeof params.id === "undefined"
@@ -214,14 +214,7 @@ export class TwigTemplates {
             cached = await this.#twig.cacher.getCache(id);
         }
         if (cached) {
-            // A template is already saved with the given id.
-            if (typeof callback === "function") {
-                const template = await this.#twig.cacher.buildTemplateForCache(cached);
-                callback(template);
-            }
-            // TODO: if async, return deferred promise
-
-            return cached;
+                return this.#twig.cacher.buildTemplateForCache(cached);
         }
 
         // If the parser name hasn't been set, default it to twig
@@ -235,6 +228,8 @@ export class TwigTemplates {
 
         // Assume 'fs' if the loader is not defined
         const loader = this.loaders[params.method] || this.loaders.fs;
-        return loader.call(this, location, params, callback, errorCallback);
+        return new Promise((resolve,reject)=>{
+            loader.call(this,location,params,resolve,reject);
+        });
     }
 }

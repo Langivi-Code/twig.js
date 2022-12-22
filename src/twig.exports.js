@@ -135,7 +135,7 @@ export class Twig {
                 async: params.async,
                 options
 
-            }, params.load, params.error);
+            }).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
         }
 
         if (params.href !== undefined) {
@@ -149,7 +149,7 @@ export class Twig {
                 async: params.async,
                 options
 
-            }, params.load, params.error);
+            }).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
         }
 
         if (params.path !== undefined) {
@@ -162,7 +162,7 @@ export class Twig {
                 precompiled: params.precompiled,
                 async: params.async,
                 options
-            }, params.load, params.error);
+            }, ).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
         }
     }
 
