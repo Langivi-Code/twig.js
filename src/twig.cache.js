@@ -18,17 +18,17 @@ class TwigCache {
         }
     }
 
-    async findCacheFile(id) {
+    findCacheFile(id) {
         try {
-            await Deno.stat(`./cache/${id}.txt`);
-            return true;
+             Deno.statSync(`./cache/${id}.txt`);
+         return true;
         } catch(e) {
             if(e instanceof Deno.errors.NotFound){
-                return false;  
+        return false;
             }else{
                 throw e;
             }
-        }
+       }
     }
 
     async setCache(id, template) {
@@ -39,9 +39,9 @@ class TwigCache {
         }
     }
 
-    async getCache(id) {
+    getCache(id) {
         try {
-            const cacheJson = await Deno.readTextFile(`./cache/${id}.txt`);
+            const cacheJson =  Deno.readTextFileSync(`./cache/${id}.txt`);
             const cache = JSON.parse(cacheJson);
             return cache;
         } catch (e) {

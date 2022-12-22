@@ -21,7 +21,7 @@
         </p>
         <hr style="border-top: 2px dotted black" />
       </div>
-      <div>
+       <div>
         <p>
           Function Country TimeZone
         </p>
@@ -39,13 +39,13 @@
         </p>
         <hr style="border-top: 2px dotted black" />
       </div>
-      <div>
+      {#<div>
         <p>
           Function include
         </p>
         {{ include('view/header.twig') }}
         <hr style="border-top: 2px dotted black" />
-      </div>
+      </div>#}
       <div>
         <p>
           Filter convert_encoding
@@ -54,6 +54,7 @@
         {{ data|convert_encoding('UTF-8', 'cesu8') }}
         <hr style="border-top: 2px dotted black" />
       </div>
+      
       <div>
         <p>
           Filter country_name
@@ -144,7 +145,7 @@
         <p>{{ '12.345'|format_number({maximumFractionDigits: 2}) }}</p>
         <p>{{ '1000000'|format_number({minimumFractionDigits: 4}) }}</p>
         <hr style="border-top: 2px dotted black" />
-      </div>
+      </div> 
       <div>
         <p>
           Filter format_time
@@ -153,7 +154,7 @@
         <p>{{ '2019-08-07 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
          <hr style="border-top: 2px dotted black" />
       </div>
-      <div>
+      {# <div>
         <p>
           Filter html_to_markdown
         </p>
@@ -167,7 +168,7 @@
         {{ include('view/header.twig')|html_to_markdown }}
         </p>
          <hr style="border-top: 2px dotted black" />
-      </div>
+      </div> #}
       <div>
         <p>
           Filter language_name

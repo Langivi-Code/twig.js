@@ -157,6 +157,7 @@ export class TwigTemplates {
         if (template.id === undefined) {
             throw new this.#twig.Error("Unable to save template with no id");
         }
+        
         const jsonTemplate = JSON.stringify(template);
         if (await this.#twig.cacher.findCacheFile(template.id)) {
             return;
@@ -200,7 +201,7 @@ export class TwigTemplates {
      *
      *
      */
-    async loadRemote(location, params) {
+    loadRemote(location, params, returnPromise = false) {
         // Default to the URL so the template is cached.
         const id =
             typeof params.id === "undefined"
@@ -208,13 +209,21 @@ export class TwigTemplates {
                       .hasher("md5")
                       .update(location)
                       .toString()
-                : params.id;
+                : this.#twig.lib
+                .hasher("md5")
+                .update(params.id)
+                .toString();
         let cached;
-        if(await this.#twig.cacher.findCacheFile(id)){
-            cached = await this.#twig.cacher.getCache(id);
+        if(this.#twig.cacher.findCacheFile(id)){
+            cached = this.#twig.cacher.getCache(id);
         }
         if (cached) {
-                return this.#twig.cacher.buildTemplateForCache(cached);
+                if(returnPromise){
+                    return this.#twig.cacher.buildTemplateForCache(cached);
+                }else{
+                    return new Promise(resolve=>{resolve(this.#twig.cacher.buildTemplateForCache(cached))})
+                }
+               
         }
 
         // If the parser name hasn't been set, default it to twig
@@ -228,6 +237,9 @@ export class TwigTemplates {
 
         // Assume 'fs' if the loader is not defined
         const loader = this.loaders[params.method] || this.loaders.fs;
+        if(returnPromise){
+            return loader.call(this,location,params);
+        }
         return new Promise((resolve,reject)=>{
             loader.call(this,location,params,resolve,reject);
         });
