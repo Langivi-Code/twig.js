@@ -1,90 +1,52 @@
-import requireNode from "./twig.deps.js";
 export default function  (Twig) {
-    'use strict';
-
-    let fs;
-    let path;
-
-    try {
-        // Require lib dependencies at runtime
-        var Deno;
-        if (Deno) {
-            console.log('req');
-
-            fs = requireNode('fs');
-            path = requireNode('path');
-        } else {
-            fs = requireNode('fs');
-            path = requireNode('path');
-        }
-    } catch (error) {
-        // NOTE: this is in a try/catch to avoid errors cross platform
-        console.warn('Missing fs and path modules. ' + error);
-    }
-
-    Twig.Templates.registerLoader('fs', function (location, params, callback, errorCallback) {
+    Twig.Templates.registerLoader('fs', function (location, params) {
         let template;
         let data = null;
         const {precompiled} = params;
         const parser = this.parsers[params.parser] || this.parser.twig;
-
-        if (!fs || !path) {
-            throw new Twig.Error('Unsupported platform: Unable to load from file ' +
-                                 'because there is no "fs" or "path" implementation');
-        }
-
-        const loadTemplateFn = function (err, data) {
-            if (err) {
-                if (typeof errorCallback === 'function') {
-                    errorCallback(err);
-                }
-
-                return;
-            }
-
+        const loadTemplateFn = function (data) {
             if (precompiled === true) {
                 data = JSON.parse(data);
             }
-
             params.data = data;
             params.path = params.path || location;
 
             // Template is in data
             template = parser.call(this, params);
-
-            if (typeof callback === 'function') {
-                callback(template);
-            }
         };
 
         params.path = params.path || location;
 
         if (params.async) {
-            fs.stat(params.path, (err, stats) => {
-                if (err || !stats.isFile()) {
-                    if (typeof errorCallback === 'function') {
-                        errorCallback(new Twig.Error('Unable to find template file ' + params.path));
+            return new Promise(async function (res,rej){
+                try{
+                    if(await Deno.stat(params.path)){
+                        let data = await Deno.readTextFile(params.path);
+                        if (precompiled === true) {
+                            data = JSON.parse(data);
+                        }
+                        params.data = data;
+                        params.path = params.path || location;
+                        const template = parser.call(this, params);
+                        res(template);
                     }
-
+                }catch(e){
+                    rej(new Twig.Error('Unable to find template file ' + params.path));
                     return;
                 }
-
-                fs.readFile(params.path, 'utf8', loadTemplateFn);
-            });
-            // TODO: return deferred promise
-            return true;
+            })
         }
 
         try {
-            if (!fs.statSync(params.path).isFile()) {
+            if (!Deno.statSync(params.path)) {
                 throw new Twig.Error('Unable to find template file ' + params.path);
             }
         } catch (error) {
             throw new Twig.Error('Unable to find template file ' + params.path + '. ' + error);
         }
 
-        data = fs.readFileSync(params.path, 'utf8');
-        loadTemplateFn(undefined, data);
+        data = Deno.readTextFileSync(params.path);
+        loadTemplateFn(data);
         return template;
     });
 };

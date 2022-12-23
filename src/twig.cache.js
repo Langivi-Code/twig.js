@@ -3,19 +3,7 @@ class TwigCache {
 
     constructor(twig) {
         this.#twig = twig;
-        this.findCacheDir();
-    }
-
-    async findCacheDir() {
-        try {
-            await Deno.stat("./cache");
-        } catch (e) {
-            if (e instanceof Deno.errors.NotFound) {
-                await Deno.mkdir("./cache");
-            } else {
-                throw e;
-            }
-        }
+        this.#twig.lib.ensureDir("./cache");
     }
 
     findCacheFile(id) {

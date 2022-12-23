@@ -201,7 +201,7 @@ export class TwigTemplates {
      *
      *
      */
-    loadRemote(location, params, returnPromise = false) {
+    loadRemote(location, params) {
         // Default to the URL so the template is cached.
         const id =
             typeof params.id === "undefined"
@@ -213,35 +213,29 @@ export class TwigTemplates {
                 .hasher("md5")
                 .update(params.id)
                 .toString();
+          // Default to async
+        if (typeof params.async === 'undefined') {
+            params.async = true;
+        }
+
         let cached;
         if(this.#twig.cacher.findCacheFile(id)){
             cached = this.#twig.cacher.getCache(id);
         }
         if (cached) {
-                if(returnPromise){
-                    return this.#twig.cacher.buildTemplateForCache(cached);
-                }else{
-                    return new Promise(resolve=>{resolve(this.#twig.cacher.buildTemplateForCache(cached))})
-                }
-               
+            const buildcache = this.#twig.cacher.buildTemplateForCache(cached);
+            if(!params.async ){
+                return buildcache;
+            }
+            return new Promise(resolve=>{resolve(buildcache)});
         }
 
         // If the parser name hasn't been set, default it to twig
         params.parser = params.parser || 'twig';
         params.id = id;
 
-        // Default to async
-        if (typeof params.async === 'undefined') {
-            params.async = true;
-        }
-
         // Assume 'fs' if the loader is not defined
         const loader = this.loaders[params.method] || this.loaders.fs;
-        if(returnPromise){
-            return loader.call(this,location,params);
-        }
-        return new Promise((resolve,reject)=>{
-            loader.call(this,location,params,resolve,reject);
-        });
+        return loader.call(this,location,params);
     }
 }

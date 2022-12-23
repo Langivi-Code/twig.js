@@ -266,7 +266,7 @@ export default function (Twig) {
             //
             // on exception, log it
             try {
-                templateTwig = Twig.Templates.loadRemote(name, paramsLoad, true);
+                templateTwig = Twig.Templates.loadRemote(name, paramsLoad);
                 // If the template is undefined or null, set the template to an empty string and do NOT flip the
                 // boolean indicating we found the template
                 //

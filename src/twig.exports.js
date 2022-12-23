@@ -78,7 +78,7 @@ export class Twig {
      *
      * @return {Twig.Template} A Twig template ready for rendering.
      */
-    twig(params) {
+    async twig(params) {
         'use strict';
         const {id} = params;
         const options = {
@@ -124,22 +124,27 @@ export class Twig {
             if (!this.Templates.isRegisteredLoader(params.method)) {
                 throw new Twig.Error('Loader for "' + params.method + '" is not defined.');
             }
-
-            return this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
-                id,
-                method: params.method,
-                parser: params.parser || 'twig',
-                base: params.base,
-                module: params.module,
-                precompiled: params.precompiled,
-                async: params.async,
-                options
-
-            }).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
+            try{
+               const template = await this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
+                    id,
+                    method: params.method,
+                    parser: params.parser || 'twig',
+                    base: params.base,
+                    module: params.module,
+                    precompiled: params.precompiled,
+                    async: params.async,
+                    options
+                });
+                params.load(template);
+            }catch(e){  
+                params.error(e);
+            }
+           
         }
 
         if (params.href !== undefined) {
-            return this.Templates.loadRemote(params.href, {
+            try{
+                const template = await this.Templates.loadRemote(params.href, {
                 id,
                 method: 'ajax',
                 parser: params.parser || 'twig',
@@ -148,12 +153,16 @@ export class Twig {
                 precompiled: params.precompiled,
                 async: params.async,
                 options
-
-            }).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
+                });
+                params.load(template);
+            }catch(e){
+                params.error(e);
+            }
         }
 
         if (params.path !== undefined) {
-            return this.Templates.loadRemote(params.path, {
+            try{ 
+                const template = await this.Templates.loadRemote(params.path, {
                 id,
                 method: 'fs',
                 parser: params.parser || 'twig',
@@ -162,7 +171,11 @@ export class Twig {
                 precompiled: params.precompiled,
                 async: params.async,
                 options
-            }, ).then(resolve=>params.load(resolve)).catch(reject=>params.error(reject));
+                });
+                params.load(template);
+            }catch(e){
+                params.error(e);
+            }
         }
     }
 
@@ -232,6 +245,7 @@ export class Twig {
             load(template) {
                 // Render and return template as a simple string, see https://github.com/twigjs/twig.js/pull/348 for more information
                 if (!viewOptions || !viewOptions.allowAsync) {
+                    console.log("TEMP",template);
                     fn(null, String(template.render(options)));
                     return;
                 }
