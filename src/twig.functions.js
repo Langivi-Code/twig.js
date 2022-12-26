@@ -230,7 +230,9 @@ export default function (Twig) {
             let loader;
             const path = name;
             const state = this;
-           
+            if(Twig.lib.is("Object",name) ) {
+                return name.render();
+            }
             if (Twig.lib.is("Object", secondArg)) {
                 paramsInclude = secondArg;
             }else if (Twig.lib.is("Boolean",secondArg)){
