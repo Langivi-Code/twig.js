@@ -24,6 +24,7 @@ import {Twig} from "./twig.exports.js";
 import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
 import {TwigTemplates} from "./twig.templates.js";
+import { TwigTemplate } from "./twig.template.js";
 
 
 function factory() {
@@ -35,12 +36,13 @@ function factory() {
     twig.setPathClass((t) => new TwigPath(t));
     twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
+    twig.setTemplateClass(TwigTemplate);
     functions(twig);
     expression(twig);
     logic(twig);
 
     twig.Templates.registerParser('twig', params => {
-        return new twig.Template(params);
+        return new twig.Template(twig,params);
     });
 
     twig.Templates.registerParser('source', params => {

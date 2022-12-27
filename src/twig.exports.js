@@ -14,6 +14,7 @@ export class Twig {
     lib;
     path;
     Templates;
+    Template;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -24,7 +25,6 @@ export class Twig {
         // Express 3 handler
         this.__express = this.renderFile;
     }
-
     setCompile(compilerSetter) {
         this.compiler = compilerSetter(this);
         return this;
@@ -52,6 +52,11 @@ export class Twig {
 
     setTestsClass(testssSetter) {
         this.tests = testssSetter(this);
+        return this;
+    }
+
+    setTemplateClass(templateSetter) {
+        this.Template = templateSetter;
         return this;
     }
 

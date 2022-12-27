@@ -24,9 +24,6 @@ export default function (Twig) {
         return Twig.logic.parse.call(state, token, context, chain, true);
     };
 
-    Twig.Template.prototype.renderAsync = function (context, params) {
-        return this.render(context, params, true);
-    };
 
     Twig.async = {};
 

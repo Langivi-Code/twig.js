@@ -9,7 +9,7 @@ export default function  (Twig) {
         // Require lib dependencies at runtime
         var Deno;
         if (Deno) {
-            console.log('req');
+            // console.log('req');
 
             fs = requireNode('fs');
             path = requireNode('path');
