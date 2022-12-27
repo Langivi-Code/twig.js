@@ -25,6 +25,7 @@
     "languageName": "npm:language-name-to-language-name@^0.5.1",
     "showdown":"npm:showdown@^2.1.0",
     "slug":"npm:slugify@^1.6.5",
-    "timeZoneName":"npm:spacetime-informal@^0.6.1"
+    "timeZoneName":"npm:spacetime-informal@^0.6.1",
+    "ensureDir":"https://deno.land/std@0.168.0/fs/ensure_dir.ts"
   }
 }
