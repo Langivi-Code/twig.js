@@ -39,8 +39,16 @@ class TwigCache {
     }
 
     buildTemplateForCache(cached) {
+        if(!(cached.hasOwnProperty("options"))){
+            cached.options = {
+                strictVariables: false,
+                autoescape: false,
+                allowInlineIncludes: false,
+                rethrow: false
+              };
+        }
+        cached.data = cached.tokens;
         const tem = new this.#twig.Template(cached);
-        tem.tokens = cached.tokens;
         return tem;
     }
 }
