@@ -20,7 +20,7 @@ Documentation is available in the [twig.js wiki](https://github.com/twigjs/twig.
 
 ### Feature Support
 
-For a list of supported tags/filters/functions/tests see the [Implementation Notes](https://github.com/twigjs/twig.js/wiki/Implementation-Notes) page on the wiki.
+For a list of supported tags/filters/functions/tests see the [Implementation Notes](https://github.com/LangiviTechnology/twig.js/wiki/Implementation-Notes#feature-support) page on the wiki.
 
 # Install
 
