@@ -245,7 +245,6 @@ export class Twig {
             load(template) {
                 // Render and return template as a simple string, see https://github.com/twigjs/twig.js/pull/348 for more information
                 if (!viewOptions || !viewOptions.allowAsync) {
-                    console.log("TEMP",template);
                     fn(null, String(template.render(options)));
                     return;
                 }
