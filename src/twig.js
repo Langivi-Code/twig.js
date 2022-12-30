@@ -25,10 +25,10 @@ import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
 import {TwigTemplates} from "./twig.templates.js";
 import { TwigTemplate } from "./twig.template.js";
+const twig = new Twig('1.14.0');
 
+function factory(twig) {
 
-function factory() {
-    const twig = new Twig('1.14.0');
     core(twig);
     twig.setCompile((t) => new TwigCompiler(t));
     twig.setFilterClass((t) => new TwigFilters(t));
@@ -39,23 +39,19 @@ function factory() {
     functions(twig);
     expression(twig);
     logic(twig);
-
+    async(twig);
+    loaderajax(twig);
+    loaderfs(twig);
     twig.Templates.registerParser('twig', params => {
-        return new TwigTemplate(twig,params);
+        return new TwigTemplate(params);
     });
 
     twig.Templates.registerParser('source', params => {
         return params.data || '';
     });
-
-    async(twig);
-    loaderajax(twig);
-    loaderfs(twig);
-
-    return twig;
 }
 
-const twig = factory();
+factory(twig);
 
 export const renderToString = function (path, options) {
     return new Promise(
