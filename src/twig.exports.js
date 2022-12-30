@@ -56,7 +56,7 @@ export class Twig {
     }
 
     setTemplateClass(templateSetter) {
-        this.Template = templateSetter;
+        this.Template = templateSetter(this);
         return this;
     }
 

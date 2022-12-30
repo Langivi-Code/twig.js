@@ -36,13 +36,13 @@ function factory() {
     twig.setPathClass((t) => new TwigPath(t));
     twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
-    twig.setTemplateClass(TwigTemplate);
+    twig.setTemplateClass((t)=> new TwigTemplate(t));
     functions(twig);
     expression(twig);
     logic(twig);
 
     twig.Templates.registerParser('twig', params => {
-        return new twig.Template(twig,params);
+        return twig.Template.create(params);
     });
 
     twig.Templates.registerParser('source', params => {
