@@ -1,4 +1,3 @@
-import {Twig} from './twig.exports.js';
 export class TwigTemplate{
     #twig;
     base;
@@ -10,11 +9,9 @@ export class TwigTemplate{
     parentTemplate;
     path;
     url;
-    constructor(twig){
-        this.#twig = twig;
-    }
 
-    create(params){
+    constructor(twig, params){
+        this.#twig = twig;
         const {data, id, base, path, url, name, method, options} = params;
 
         // # What is stored in a Twig.Template
@@ -56,8 +53,8 @@ export class TwigTemplate{
         if (id !== undefined) {
             this.#twig.Templates.save(this);
         }
-        return this;
     }
+
     /**
      * Get a block by its name, resolving in the following order:
      *     - blocks defined in the template itself

@@ -14,7 +14,6 @@ export class Twig {
     lib;
     path;
     Templates;
-    Template;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -55,11 +54,6 @@ export class Twig {
         return this;
     }
 
-    setTemplateClass(templateSetter) {
-        this.Template = templateSetter(this);
-        return this;
-    }
-
     merge (target, source, onlyChanged) {
         Object.keys(source).forEach(key => {
             if (onlyChanged && !(key in target)) {
@@ -76,7 +70,7 @@ export class Twig {
      *
      * @param {Object} param Paramteres for creating a Twig template.
      *
-     * @return {Twig.Template} A Twig template ready for rendering.
+     * @return {TwigTemplate} A Twig template ready for rendering.
      */
     twig(params) {
         'use strict';

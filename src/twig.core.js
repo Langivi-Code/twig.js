@@ -1,6 +1,7 @@
 // ## twig.core.js
 //
 // This file handles template level tokenizing, compiling and parsing.
+import { TwigTemplate } from "./twig.template.js";
 export default  function (Twig) {
     'use strict';
 
@@ -767,7 +768,7 @@ export default  function (Twig) {
     /**
      * Holds the state needed to parse a template.
      *
-     * @param {Twig.Template} template The template that the tokens being parsed are associated with.
+     * @param {TwigTemplate} template The template that the tokens being parsed are associated with.
      * @param {Object} blockOverrides Any blocks that should override those defined in the associated template.
      */
     Twig.ParseState = function (template, blockOverrides) {
