@@ -1,6 +1,7 @@
 // ## twig.logic.js
 //
 // This file handles tokenizing, compiling and parsing logic tokens. {% ... %}
+import { TwigTemplate } from "./twig.template.js";
 export default function (Twig) {
     'use strict';
 
@@ -856,7 +857,7 @@ export default function (Twig) {
 
                         const result = files.reduce((acc, file) => {
                             if (acc.render === null) {
-                                if (file instanceof Twig.Template) {
+                                if (file instanceof TwigTemplate) {
                                     return {
                                         render: file.renderAsync(
                                             innerContext,
