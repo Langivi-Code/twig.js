@@ -1,7 +1,5 @@
-[![Known Vulnerabilities](https://snyk.io/test/github/twigjs/twig.js/badge.svg)](https://snyk.io/test/github/twigjs/twig.js)
-[![Build Status](https://secure.travis-ci.org/twigjs/twig.js.svg)](http://travis-ci.org/twigjs/twig.js)
-[![NPM version](https://badge.fury.io/js/twig.svg)](http://badge.fury.io/js/twig)
-[![Gitter](https://badges.gitter.im/twigjs/twig.js.svg)](https://gitter.im/twigjs/twig.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+[![Deno](https://img.shields.io/badge/deno.land-twig.js-brightgreen)](https://deno.land/x/twig@1.16.2)
 
 # About
 
@@ -12,7 +10,7 @@
 Twig.js is a pure JavaScript implementation of the Twig PHP templating language
 (<http://twig.sensiolabs.org/>)
 
-The goal is to provide a library that is compatible with both browsers and server side JavaScript environments such as node.js.
+The goal is to provide a library that is compatible with  server side JavaScript environment such as deno.js.
 
 Twig.js is currently a work in progress and supports a limited subset of the Twig templating language (with more coming).
 
@@ -22,87 +20,43 @@ Documentation is available in the [twig.js wiki](https://github.com/twigjs/twig.
 
 ### Feature Support
 
-For a list of supported tags/filters/functions/tests see the [Implementation Notes](https://github.com/LangiviTechnology/twig.js/wiki/Implementation-Notes) page on the wiki.
+For a list of supported tags/filters/functions/tests see the [Implementation Notes](https://github.com/LangiviTechnology/twig.js/wiki/Implementation-Notes#feature-support) page on the wiki.
 
 # Install
 
-Download the latest twig.js release from github: https://github.com/twigjs/twig.js/releases or via NPM:
-
-```bash
-npm install twig --save
-```
-
-# Bower
-
-A bower package is available from [philsbury](https://github.com/philsbury/twigjs-bower). Please direct any Bower support issues to that repo.
-
-## Browser Usage
-
-Include twig.js or twig.min.js in your page, then:
+Download the latest twig.js release from github: https://github.com/LangiviTechnology/twig.js or via deno.land:
 
 ```js
-var template = Twig.twig({
-    data: 'The {{ baked_good }} is a lie.'
-});
-
-console.log(
-    template.render({baked_good: 'cupcake'})
-);
-// outputs: "The cupcake is a lie."
+import Twig, {renderToString} from 'https://deno.land/x/twig@1.16.2/mod.js'
 ```
 
-## Webpack
+### Usage with Opine
 
-A loader is available from [zimmo.be](https://github.com/zimmo-be/twig-loader).
-
-## Node Usage (npm)
-
-Tested on node >=6.0.
-
-You can use twig in your app with
-
-```js
-var Twig = require('twig'), // Twig module
-    twig = Twig.twig;       // Render function
-```
-
-### Usage without Express
-
-If you don't want to use Express, you can render a template with the following method:
-
-```js
-import Twig from 'twig';
-Twig.renderFile('./path/to/someFile.twig', {foo:'bar'}, (err, html) => {
-  html; // compiled string
-});
-```
-
-### Usage with Express
-
-Twig is compatible with express 2 and 3. You can create an express app using the twig.js templating language by setting the view engine to twig.
+Twig is compatible with Opine. You can create an opine app using the twig.js templating language by setting the view engine to twig.
 
 ### app.js
 
-**Express 3**
+**opine 2.1.3**
 
 ```js
-var Twig = require("twig"),
-    express = require('express'),
-    app = express();
+import opine from "https://deno.land/x/opine@2.1.3/mod.ts";
+import {renderToString} from "../../src/twig.js";
 
-// This section is optional and used to configure twig.
-app.set("twig options", {
-    allow_async: true, // Allow asynchronous compiling
-    strict_variables: false
-});
+const app = opine();
+//specifies a function to process the template
+app.engine('twig', renderToString);
+//specify the folder with templates
+app.set('views',"./view");
+app.set('view engine', 'twig');
+app.set('view cache', true);
 
-app.get('/', function(req, res){
-  res.render('index.twig', {
-    message : "Hello World"
+app.get('/',function(req,res){
+    res.render("index.twig", {
+      message : "Hello World"
   });
 });
+app.listen(3001);
 
-app.listen(9999);
 ```
 
 ## views/index.twig
@@ -111,7 +65,6 @@ app.listen(9999);
 Message of the moment: <b>{{ message }}</b>
 ```
 
-An [Express 2 Example](https://github.com/twigjs/twig.js/wiki/Express-2) is available on the wiki.
 
 # Alternatives
 
@@ -120,21 +73,6 @@ An [Express 2 Example](https://github.com/twigjs/twig.js/wiki/Express-2) is avai
 # Contributing
 
 If you have a change you want to make to twig.js, feel free to fork this repository and submit a pull request on Github. The source files are located in `src/*.js`.
-
-twig.js is built by running `npm run build`
-
-For more details on getting setup, see the [contributing page](https://github.com/twigjs/twig.js/wiki/Contributing) on the wiki.
-
-## Environment Requirements
-When developing on Windows, the repository must be checked out **without** automatic conversion of LF to CRLF. Failure to do so will cause tests that would otherwise pass on Linux or Mac to fail instead.
-
-## Tests
-
-The twig.js tests are written in [Mocha][mocha] and can be invoked with `npm test`.
-
-## License
-
-Twig.js is available under a [BSD 2-Clause License][bsd-2], see the LICENSE file for more information.
 
 ## Acknowledgments
 
