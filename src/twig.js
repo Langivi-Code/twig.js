@@ -9,7 +9,6 @@
 // ## twig.factory.js
 //
 // This file handles creating the Twig library
-import core from "./twig.core.js";
 
 import expression from "./twig.expression.js";
 import functions from "./twig.functions.js";
@@ -19,14 +18,16 @@ import loaderfs from "./twig.loader.fs.js";
 import {TwigTests} from "./twig.tests.js";
 import logic from "./twig.logic.js";
 import async from "./twig.async.js";
-import {Twig} from "./twig.exports.js";
+import {TwigCore} from "./twig.core.js";
 import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
 import {TwigTemplates} from "./twig.templates.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
-const twig = new Twig('1.16.2');
+
+
+const twig = new TwigCore('1.16.2');
 
 function factory(twig) {
 

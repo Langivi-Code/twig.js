@@ -1,5 +1,6 @@
 import TwigError from "./TwigError.js";
-import {Twig} from "./twig.exports.js";
+import {TwigCore} from "./twig.core.js";
+import {twig} from "./twig.js";
 
 function handleException(state, ex) {
     if (state.template.options.rethrow) {
@@ -13,14 +14,14 @@ function handleException(state, ex) {
 
         throw ex;
     } else {
-        Twig.log.error('Error parsing twig template ' + state.template.id + ': ');
+        TwigCore.log.error('Error parsing twig template ' + state.template.id + ': ');
         if (ex.stack) {
-            Twig.log.error(ex.stack);
+            TwigCore.log.error(ex.stack);
         } else {
-            Twig.log.error(ex.toString());
+            TwigCore.log.error(ex.toString());
         }
 
-        if (Twig.debug) {
+        if (TwigCore.debug) {
             return ex.toString();
         }
     }
@@ -52,7 +53,7 @@ export default class TwigParseState {
      * @param {String} name The name of the block to return.
      * @param {Boolean} checkOnlyInheritedBlocks Whether to skip checking the overrides and associated template, will not skip by default.
      *
-     * @return {Twig.Block|undefined}
+     * @return {TwigCore.Block|undefined}
      */
     getBlock(name, checkOnlyInheritedBlocks) {
         let block;
@@ -133,7 +134,6 @@ export default class TwigParseState {
      * @param {Array} tokens The compiled tokens.
      * @param {Object} context The context to set the state to while parsing.
      * @param {Boolean} allowAsync Whether to parse asynchronously.
-     * @param {Object} blocks Blocks that should override any defined while parsing.
      *
      * @return {String} The rendered tokens.
      *
@@ -179,35 +179,35 @@ export default class TwigParseState {
             }
         }
 
-        promise = Twig.async.forEach(tokens, token => {
-            Twig.log.debug('Twig.ParseState.parse: ', 'Parsing token: ', token);
+        promise = TwigCore.async.forEach(tokens, token => {
+            TwigCore.log.debug('Twig.ParseState.parse: ', 'Parsing token: ', token);
 
             switch (token.type) {
-                case Twig.token.type.raw:
-                    output.push(Twig.filters.raw(token.value));
+                case TwigCore.token.type.raw:
+                    output.push(TwigCore.filters.raw(token.value));
                     break;
 
-                case Twig.token.type.logic:
-                    return Twig.logic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
+                case TwigCore.token.type.logic:
+                    return TwigCore.logic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
                         .then(parseTokenLogic);
-                case Twig.token.type.comment:
+                case TwigCore.token.type.comment:
                     // Do nothing, comments should be ignored
                     break;
 
                 // Fall through whitespace to output
-                case Twig.token.type.outputWhitespacePre:
-                case Twig.token.type.outputWhitespacePost:
-                case Twig.token.type.outputWhitespaceBoth:
-                case Twig.token.type.output:
-                    Twig.log.debug('Twig.ParseState.parse: ', 'Output token: ', token.stack);
+                case TwigCore.token.type.outputWhitespacePre:
+                case TwigCore.token.type.outputWhitespacePost:
+                case TwigCore.token.type.outputWhitespaceBoth:
+                case TwigCore.token.type.output:
+                    TwigCore.log.debug('Twig.ParseState.parse: ', 'Output token: ', token.stack);
                     // Parse the given expression in the given context
-                    return Twig.expression.parseAsync.call(state, token.stack, state.context)
+                    return TwigCore.expression.parseAsync.call(state, token.stack, state.context)
                         .then(outputPush);
                 default:
                     break;
             }
         }).then(() => {
-            output = Twig.output.call(state.template, output);
+            output = twig.output.call(state.template, output);
             isAsync = false;
             return output;
         }).catch(error => {

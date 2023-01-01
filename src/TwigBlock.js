@@ -1,9 +1,9 @@
-import {Twig} from "./twig.exports.js";
+import {TwigCore} from "./twig.core.js";
 export default class TwigBlock {
     /**
      * A wrapper for template blocks.
      *
-     * @param  {Twig.Template}template that the block was originally defined in.
+     * @param  {TwigCore.Template}template that the block was originally defined in.
      * @param  {Object} token The compiled block token.
      */
     constructor(template, token) {
@@ -14,7 +14,7 @@ export default class TwigBlock {
     /**
      * Render the block using a specific parse state and context.
      *
-     * @param  {Twig.ParseState} parseState
+     * @param  {TwigCore.ParseState} parseState
      * @param  {Object} context
      *
      * @return {Promise}
@@ -26,17 +26,17 @@ export default class TwigBlock {
         parseState.template = this.template;
 
         if (this.token.expression) {
-            promise = Twig.expression.parseAsync.call(parseState, this.token.output, context);
+            promise = TwigCore.expression.parseAsync.call(parseState, this.token.output, context);
         } else {
             promise = parseState.parseAsync(this.token.output, context);
         }
 
         return promise
             .then(value => {
-                return Twig.expression.parseAsync.call(
+                return TwigCore.expression.parseAsync.call(
                     parseState,
                     {
-                        type: Twig.expression.type.string,
+                        type: TwigCore.expression.type.string,
                         value
                     },
                     context
