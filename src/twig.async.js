@@ -61,7 +61,7 @@ export default function (Twig) {
         }
 
         if (isAsync) {
-            throw new Twig.Error('You are using Twig.js in sync mode in combination with async extensions.');
+            throw new TwigError('You are using Twig.js in sync mode in combination with async extensions.');
         }
 
         return result;

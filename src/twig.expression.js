@@ -2,6 +2,7 @@
 //
 // This file handles tokenizing, compiling and parsing expressions.
 import ExpressionOperator from './twig.expression.operator.js';
+import TwigError from "./TwigError.js";
 export default function (Twig) {
     'use strict';
 
@@ -273,7 +274,7 @@ export default function (Twig) {
                                 keyToken.type === Twig.expression.type.subexpression.end)) {
                             token.params = keyToken.params;
                         } else {
-                            throw new Twig.Error('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
+                            throw new TwigError('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
                         }
 
                         output.push(token);
@@ -485,7 +486,7 @@ export default function (Twig) {
                         });
                 }
 
-                throw new Twig.Error('Unexpected subexpression end when token is not marked as an expression');
+                throw new TwigError('Unexpected subexpression end when token is not marked as an expression');
             }
         },
         {
@@ -580,7 +581,7 @@ export default function (Twig) {
                 }
 
                 if (!arrayEnded) {
-                    throw new Twig.Error('Expected end of parameter set.');
+                    throw new TwigError('Expected end of parameter set.');
                 }
 
                 stack.push(newArray);
@@ -665,7 +666,7 @@ export default function (Twig) {
                 }
 
                 if (!arrayEnded) {
-                    throw new Twig.Error('Expected end of array.');
+                    throw new TwigError('Expected end of array.');
                 }
 
                 stack.push(newArray);
@@ -726,7 +727,7 @@ export default function (Twig) {
 
                     if (token && token.type && (token.type === Twig.expression.type.operator.binary || token.type === Twig.expression.type.operator.unary) && token.key) {
                         if (!hasValue) {
-                            throw new Twig.Error('Missing value for key \'' + token.key + '\' in object definition.');
+                            throw new TwigError('Missing value for key \'' + token.key + '\' in object definition.');
                         }
 
                         newObject[token.key] = value;
@@ -750,7 +751,7 @@ export default function (Twig) {
                 }
 
                 if (!objectEnded) {
-                    throw new Twig.Error('Unexpected end of object.');
+                    throw new TwigError('Unexpected end of object.');
                 }
 
                 stack.push(newObject);
@@ -822,7 +823,7 @@ export default function (Twig) {
                             // Get the function from the user/context defined functions
                             value = context[fn](...params);
                         } else {
-                            throw new Twig.Error(fn + ' function does not exist and is not defined in the context');
+                            throw new TwigError(fn + ' function does not exist and is not defined in the context');
                         }
 
                         return value;
@@ -865,11 +866,11 @@ export default function (Twig) {
                     return Twig.expression.resolveAsync.call(state, context[token.value], context)
                         .then(value => {
                             if (state.template.options.strictVariables && value === undefined) {
-                                throw new Twig.Error('Variable "' + token.value + '" does not exist.');
+                                throw new TwigError('Variable "' + token.value + '" does not exist.');
                             }
                             stack.push(value);
                         });
-                
+
             }
         },
         {
@@ -894,9 +895,9 @@ export default function (Twig) {
                 if (object && !Object.prototype.hasOwnProperty.call(object, key) && state.template.options.strictVariables) {
                     const keys = Object.keys(object);
                     if (keys.length > 0) {
-                        throw new Twig.Error('Key "' + key + '" for object with keys "' + Object.keys(object).join(', ') + '" does not exist.');
+                        throw new TwigError('Key "' + key + '" for object with keys "' + Object.keys(object).join(', ') + '" does not exist.');
                     } else {
-                        throw new Twig.Error('Key "' + key + '" does not exist as the object is empty.');
+                        throw new TwigError('Key "' + key + '" does not exist as the object is empty.');
                     }
                 }
 
@@ -965,9 +966,9 @@ export default function (Twig) {
                         if (object && !Object.prototype.hasOwnProperty.call(object, key) && state.template.options.strictVariables) {
                             const keys = Object.keys(object);
                             if (keys.length > 0) {
-                                throw new Twig.Error('Key "' + key + '" for array with keys "' + keys.join(', ') + '" does not exist.');
+                                throw new TwigError('Key "' + key + '" for array with keys "' + keys.join(', ') + '" does not exist.');
                             } else {
-                                throw new Twig.Error('Key "' + key + '" does not exist as the array is empty.');
+                                throw new TwigError('Key "' + key + '" does not exist as the array is empty.');
                             }
                         } else if (object === null || object === undefined) {
                             return null;
@@ -1122,7 +1123,7 @@ export default function (Twig) {
      */
     Twig.expression.extend = function (definition) {
         if (!definition.type) {
-            throw new Twig.Error('Unable to extend logic definition. No type provided for ' + definition);
+            throw new TwigError('Unable to extend logic definition. No type provided for ' + definition);
         }
 
         Twig.expression.handler[definition.type] = definition;
@@ -1235,9 +1236,9 @@ export default function (Twig) {
             }
             if (!matchFound) {
                 if (invalidMatches.length > 0) {
-                    throw new Twig.Error(invalidMatches.join(' OR '));
+                    throw new TwigError(invalidMatches.join(' OR '));
                 } else {
-                    throw new Twig.Error('Unable to parse \'' + expression + '\' at template position' + expOffset);
+                    throw new TwigError('Unable to parse \'' + expression + '\' at template position' + expOffset);
                 }
             }
         }

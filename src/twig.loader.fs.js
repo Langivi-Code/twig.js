@@ -1,4 +1,5 @@
 import requireNode from "./twig.deps.js";
+import TwigError from "./TwigError.js";
 export default function  (Twig) {
     'use strict';
 
@@ -29,7 +30,7 @@ export default function  (Twig) {
         const parser = this.parsers[params.parser] || this.parser.twig;
 
         if (!fs || !path) {
-            throw new Twig.Error('Unsupported platform: Unable to load from file ' +
+            throw new TwigError('Unsupported platform: Unable to load from file ' +
                                  'because there is no "fs" or "path" implementation');
         }
 
@@ -63,7 +64,7 @@ export default function  (Twig) {
             fs.stat(params.path, (err, stats) => {
                 if (err || !stats.isFile()) {
                     if (typeof errorCallback === 'function') {
-                        errorCallback(new Twig.Error('Unable to find template file ' + params.path));
+                        errorCallback(new TwigError('Unable to find template file ' + params.path));
                     }
 
                     return;
@@ -77,10 +78,10 @@ export default function  (Twig) {
 
         try {
             if (!fs.statSync(params.path).isFile()) {
-                throw new Twig.Error('Unable to find template file ' + params.path);
+                throw new TwigError('Unable to find template file ' + params.path);
             }
         } catch (error) {
-            throw new Twig.Error('Unable to find template file ' + params.path + '. ' + error);
+            throw new TwigError('Unable to find template file ' + params.path + '. ' + error);
         }
 
         data = fs.readFileSync(params.path, 'utf8');

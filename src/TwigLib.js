@@ -1,4 +1,4 @@
-// ## twig.lib.js
+// ## TwigLib.js
 //
 // This file contains 3rd party libraries used within twig.
 //
@@ -86,5 +86,5 @@ class TwigLib {
     };
 
 }
-
+export const twigLib = new TwigLib();
 export {TwigLib};

@@ -3,8 +3,9 @@
 // This file provides extension points and other hooks into the twig functionality.
 
 import {TwigFilters} from "./twig.filters.js";
+import TwigError from "./TwigError.js";
 
-export class Twig {
+class Twig {
     VERSION;
     compiler;
     filters;
@@ -19,11 +20,684 @@ export class Twig {
     trace = false;
     debug = false;
 
+    static noop() {
+    }
+
+    /**
+     * Container for methods related to handling high level template tokens
+     *      (for example: {{ expression }}, {% logic %}, {# comment #}, raw data)
+     */
+    static token = {
+        /**
+         * Token types.
+         */
+        type: {
+            output: 'output',
+            logic: 'logic',
+            comment: 'comment',
+            raw: 'raw',
+            outputWhitespacePre: 'output_whitespace_pre',
+            outputWhitespacePost: 'output_whitespace_post',
+            outputWhitespaceBoth: 'output_whitespace_both',
+            logicWhitespacePre: 'logic_whitespace_pre',
+            logicWhitespacePost: 'logic_whitespace_post',
+            logicWhitespaceBoth: 'logic_whitespace_both'
+        },
+
+        /**
+         * Token syntax definitions.
+         */
+        definitions: [
+            {
+                type: Twig.token.type.raw,
+                open: '{% raw %}',
+                close: '{% endraw %}'
+            },
+            {
+                type: Twig.token.type.raw,
+                open: '{% verbatim %}',
+                close: '{% endverbatim %}'
+            },
+            // *Whitespace type tokens*
+            //
+            // These typically take the form `{{- expression -}}` or `{{- expression }}` or `{{ expression -}}`.
+            {
+                type: Twig.token.type.outputWhitespacePre,
+                open: '{{-',
+                close: '}}'
+            },
+            {
+                type: Twig.token.type.outputWhitespacePost,
+                open: '{{',
+                close: '-}}'
+            },
+            {
+                type: Twig.token.type.outputWhitespaceBoth,
+                open: '{{-',
+                close: '-}}'
+            },
+            {
+                type: Twig.token.type.logicWhitespacePre,
+                open: '{%-',
+                close: '%}'
+            },
+            {
+                type: Twig.token.type.logicWhitespacePost,
+                open: '{%',
+                close: '-%}'
+            },
+            {
+                type: Twig.token.type.logicWhitespaceBoth,
+                open: '{%-',
+                close: '-%}'
+            },
+            // *Output type tokens*
+            //
+            // These typically take the form `{{ expression }}`.
+            {
+                type: Twig.token.type.output,
+                open: '{{',
+                close: '}}'
+            },
+            // *Logic type tokens*
+            //
+            // These typically take a form like `{% if expression %}` or `{% endif %}`
+            {
+                type: Twig.token.type.logic,
+                open: '{%',
+                close: '%}'
+            },
+            // *Comment type tokens*
+            //
+            // These take the form `{# anything #}`
+            {
+                type: Twig.token.type.comment,
+                open: '{#',
+                close: '#}'
+            }
+        ],
+        /**
+         * What characters start "strings" in token definitions. We need this to ignore token close
+         * strings inside an expression.
+         */
+        strings: ['"', '\''],
+
+        findStart: function (template) {
+            const output = {
+                position: null,
+                def: null
+            };
+            let closePosition = null;
+            const len = Twig.token.definitions.length;
+            let i;
+            let tokenTemplate;
+            let firstKeyPosition;
+            let closeKeyPosition;
+
+            for (i = 0; i < len; i++) {
+                tokenTemplate = Twig.token.definitions[i];
+                firstKeyPosition = template.indexOf(tokenTemplate.open);
+                closeKeyPosition = template.indexOf(tokenTemplate.close);
+
+                Twig.log.trace('Twig.token.findStart: ', 'Searching for ', tokenTemplate.open, ' found at ', firstKeyPosition);
+
+                // Special handling for mismatched tokens
+                if (firstKeyPosition >= 0) {
+                    // This token matches the template
+                    if (tokenTemplate.open.length !== tokenTemplate.close.length) {
+                        // This token has mismatched closing and opening tags
+                        if (closeKeyPosition < 0) {
+                            // This token's closing tag does not match the template
+                            continue;
+                        }
+                    }
+                }
+                // Does this token occur before any other types?
+
+                if (firstKeyPosition >= 0 && (output.position === null || firstKeyPosition < output.position)) {
+                    output.position = firstKeyPosition;
+                    output.def = tokenTemplate;
+                    closePosition = closeKeyPosition;
+                } else if (firstKeyPosition >= 0 && output.position !== null && firstKeyPosition === output.position) {
+                    /* This token exactly matches another token,
+                    greedily match to check if this token has a greater specificity */
+                    if (tokenTemplate.open.length > output.def.open.length) {
+                        // This token's opening tag is more specific than the previous match
+                        output.position = firstKeyPosition;
+                        output.def = tokenTemplate;
+                        closePosition = closeKeyPosition;
+                    } else if (tokenTemplate.open.length === output.def.open.length) {
+                        if (tokenTemplate.close.length > output.def.close.length) {
+                            // This token's opening tag is as specific as the previous match,
+                            // but the closing tag has greater specificity
+                            if (closeKeyPosition >= 0 && closeKeyPosition < closePosition) {
+                                // This token's closing tag exists in the template,
+                                // and it occurs sooner than the previous match
+                                output.position = firstKeyPosition;
+                                output.def = tokenTemplate;
+                                closePosition = closeKeyPosition;
+                            }
+                        } else if (closeKeyPosition >= 0 && closeKeyPosition < closePosition) {
+                            // This token's closing tag is not more specific than the previous match,
+                            // but it occurs sooner than the previous match
+                            output.position = firstKeyPosition;
+                            output.def = tokenTemplate;
+                            closePosition = closeKeyPosition;
+                        }
+                    }
+                }
+            }
+
+            return output;
+        },
+
+        findEnd: function (template, tokenDef, start) {
+            let end = null;
+            let found = false;
+            let offset = 0;
+
+            // String position variables
+            let strPos = null;
+            let strFound = null;
+            let pos = null;
+            let endOffset = null;
+            let thisStrPos = null;
+            let endStrPos = null;
+
+            // For loop variables
+            let i;
+            let l;
+
+            while (!found) {
+                strPos = null;
+                strFound = null;
+                pos = template.indexOf(tokenDef.close, offset);
+
+                if (pos >= 0) {
+                    end = pos;
+                    found = true;
+                } else {
+                    // Throw an exception
+                    throw new TwigError('Unable to find closing bracket \'' + tokenDef.close +
+                        '\' opened near template position ' + start);
+                }
+
+                // Ignore quotes within comments; just look for the next comment close sequence,
+                // regardless of what comes before it. https://github.com/justjohn/twig.js/issues/95
+                if (tokenDef.type === Twig.token.type.comment) {
+                    break;
+                }
+                // Ignore quotes within raw tag
+                // Fixes #283
+
+                if (tokenDef.type === Twig.token.type.raw) {
+                    break;
+                }
+
+                l = Twig.token.strings.length;
+                for (i = 0; i < l; i += 1) {
+                    thisStrPos = template.indexOf(Twig.token.strings[i], offset);
+
+                    if (thisStrPos > 0 && thisStrPos < pos &&
+                        (strPos === null || thisStrPos < strPos)) {
+                        strPos = thisStrPos;
+                        strFound = Twig.token.strings[i];
+                    }
+                }
+
+                // We found a string before the end of the token, now find the string's end and set the search offset to it
+                if (strPos !== null) {
+                    endOffset = strPos + 1;
+                    end = null;
+                    found = false;
+                    for (; ;) {
+                        endStrPos = template.indexOf(strFound, endOffset);
+                        if (endStrPos < 0) {
+                            throw new TwigError('Unclosed string in template');
+                        }
+                        // Ignore escaped quotes
+
+                        if (template.slice(endStrPos - 1, endStrPos) === '\\') {
+                            endOffset = endStrPos + 1;
+                        } else {
+                            offset = endStrPos + 1;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return end;
+        },
+    };
+    /**
+     * Wrapper for logging to the console.
+     */
+    static log = {
+        trace(...args) {
+            if (Twig.trace && console) {
+                console.log(Array.prototype.slice.call(args));
+            }
+        },
+        debug(...args) {
+            if (Twig.debug && console) {
+                console.log(Array.prototype.slice.call(args));
+            }
+        }
+    };
+
+    /**
+     * Convert a template into high-level tokens.
+     */
+    static tokenize(template) {
+        const tokens = [];
+        // An offset for reporting errors locations in the template.
+        let errorOffset = 0;
+
+        // The start and type of the first token found in the template.
+        let foundToken = null;
+        // The end position of the matched token.
+        let end = null;
+
+        while (template.length > 0) {
+            // Find the first occurance of any token type in the template
+            foundToken = Twig.token.findStart(template);
+
+            Twig.log.trace('Twig.tokenize: ', 'Found token: ', foundToken);
+
+            if (foundToken.position === null) {
+                // No more tokens -> add the rest of the template as a raw-type token
+                tokens.push({
+                    type: Twig.token.type.raw,
+                    value: template
+                });
+                template = '';
+            } else {
+                // Add a raw type token for anything before the start of the token
+                if (foundToken.position > 0) {
+                    tokens.push({
+                        type: Twig.token.type.raw,
+                        value: template.slice(0, Math.max(0, foundToken.position))
+                    });
+                }
+
+                template = template.slice(foundToken.position + foundToken.def.open.length);
+                errorOffset += foundToken.position + foundToken.def.open.length;
+
+                // Find the end of the token
+                end = Twig.token.findEnd(template, foundToken.def, errorOffset);
+
+                Twig.log.trace('Twig.tokenize: ', 'Token ends at ', end);
+
+                tokens.push({
+                    type: foundToken.def.type,
+                    value: template.slice(0, Math.max(0, end)).trim()
+                });
+
+                if (template.slice(end + foundToken.def.close.length, end + foundToken.def.close.length + 1) === '\n') {
+                    switch (foundToken.def.type) {
+                        case 'logic_whitespace_pre':
+                        case 'logic_whitespace_post':
+                        case 'logic_whitespace_both':
+                        case 'logic':
+                            // Newlines directly after logic tokens are ignored
+                            end += 1;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                template = template.slice(end + foundToken.def.close.length);
+
+                // Increment the position in the template
+                errorOffset += end + foundToken.def.close.length;
+            }
+        }
+
+        return tokens;
+    }
+
+    static compile(tokens) {
+        const self = this;
+        try {
+            // Output and intermediate stacks
+            const output = [];
+            const stack = [];
+            // The tokens between open and close tags
+            let intermediateOutput = [];
+
+            let token = null;
+            let logicToken = null;
+            let unclosedToken = null;
+            // Temporary previous token.
+            let prevToken = null;
+            // Temporary previous output.
+            let prevOutput = null;
+            // Temporary previous intermediate output.
+            let prevIntermediateOutput = null;
+            // The previous token's template
+            let prevTemplate = null;
+            // Token lookahead
+            let nextToken = null;
+            // The output token
+            let tokOutput = null;
+
+            // Logic Token values
+            let type = null;
+            let open = null;
+            let next = null;
+
+            const compileOutput = function (token) {
+                Twig.expression.compile.call(self, token);
+                if (stack.length > 0) {
+                    intermediateOutput.push(token);
+                } else {
+                    output.push(token);
+                }
+            };
+
+            const compileLogic = function (token) {
+                // Compile the logic token
+                logicToken = Twig.logic.compile.call(self, token);
+
+                type = logicToken.type;
+                open = Twig.logic.handler[type].open;
+                next = Twig.logic.handler[type].next;
+
+                Twig.log.trace('Twig.compile: ', 'Compiled logic token to ', logicToken,
+                    ' next is: ', next, ' open is : ', open);
+
+                // Not a standalone token, check logic stack to see if this is expected
+                if (open !== undefined && !open) {
+                    prevToken = stack.pop();
+                    prevTemplate = Twig.logic.handler[prevToken.type];
+
+                    if (!prevTemplate.next.includes(type)) {
+                        throw new Error(type + ' not expected after a ' + prevToken.type);
+                    }
+
+                    prevToken.output = prevToken.output || [];
+
+                    prevToken.output = prevToken.output.concat(intermediateOutput);
+                    intermediateOutput = [];
+
+                    tokOutput = {
+                        type: Twig.token.type.logic,
+                        token: prevToken
+                    };
+                    if (stack.length > 0) {
+                        intermediateOutput.push(tokOutput);
+                    } else {
+                        output.push(tokOutput);
+                    }
+                }
+
+                // This token requires additional tokens to complete the logic structure.
+                if (next !== undefined && next.length > 0) {
+                    Twig.log.trace('Twig.compile: ', 'Pushing ', logicToken, ' to logic stack.');
+
+                    if (stack.length > 0) {
+                        // Put any currently held output into the output list of the logic operator
+                        // currently at the head of the stack before we push a new one on.
+                        prevToken = stack.pop();
+                        prevToken.output = prevToken.output || [];
+                        prevToken.output = prevToken.output.concat(intermediateOutput);
+                        stack.push(prevToken);
+                        intermediateOutput = [];
+                    }
+
+                    // Push the new logic token onto the logic stack
+                    stack.push(logicToken);
+                } else if (open !== undefined && open) {
+                    tokOutput = {
+                        type: Twig.token.type.logic,
+                        token: logicToken
+                    };
+                    // Standalone token (like {% set ... %}
+                    if (stack.length > 0) {
+                        intermediateOutput.push(tokOutput);
+                    } else {
+                        output.push(tokOutput);
+                    }
+                }
+            };
+
+            while (tokens.length > 0) {
+                token = tokens.shift();
+                prevOutput = output[output.length - 1];
+                prevIntermediateOutput = intermediateOutput[intermediateOutput.length - 1];
+                nextToken = tokens[0];
+                Twig.log.trace('Compiling token ', token);
+                switch (token.type) {
+                    case Twig.token.type.raw:
+                        if (stack.length > 0) {
+                            intermediateOutput.push(token);
+                        } else {
+                            output.push(token);
+                        }
+
+                        break;
+
+                    case Twig.token.type.logic:
+                        compileLogic.call(self, token);
+                        break;
+
+                    // Do nothing, comments should be ignored
+                    case Twig.token.type.comment:
+                        break;
+
+                    case Twig.token.type.output:
+                        compileOutput.call(self, token);
+                        break;
+
+                    // Kill whitespace ahead and behind this token
+                    case Twig.token.type.logicWhitespacePre:
+                    case Twig.token.type.logicWhitespacePost:
+                    case Twig.token.type.logicWhitespaceBoth:
+                    case Twig.token.type.outputWhitespacePre:
+                    case Twig.token.type.outputWhitespacePost:
+                    case Twig.token.type.outputWhitespaceBoth:
+                        if (token.type !== Twig.token.type.outputWhitespacePost && token.type !== Twig.token.type.logicWhitespacePost) {
+                            if (prevOutput) {
+                                // If the previous output is raw, pop it off
+                                if (prevOutput.type === Twig.token.type.raw) {
+                                    output.pop();
+
+                                    prevOutput.value = prevOutput.value.trimEnd();
+                                    // Repush the previous output
+                                    output.push(prevOutput);
+                                }
+                            }
+
+                            if (prevIntermediateOutput) {
+                                // If the previous intermediate output is raw, pop it off
+                                if (prevIntermediateOutput.type === Twig.token.type.raw) {
+                                    intermediateOutput.pop();
+
+                                    prevIntermediateOutput.value = prevIntermediateOutput.value.trimEnd();
+                                    // Repush the previous intermediate output
+                                    intermediateOutput.push(prevIntermediateOutput);
+                                }
+                            }
+                        }
+
+                        // Compile this token
+                        switch (token.type) {
+                            case Twig.token.type.outputWhitespacePre:
+                            case Twig.token.type.outputWhitespacePost:
+                            case Twig.token.type.outputWhitespaceBoth:
+                                compileOutput.call(self, token);
+                                break;
+                            case Twig.token.type.logicWhitespacePre:
+                            case Twig.token.type.logicWhitespacePost:
+                            case Twig.token.type.logicWhitespaceBoth:
+                                compileLogic.call(self, token);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (token.type !== Twig.token.type.outputWhitespacePre && token.type !== Twig.token.type.logicWhitespacePre) {
+                            if (nextToken) {
+                                // If the next token is raw, shift it out
+                                if (nextToken.type === Twig.token.type.raw) {
+                                    tokens.shift();
+
+                                    nextToken.value = nextToken.value.trimStart();
+                                    // Unshift the next token
+                                    tokens.unshift(nextToken);
+                                }
+                            }
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+
+                Twig.log.trace('Twig.compile: ', ' Output: ', output,
+                    ' Logic Stack: ', stack,
+                    ' Pending Output: ', intermediateOutput
+                );
+            }
+
+            // Verify that there are no logic tokens left in the stack.
+            if (stack.length > 0) {
+                unclosedToken = stack.pop();
+                throw new Error('Unable to find an end tag for ' + unclosedToken.type +
+                    ', expecting one of ' + unclosedToken.next);
+            }
+
+            return output;
+        } catch (error) {
+            if (self.options.rethrow) {
+                if (error.type === 'TwigException' && !error.file) {
+                    error.file = self.id;
+                }
+
+                throw error;
+            } else {
+                Twig.log.error('Error compiling twig template ' + self.id + ': ');
+                if (error.stack) {
+                    Twig.log.error(error.stack);
+                } else {
+                    Twig.log.error(error.toString());
+                }
+            }
+        }
+    }
+
+    /**
+     * Tokenize and compile a string template.
+     *
+     * @param {string} data The template.
+     *
+     * @return {Array} The compiled tokens.
+     */
+    static prepare(data) {
+        // Tokenize
+        Twig.log.debug('Twig.prepare: ', 'Tokenizing ', data);
+        const rawTokens = Twig.tokenize.call(this, data);
+
+        // Compile
+        Twig.log.debug('Twig.prepare: ', 'Compiling ', rawTokens);
+        const tokens = Twig.compile.call(this, rawTokens);
+
+        Twig.log.debug('Twig.prepare: ', 'Compiled ', tokens);
+
+        return tokens;
+    }
+
+
+    /**
+     * Join the output token's stack and escape it if needed
+     *
+     * @param {Array} output token's stack
+     *
+     * @return {string|String} Autoescaped output
+     */
+    static output(output) {
+        const {autoescape} = this.options;
+
+        if (!autoescape) {
+            return output.join('');
+        }
+
+        const strategy = (typeof autoescape === 'string') ? autoescape : 'html';
+
+        const escapedOutput = output.map(str => {
+            if (
+                str &&
+                (str.twigMarkup !== true && str.twigMarkup !== strategy) &&
+                !(strategy === 'html' && str.twigMarkup === 'html_attr')
+            ) {
+                str = Twig.filters.escape(str, [strategy]);
+            }
+
+            return str;
+        });
+
+        if (escapedOutput.length === 0) {
+            return '';
+        }
+
+        const joinedOutput = escapedOutput.join('');
+        if (joinedOutput.length === 0) {
+            return '';
+        }
+
+        return new Twig.Markup(joinedOutput, true);
+    }
+
+    /**
+     * Create safe output
+     *
+     * @param {string} content safe to output
+     * @param {string} strategy to output
+     *
+     * @return {String}  Content wrapped into a String
+     */
+
+    static Markup(content, strategy) {
+        if (typeof content !== 'string') {
+            return content;
+        }
+
+        /* eslint-disable no-new-wrappers, unicorn/new-for-builtins */
+        const output = new String(content);
+        /* eslint-enable */
+        output.twigMarkup = (typeof strategy === 'undefined') ? true : strategy;
+
+        return output;
+    };
+
+
+    /**
+     * Is this id valid for a twig template?
+     *
+     * @param {string} id The ID to check.
+     *
+     * @throws {TwigError} If the ID is invalid or used.
+     * @return {boolean} True if the ID is valid.
+     */
+    static validateId(id) {
+        if (id === 'prototype') {
+            throw new TwigError(id + ' is not a valid twig identifier');
+        } else if (Twig.cache && Object.hasOwnProperty.call(Twig.Templates.registry, id)) {
+            throw new TwigError('There is already a template with the ID ' + id);
+        }
+
+        return true;
+    };
+
     constructor(version) {
         this.VERSION = version;
         // Express 3 handler
         this.__express = this.renderFile;
     }
+
+
     setCompile(compilerSetter) {
         this.compiler = compilerSetter(this);
         return this;
@@ -39,11 +713,6 @@ export class Twig {
         return this;
     }
 
-    setPathClass(pathSetter) {
-        this.path = pathSetter(this);
-        return this;
-    }
-
     setTemplateStoreClass(tsSetter) {
         this.Templates = tsSetter(this);
         return this;
@@ -54,7 +723,7 @@ export class Twig {
         return this;
     }
 
-    merge (target, source, onlyChanged) {
+    merge(target, source, onlyChanged) {
         Object.keys(source).forEach(key => {
             if (onlyChanged && !(key in target)) {
                 return;
@@ -65,10 +734,11 @@ export class Twig {
 
         return target;
     };
+
     /**
      * Create and compile a twig.js template.
      *
-     * @param {Object} param Paramteres for creating a Twig template.
+     * @param {Object} params Paramteres for creating a Twig template.
      *
      * @return {TwigTemplate} A Twig template ready for rendering.
      */
@@ -108,7 +778,7 @@ export class Twig {
 
         if (params.ref !== undefined) {
             if (params.id !== undefined) {
-                throw new Twig.Error('Both ref and id cannot be set on a twig.js template.');
+                throw new TwigError('Both ref and id cannot be set on a twig.js template.');
             }
 
             return this.Templates.load(params.ref);
@@ -116,7 +786,7 @@ export class Twig {
 
         if (params.method !== undefined) {
             if (!this.Templates.isRegisteredLoader(params.method)) {
-                throw new Twig.Error('Loader for "' + params.method + '" is not defined.');
+                throw new TwigError('Loader for "' + params.method + '" is not defined.');
             }
 
             return this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
@@ -197,16 +867,17 @@ export class Twig {
     extendTag(definition) {
         this.logic.extend(definition);
     };
+
     /**
      * Provide an extension for use with express 3.
      *
      * @param {string} path The location of the template file on disk.
-     * @param {Object|Function} The options or callback.
+     * @param {Object|Function} options or callback.
      * @param {Function} fn callback.
      *
      * @throws this.Error
      */
-    renderFile (path, options, fn) {
+    renderFile(path, options, fn) {
         // Handle callback in options
         if (typeof options === 'function') {
             fn = options;
@@ -249,7 +920,26 @@ export class Twig {
         this.twig(params);
     };
 
-
+    /**
+     * Provide an extension for use with Opine.
+     *
+     * @param {string} path The location of the template file on disk.
+     * @param {Object} options or callback.
+     *
+     * @throws this.Error
+     */
+    renderToString(path, options) {
+        return new Promise(
+            (resolve, reject) => {
+                this.renderFile(path, options, (err, html) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(html);
+                    }
+                });
+            });
+    };
 
     /**
      * Should Twig.js cache templates.
@@ -268,6 +958,7 @@ export class Twig {
     extend(fn) {
         fn(this);
     };
+
     /**
      * Provide an extension for use with express 2.
      *
@@ -294,3 +985,15 @@ export class Twig {
     // };
 }
 
+if (typeof console === 'undefined') {
+    Twig.log.error = function () {};
+} else if (typeof console.error !== 'undefined') {
+    Twig.log.error = function (...args) {
+        console.error(...args);
+    };
+} else if (typeof console.log !== 'undefined') {
+    Twig.log.error = function (...args) {
+        console.log(...args);
+    };
+}
+export {Twig}

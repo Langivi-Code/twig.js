@@ -1,12 +1,9 @@
-// ## twig.path.js
+// ## TwigPath.js
 //
 // This file handles path parsing
 import requireNode from "./twig.deps.js";
+import TwigError from "./TwigError.js";
 export class TwigPath {
-    Twig;
-    constructor(Twig) {
-        this.Twig = Twig;
-    }
 
     /**
      * Generate the canonical version of a url based on the given base path and file path and in
@@ -95,7 +92,7 @@ export class TwigPath {
             // Custom registered loader
             base = template.base || template.name || template.id;
         } else {
-            throw new Twig.Error('Cannot extend an inline template.');
+            throw new TwigError('Cannot extend an inline template.');
         }
 
         basePath = base.split(sepChr);
@@ -117,6 +114,6 @@ export class TwigPath {
 
         return newPath.join(sepChr);
     };
-
 }
+export const twigPath = new TwigPath();
 

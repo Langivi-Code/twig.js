@@ -2,6 +2,7 @@
 //
 // This file handles tokenizing, compiling and parsing logic tokens. {% ... %}
 import { TwigTemplate } from "./twig.template.js";
+import TwigError from "./TwigError.js";
 export default function (Twig) {
     'use strict';
 
@@ -229,7 +230,7 @@ export default function (Twig) {
                         token.keyVar = kvSplit[0].trim();
                         token.valueVar = kvSplit[1].trim();
                     } else {
-                        throw new Twig.Error('Invalid expression in for loop: ' + keyValue);
+                        throw new TwigError('Invalid expression in for loop: ' + keyValue);
                     }
                 } else {
                     token.valueVar = keyValue.trim();
@@ -972,7 +973,7 @@ export default function (Twig) {
                     for (let i = 0; i < parametersCount; i++) {
                         const parameter = parameters[i];
                         if (uniq[parameter]) {
-                            throw new Twig.Error('Duplicate arguments for parameter: ' + parameter);
+                            throw new TwigError('Duplicate arguments for parameter: ' + parameter);
                         } else {
                             uniq[parameter] = 1;
                         }
@@ -1416,7 +1417,7 @@ export default function (Twig) {
         if (definition.type) {
             Twig.logic.extendType(definition.type);
         } else {
-            throw new Twig.Error('Unable to extend logic definition. No type provided for ' + definition);
+            throw new TwigError('Unable to extend logic definition. No type provided for ' + definition);
         }
 
         Twig.logic.handler[definition.type] = definition;
@@ -1497,7 +1498,7 @@ export default function (Twig) {
         }
 
         // No regex matches
-        throw new Twig.Error('Unable to parse \'' + expression.trim() + '\'');
+        throw new TwigError('Unable to parse \'' + expression.trim() + '\'');
     };
 
     /**

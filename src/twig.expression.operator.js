@@ -1,6 +1,8 @@
 // ## twig.expression.operator.js
 //
 // This file handles operator lookups and parsing.
+import TwigError from "./TwigError.js";
+
 export default function (Twig) {
     'use strict';
 
@@ -140,7 +142,7 @@ export default function (Twig) {
                 break;
 
             default:
-                throw new Twig.Error('Failed to lookup operator: ' + operator + ' is an unknown operator.');
+                throw new TwigError('Failed to lookup operator: ' + operator + ' is an unknown operator.');
         }
 
         token.operator = operator;
@@ -358,7 +360,7 @@ export default function (Twig) {
                 break;
 
             default:
-                throw new Twig.Error('Failed to parse operator: ' + operator + ' is an unknown operator.');
+                throw new TwigError('Failed to parse operator: ' + operator + ' is an unknown operator.');
         }
     };
 

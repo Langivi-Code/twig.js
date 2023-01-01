@@ -142,11 +142,11 @@ See the LICENSES.md file for copies of the referenced licenses.
 
 1. The JavaScript Array fills in src/twig.fills.js are from <https://developer.mozilla.org/> and are available under the [MIT License][mit] or are [public domain][mdn-license].
 
-2. The Date.format function in src/twig.lib.js is from <http://jpaq.org/> and used under a [MIT license][mit-jpaq].
+2. The Date.format function in src/TwigLib.js is from <http://jpaq.org/> and used under a [MIT license][mit-jpaq].
 
-3. The sprintf implementation in src/twig.lib.js used for the format filter is from <http://www.diveintojavascript.com/projects/javascript-sprintf> and used under a [BSD 3-Clause License][bsd-3].
+3. The sprintf implementation in src/TwigLib.js used for the format filter is from <http://www.diveintojavascript.com/projects/javascript-sprintf> and used under a [BSD 3-Clause License][bsd-3].
 
-4. The strip_tags implementation in src/twig.lib.js used for the striptags filter is from <http://phpjs.org/functions/strip_tags> and used under and [MIT License][mit-phpjs].
+4. The strip_tags implementation in src/TwigLib.js used for the striptags filter is from <http://phpjs.org/functions/strip_tags> and used under and [MIT License][mit-phpjs].
 
 [mit-jpaq]:     http://jpaq.org/license/
 [mit-phpjs]:    http://phpjs.org/pages/license/#MIT

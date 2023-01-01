@@ -1,3 +1,5 @@
+import TwigError from "./TwigError.js";
+
 export class TwigTemplates {
     // Namespace for template storage and retrieval
 
@@ -48,13 +50,13 @@ export class TwigTemplates {
      * @param {Function} func The function to execute when loading the template
      * @param {Object|undefined} scope Optional scope parameter to bind func to
      *
-     * @throws Twig.Error
+     * @throws TwigError
      *
      * @return {void}
      */
     registerLoader(methodName, func, scope) {
         if (typeof func !== 'function') {
-            throw new this.#twig.Error('Unable to add loader for ' + methodName + ': Invalid function reference given.');
+            throw new TwigError('Unable to add loader for ' + methodName + ': Invalid function reference given.');
         }
 
         if (scope) {
@@ -108,13 +110,13 @@ export class TwigTemplates {
      * @param {Function} func The function to execute when parsing the template
      * @param {Object|undefined} scope Optional scope parameter to bind func to
      *
-     * @throws Twig.Error
+     * @throws TwigError
      *
      * @return {void}
      */
     registerParser(methodName, func, scope) {
         if (typeof func !== 'function') {
-            throw new this.#twig.Error('Unable to add parser for ' + methodName + ': Invalid function regerence given.');
+            throw new TwigError('Unable to add parser for ' + methodName + ': Invalid function regerence given.');
         }
 
         if (scope) {
@@ -155,7 +157,7 @@ export class TwigTemplates {
      */
     save(template) {
         if (template.id === undefined) {
-            throw new this.#twig.Error('Unable to save template with no id');
+            throw new TwigError('Unable to save template with no id');
         }
 
         this.registry[template.id] = template;
