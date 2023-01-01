@@ -1,14 +1,20 @@
 class TwigCache {
     #twig;
+    #cacheDir = "./.twig_cache";
 
     constructor(twig) {
         this.#twig = twig;
-        this.#twig.lib.ensureDir("./cache");
+        this.#twig.lib.ensureDir(this.#cacheDir);
+    }
+
+    set cacheDir(dir){
+        this.#twig.lib.ensureDir(dir);
+        this.#cacheDir = dir;
     }
 
     findCacheFile(id) {
         try {
-            Deno.statSync(`./cache/${id}.txt`);
+            Deno.statSync(`${this.#cacheDir}/${id}.txt`);
             return true;
         } catch (e) {
             if (e instanceof Deno.errors.NotFound) {
@@ -20,7 +26,7 @@ class TwigCache {
 
     async setCache(id, template) {
         try {
-            await Deno.writeTextFile(`./cache/${id}.txt`, template);
+            await Deno.writeTextFile(`${this.#cacheDir}/${id}.txt`, template);
         } catch (e) {
             console.log("Cache don't write", e);
         }
@@ -28,7 +34,7 @@ class TwigCache {
 
     getCache(id) {
         try {
-            const cacheJson = Deno.readTextFileSync(`./cache/${id}.txt`);
+            const cacheJson = Deno.readTextFileSync(`${this.#cacheDir}/${id}.txt`);
             return JSON.parse(cacheJson);
         } catch (e) {
             if (e instanceof Deno.errors.NotFound){
