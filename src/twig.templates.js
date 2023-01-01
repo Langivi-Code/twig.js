@@ -153,13 +153,18 @@ export class TwigTemplates {
      *
      * @param {Twig.Template} template   The twig.js template to store.
      */
-    save(template) {
+    async save(template) {
         if (template.id === undefined) {
-            throw new this.#twig.Error('Unable to save template with no id');
+            throw new this.#twig.Error("Unable to save template with no id");
         }
-
-        this.registry[template.id] = template;
-    };
+        
+        const jsonTemplate = JSON.stringify(template);
+        if (await this.#twig.cacher.findCacheFile(template.id)) {
+            return;
+        } else {
+            await this.#twig.cacher.setCache(template.id,jsonTemplate);
+        }
+    }
 
     /**
      * Load a previously saved template from the store.
@@ -196,33 +201,41 @@ export class TwigTemplates {
      *
      *
      */
-    loadRemote(location, params, callback, errorCallback) {
+    loadRemote(location, params) {
         // Default to the URL so the template is cached.
-        const id = typeof params.id === 'undefined' ? location : params.id;
-        const cached = this.registry[id];
+        const id =
+            typeof params.id === "undefined"
+                ? this.#twig.lib
+                      .hasher("md5")
+                      .update(location)
+                      .toString()
+                : this.#twig.lib
+                .hasher("md5")
+                .update(params.id)
+                .toString();
+          // Default to async
+        if (typeof params.async === 'undefined') {
+            params.async = true;
+        }
 
-        // Check for existing template
-        if (this.#twig.cache && typeof cached !== 'undefined') {
-            // A template is already saved with the given id.
-            if (typeof callback === 'function') {
-                callback(cached);
+        let cached;
+        if(this.#twig.cacher.findCacheFile(id)){
+            cached = this.#twig.cacher.getCache(id);
+        }
+        if (cached) {
+            const buildcache = this.#twig.cacher.buildTemplateForCache(cached);
+            if(!params.async ){
+                return buildcache;
             }
-            // TODO: if async, return deferred promise
-
-            return cached;
+            return new Promise(resolve=>{resolve(buildcache)});
         }
 
         // If the parser name hasn't been set, default it to twig
         params.parser = params.parser || 'twig';
         params.id = id;
 
-        // Default to async
-        if (typeof params.async === 'undefined') {
-            params.async = true;
-        }
-
         // Assume 'fs' if the loader is not defined
         const loader = this.loaders[params.method] || this.loaders.fs;
-        return loader.call(this, location, params, callback, errorCallback);
+        return loader.call(this,location,params);
     }
 }

@@ -41,7 +41,7 @@ Twig is compatible with Opine. You can create an opine app using the twig.js tem
 ```js
 import opine from "https://deno.land/x/opine@2.1.3/mod.ts";
 import {renderToString} from "../../src/twig.js";
-    
+
 const app = opine();
 //specifies a function to process the template
 app.engine('twig', renderToString);
