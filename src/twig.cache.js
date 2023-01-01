@@ -8,15 +8,14 @@ class TwigCache {
 
     findCacheFile(id) {
         try {
-             Deno.statSync(`./cache/${id}.txt`);
-         return true;
-        } catch(e) {
-            if(e instanceof Deno.errors.NotFound){
-        return false;
-            }else{
-                throw e;
+            Deno.statSync(`./cache/${id}.txt`);
+            return true;
+        } catch (e) {
+            if (e instanceof Deno.errors.NotFound) {
+                return false;
             }
-       }
+            throw e;
+        }
     }
 
     async setCache(id, template) {
@@ -29,28 +28,29 @@ class TwigCache {
 
     getCache(id) {
         try {
-            const cacheJson =  Deno.readTextFileSync(`./cache/${id}.txt`);
-            const cache = JSON.parse(cacheJson);
-            return cache;
+            const cacheJson = Deno.readTextFileSync(`./cache/${id}.txt`);
+            return JSON.parse(cacheJson);
         } catch (e) {
-            if (e instanceof Deno.errors.NotFound)
+            if (e instanceof Deno.errors.NotFound){
                 console.error("file does not exists");
+                return false;
+            }
+            throw e;
         }
     }
 
     buildTemplateForCache(cached) {
-        if(!(cached.hasOwnProperty("options"))){
+        if (!(cached.hasOwnProperty("options"))) {
             cached.options = {
                 strictVariables: false,
                 autoescape: false,
                 allowInlineIncludes: false,
                 rethrow: false
-              };
+            };
         }
         cached.data = cached.tokens;
-        const tem = new this.#twig.Template(cached);
-        return tem;
+        return new this.#twig.Template(cached);
     }
 }
 
-export { TwigCache };
+export {TwigCache};

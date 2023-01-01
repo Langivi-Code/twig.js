@@ -1,10 +1,9 @@
-export default function  (Twig) {
+export default function (Twig) {
     Twig.Templates.registerLoader('fs', function (location, params) {
-        let template;
         let data = null;
         const {precompiled} = params;
         const parser = this.parsers[params.parser] || this.parser.twig;
-        const loadTemplateFn = function (data) {
+        const parseTemplateFn = function (data) {
             if (precompiled === true) {
                 data = JSON.parse(data);
             }
@@ -12,41 +11,36 @@ export default function  (Twig) {
             params.path = params.path || location;
 
             // Template is in data
-            template = parser.call(this, params);
+            const  template = parser.call(this, params);
+            return template;
         };
 
         params.path = params.path || location;
 
         if (params.async) {
-            return new Promise(async function (res,rej){
-                try{
-                    if(await Deno.stat(params.path)){
+            return (async function () {
+                try {
+                    if ((await Deno.stat(params.path)).isFile) {
                         let data = await Deno.readTextFile(params.path);
-                        if (precompiled === true) {
-                            data = JSON.parse(data);
-                        }
-                        params.data = data;
-                        params.path = params.path || location;
-                        const template = parser.call(this, params);
-                        res(template);
+                        return parseTemplateFn(data);
                     }
-                }catch(e){
-                    rej(new Twig.Error('Unable to find template file ' + params.path));
-                    return;
+                } catch (e) {
+                    throw new Twig.Error('Unable to find template file ' + params.path);
                 }
-            })
+            })();
         }
 
         try {
             if (!Deno.statSync(params.path)) {
                 throw new Twig.Error('Unable to find template file ' + params.path);
             }
+            data = Deno.readTextFileSync(params.path);
         } catch (error) {
+            if (error instanceof Twig.Error){
+                throw error;
+            }
             throw new Twig.Error('Unable to find template file ' + params.path + '. ' + error);
         }
-
-        data = Deno.readTextFileSync(params.path);
-        loadTemplateFn(data);
-        return template;
+        return parseTemplateFn(data);
     });
 };
