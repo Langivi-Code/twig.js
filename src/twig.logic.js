@@ -1237,7 +1237,7 @@ export default function (Twig) {
                         return Twig.expression.parseAsync.call(state, token.stack, embedContext);
                     })
                     .then(fileName => {
-                        const embedOverrideTemplate = new TwigTemplate(Twig, {
+                        const embedOverrideTemplate = new TwigTemplate({
                             data: token.output,
                             id: state.template.id,
                             base: state.template.base,
