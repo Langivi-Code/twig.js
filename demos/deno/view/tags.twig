@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Filters</title>
+  </head>
+  <body>
+    <div>
+      <p>Tag apply </p>
+      <div>
+        {% apply upper %}
+            This text becomes uppercase
+        {% endapply %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag deprecated</p>
+      <div>
+        {# {% deprecated 'The "base.twig" template is deprecated, use "layout.twig" instead.' %} #}
+        {# {% extends 'header.twig' %} #}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag do</p>
+      <div>
+       {% do 1 + 2 %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag embed</p>
+      <div>
+      {% embed "header.twig" %}
+      {% endembed %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag include</p>
+      <div>
+      {% include "header.twig" %}
+      
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag macro</p>
+      <div>
+        {% macro input(name = "newName" , value = "value", type = "text", size = 20) %}
+            <input type="{{ type }}" name="{{ name }}" value="{{ value|e }}" size="{{ size }}"/>
+        {% endmacro %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Tag set</p>
+      <div>
+        {% set foo = 'bar' %}
+        {{ foo }}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+  </body>
+</html>

@@ -14,6 +14,7 @@ export class Twig {
     lib;
     path;
     Templates;
+    cacher;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -53,6 +54,10 @@ export class Twig {
         this.tests = testssSetter(this);
         return this;
     }
+    setCacheClass(cacherSetter) {
+        this.cacher = cacherSetter(this);
+        return this;
+    }
 
     merge (target, source, onlyChanged) {
         Object.keys(source).forEach(key => {
@@ -72,7 +77,7 @@ export class Twig {
      *
      * @return {TwigTemplate} A Twig template ready for rendering.
      */
-    twig(params) {
+    async twig(params) {
         'use strict';
         const {id} = params;
         const options = {
@@ -118,22 +123,27 @@ export class Twig {
             if (!this.Templates.isRegisteredLoader(params.method)) {
                 throw new Twig.Error('Loader for "' + params.method + '" is not defined.');
             }
-
-            return this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
-                id,
-                method: params.method,
-                parser: params.parser || 'twig',
-                base: params.base,
-                module: params.module,
-                precompiled: params.precompiled,
-                async: params.async,
-                options
-
-            }, params.load, params.error);
+            try{
+               const template = await this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
+                    id,
+                    method: params.method,
+                    parser: params.parser || 'twig',
+                    base: params.base,
+                    module: params.module,
+                    precompiled: params.precompiled,
+                    async: params.async,
+                    options
+                });
+                params.load(template);
+            }catch(e){  
+                params.error(e);
+            }
+           
         }
 
         if (params.href !== undefined) {
-            return this.Templates.loadRemote(params.href, {
+            try{
+                const template = await this.Templates.loadRemote(params.href, {
                 id,
                 method: 'ajax',
                 parser: params.parser || 'twig',
@@ -142,12 +152,16 @@ export class Twig {
                 precompiled: params.precompiled,
                 async: params.async,
                 options
-
-            }, params.load, params.error);
+                });
+                params.load(template);
+            }catch(e){
+                params.error(e);
+            }
         }
 
         if (params.path !== undefined) {
-            return this.Templates.loadRemote(params.path, {
+            try{ 
+                const template = await this.Templates.loadRemote(params.path, {
                 id,
                 method: 'fs',
                 parser: params.parser || 'twig',
@@ -156,7 +170,11 @@ export class Twig {
                 precompiled: params.precompiled,
                 async: params.async,
                 options
-            }, params.load, params.error);
+                });
+                params.load(template);
+            }catch(e){
+                params.error(e);
+            }
         }
     }
 

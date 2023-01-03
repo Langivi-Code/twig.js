@@ -230,7 +230,9 @@ export default function (Twig) {
             let loader;
             const path = name;
             const state = this;
-           
+            if(Twig.lib.is("Object",name) ) {
+                return name.render();
+            }
             if (Twig.lib.is("Object", secondArg)) {
                 paramsInclude = secondArg;
             }else if (Twig.lib.is("Boolean",secondArg)){
@@ -267,7 +269,6 @@ export default function (Twig) {
             // on exception, log it
             try {
                 templateTwig = Twig.Templates.loadRemote(name, paramsLoad);
-
                 // If the template is undefined or null, set the template to an empty string and do NOT flip the
                 // boolean indicating we found the template
                 //
