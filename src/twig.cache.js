@@ -1,3 +1,4 @@
+import { TwigTemplate } from "./twig.template.js";
 class TwigCache {
     #twig;
     #cacheDir = "./.twig_cache";
@@ -55,7 +56,7 @@ class TwigCache {
             };
         }
         cached.data = cached.tokens;
-        return new this.#twig.Template(cached);
+        return new TwigTemplate(cached);
     }
 }
 

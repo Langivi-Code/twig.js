@@ -25,7 +25,6 @@ export class Twig {
         // Express 3 handler
         this.__express = this.renderFile;
     }
-
     setCompile(compilerSetter) {
         this.compiler = compilerSetter(this);
         return this;
@@ -76,7 +75,7 @@ export class Twig {
      *
      * @param {Object} param Paramteres for creating a Twig template.
      *
-     * @return {Twig.Template} A Twig template ready for rendering.
+     * @return {TwigTemplate} A Twig template ready for rendering.
      */
     async twig(params) {
         'use strict';
