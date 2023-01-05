@@ -597,7 +597,7 @@ class TwigCore {
      *
      * @return {Array} The compiled tokens.
      */
-    prepare(data, twig) {
+    prepare(data) {
         // Tokenize
         TwigCore.log.debug('Twig.prepare: ', 'Tokenizing ', data);
         const rawTokens = twig.tokenize(data);

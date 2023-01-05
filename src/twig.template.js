@@ -46,7 +46,8 @@ export class TwigTemplate{
         this.url = url;
 
         if (twigLib.is('String', data)) {
-            this.tokens = twig.prepare.call(this, data,twig);
+            //Problematic place because it is transmitted this and afrer this form template
+            this.tokens = twig.prepare.call(this, data);
         } else {
             this.tokens = data;
         }
