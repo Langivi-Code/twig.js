@@ -11,6 +11,8 @@
     "date":"npm:locutus@^2.0.16/php/datetime/date.js",
     "boolval":"npm:locutus@^2.0.16/php/var/boolval.js",
     "module": "https://deno.land/std@0.129.0/node/module.ts",
+    "countryLocaleMap/": "https://cdn.skypack.dev/country-locale-map/",
+    "hasher": "https://deno.land/std@0.91.0/hash/mod.ts",
     "iconv":"https://deno.land/x/iconv_lite@v1.0.0/mod.ts",
     "countryLocaleMap": "npm:country-locale-map@^1.8.11",
     "currenciesMap": "https://cdn.skypack.dev/currencies-map",
@@ -23,6 +25,7 @@
     "languageName": "npm:language-name-to-language-name@^0.5.1",
     "showdown":"npm:showdown@^2.1.0",
     "slug":"npm:slugify@^1.6.5",
-    "timeZoneName":"npm:spacetime-informal@^0.6.1"
+    "timeZoneName":"npm:spacetime-informal@^0.6.1",
+    "ensureDir":"https://deno.land/std@0.168.0/fs/ensure_dir.ts"
   }
 }

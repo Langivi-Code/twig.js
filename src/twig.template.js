@@ -170,7 +170,6 @@ export class TwigTemplate{
     importFile(file){
         let url = null;
         let subTemplate;
-        console.log("THIS IN IMPORTFILE",this);
         if (!this.url && this.options.allowInlineIncludes) {
             file = this.path ? twigPath.parsePath(this, file) : file;
             subTemplate = twig.Templates.load(file);
