@@ -46,7 +46,7 @@ export class TwigTemplate{
         this.url = url;
 
         if (twigLib.is('String', data)) {
-            this.tokens = twig.prepare.call(this, data);
+            this.tokens = twig.prepare.call(this, data,twig);
         } else {
             this.tokens = data;
         }
@@ -162,7 +162,6 @@ export class TwigTemplate{
                     if (params.isInclude === true) {
                         return output;
                     }
-
                     return output.valueOf();
                 });
         });
@@ -171,6 +170,7 @@ export class TwigTemplate{
     importFile(file){
         let url = null;
         let subTemplate;
+        console.log("THIS IN IMPORTFILE",this);
         if (!this.url && this.options.allowInlineIncludes) {
             file = this.path ? twigPath.parsePath(this, file) : file;
             subTemplate = twig.Templates.load(file);

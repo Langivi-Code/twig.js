@@ -1,6 +1,7 @@
 // ## twig.expression.js
 //
 // This file handles tokenizing, compiling and parsing expressions.
+import { TwigCore } from './twig.core.js';
 import ExpressionOperator from './twig.expression.operator.js';
 import TwigError from "./TwigError.js";
 export default function (Twig) {
@@ -238,7 +239,7 @@ export default function (Twig) {
                 const { value } = token;
                 const operator = Twig.expression.operator.lookup(value, token);
 
-                Twig.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
+                TwigCore.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
                     (stack[stack.length - 1].type === Twig.expression.type.operator.unary || stack[stack.length - 1].type === Twig.expression.type.operator.binary) &&
@@ -360,7 +361,7 @@ export default function (Twig) {
                 }
 
                 token.value = value.slice(1, -1).replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-                Twig.log.trace('Twig.expression.compile: ', 'String value: ', token.value);
+                TwigCore.log.trace('Twig.expression.compile: ', 'String value: ', token.value);
                 output.push(token);
             },
             parse: Twig.expression.fn.parse.pushValue
@@ -1165,7 +1166,7 @@ export default function (Twig) {
                 match[matchI] = args[matchI];
             }
 
-            Twig.log.trace('Twig.expression.tokenize',
+            TwigCore.log.trace('Twig.expression.tokenize',
                 'Matched a ', type, ' regular expression of ', match);
 
             if (next && !next.includes(type)) {
@@ -1207,8 +1208,7 @@ export default function (Twig) {
 
             return '';
         };
-
-        Twig.log.debug('Twig.expression.tokenize', 'Tokenizing expression ', expression);
+        TwigCore.log.debug('Twig.expression.tokenize', 'Tokenizing expression ', expression);
 
         while (expression.length > 0) {
             expression = expression.trim();
@@ -1216,7 +1216,7 @@ export default function (Twig) {
                 if (Object.hasOwnProperty.call(Twig.expression.handler, type)) {
                     tokenNext = Twig.expression.handler[type].next;
                     regex = Twig.expression.handler[type].regex;
-                    Twig.log.trace('Checking type ', type, ' on ', expression);
+                    TwigCore.log.trace('Checking type ', type, ' on ', expression);
                     matchFound = false;
                     if (Array.isArray(regex)) {
                         regexI = regex.length;
@@ -1243,7 +1243,7 @@ export default function (Twig) {
             }
         }
 
-        Twig.log.trace('Twig.expression.tokenize', 'Tokenized to ', tokens);
+        TwigCore.log.trace('Twig.expression.tokenize', 'Tokenized to ', tokens);
         return tokens;
     };
 
@@ -1263,7 +1263,7 @@ export default function (Twig) {
         const stack = [];
         let tokenTemplate = null;
 
-        Twig.log.trace('Twig.expression.compile: ', 'Compiling ', expression);
+        TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', expression);
 
         // Push tokens into RPN stack using the Shunting-yard algorithm
         // See http://en.wikipedia.org/wiki/Shunting_yard_algorithm
@@ -1272,20 +1272,20 @@ export default function (Twig) {
             token = tokens.shift();
             tokenTemplate = Twig.expression.handler[token.type];
 
-            Twig.log.trace('Twig.expression.compile: ', 'Compiling ', token);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', token);
 
             // Compile the template
             tokenTemplate.compile(token, stack, output);
 
-            Twig.log.trace('Twig.expression.compile: ', 'Stack is', stack);
-            Twig.log.trace('Twig.expression.compile: ', 'Output is', output);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Stack is', stack);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Output is', output);
         }
 
         while (stack.length > 0) {
             output.push(stack.pop());
         }
 
-        Twig.log.trace('Twig.expression.compile: ', 'Final output is', output);
+        TwigCore.log.trace('Twig.expression.compile: ', 'Final output is', output);
 
         rawToken.stack = output;
         delete rawToken.value;

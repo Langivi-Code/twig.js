@@ -1,6 +1,7 @@
 // ## twig.expression.operator.js
 //
 // This file handles operator lookups and parsing.
+import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
 
 export default function (Twig) {
@@ -155,7 +156,7 @@ export default function (Twig) {
      * Returns the updated stack.
      */
     Twig.expression.operator.parse = function (operator, stack) {
-        Twig.log.trace('Twig.expression.operator.parse: ', 'Handling ', operator);
+        TwigCore.log.trace('Twig.expression.operator.parse: ', 'Handling ', operator);
         let a;
         let b;
         let c;

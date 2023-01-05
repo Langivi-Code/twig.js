@@ -4,7 +4,7 @@
 
 import {TwigFilters} from "./twig.filters.js";
 import TwigError from "./TwigError.js";
-
+import {twig} from "./twig.js";
 class TwigCore {
     VERSION;
     compiler;
@@ -49,12 +49,12 @@ class TwigCore {
          */
         definitions: [
             {
-                type: TwigCore.token.type.raw,
+                type: "raw",
                 open: '{% raw %}',
                 close: '{% endraw %}'
             },
             {
-                type: TwigCore.token.type.raw,
+                type: 'raw',
                 open: '{% verbatim %}',
                 close: '{% endverbatim %}'
             },
@@ -62,32 +62,32 @@ class TwigCore {
             //
             // These typically take the form `{{- expression -}}` or `{{- expression }}` or `{{ expression -}}`.
             {
-                type: TwigCore.token.type.outputWhitespacePre,
+                type: 'output_whitespace_pre',
                 open: '{{-',
                 close: '}}'
             },
             {
-                type: TwigCore.token.type.outputWhitespacePost,
+                type: 'output_whitespace_post',
                 open: '{{',
                 close: '-}}'
             },
             {
-                type: TwigCore.token.type.outputWhitespaceBoth,
+                type: 'output_whitespace_both',
                 open: '{{-',
                 close: '-}}'
             },
             {
-                type: TwigCore.token.type.logicWhitespacePre,
+                type: 'logic_whitespace_pre',
                 open: '{%-',
                 close: '%}'
             },
             {
-                type: TwigCore.token.type.logicWhitespacePost,
+                type: 'logic_whitespace_post',
                 open: '{%',
                 close: '-%}'
             },
             {
-                type: TwigCore.token.type.logicWhitespaceBoth,
+                type: 'logic_whitespace_both',
                 open: '{%-',
                 close: '-%}'
             },
@@ -95,7 +95,7 @@ class TwigCore {
             //
             // These typically take the form `{{ expression }}`.
             {
-                type: TwigCore.token.type.output,
+                type: 'output',
                 open: '{{',
                 close: '}}'
             },
@@ -103,7 +103,7 @@ class TwigCore {
             //
             // These typically take a form like `{% if expression %}` or `{% endif %}`
             {
-                type: TwigCore.token.type.logic,
+                type: 'logic',
                 open: '{%',
                 close: '%}'
             },
@@ -111,7 +111,7 @@ class TwigCore {
             //
             // These take the form `{# anything #}`
             {
-                type: TwigCore.token.type.comment,
+                type: 'comment',
                 open: '{#',
                 close: '#}'
             }
@@ -389,7 +389,8 @@ class TwigCore {
             let next = null;
 
             const compileOutput =  (token) => {
-                this.expression.compile.call(this, token);
+              
+                twig.expression.compile.call(this, token);
                 if (stack.length > 0) {
                     intermediateOutput.push(token);
                 } else {
@@ -399,11 +400,11 @@ class TwigCore {
 
             const compileLogic = (token) => {
                 // Compile the logic token
-                logicToken = this.logic.compile.call(this, token);
+                logicToken = twig.logic.compile.call(this, token);
 
                 type = logicToken.type;
-                open = this.logic.handler[type].open;
-                next = this.logic.handler[type].next;
+                open = twig.logic.handler[type].open;
+                next = twig.logic.handler[type].next;
 
                 TwigCore.log.trace('Twig.compile: ', 'Compiled logic token to ', logicToken,
                     ' next is: ', next, ' open is : ', open);
@@ -411,7 +412,7 @@ class TwigCore {
                 // Not a standalone token, check logic stack to see if this is expected
                 if (open !== undefined && !open) {
                     prevToken = stack.pop();
-                    prevTemplate = this.logic.handler[prevToken.type];
+                    prevTemplate = twig.logic.handler[prevToken.type];
 
                     if (!prevTemplate.next.includes(type)) {
                         throw new Error(type + ' not expected after a ' + prevToken.type);
@@ -595,14 +596,14 @@ class TwigCore {
      *
      * @return {Array} The compiled tokens.
      */
-    prepare(data) {
+    prepare(data, twig) {
         // Tokenize
         TwigCore.log.debug('Twig.prepare: ', 'Tokenizing ', data);
-        const rawTokens = this.tokenize(data);
+        const rawTokens = twig.tokenize(data);
 
         // Compile
         TwigCore.log.debug('Twig.prepare: ', 'Compiling ', rawTokens);
-        const tokens = this.compile(rawTokens);
+        const tokens = twig.compile.call(this,rawTokens);
 
         TwigCore.log.debug('Twig.prepare: ', 'Compiled ', tokens);
 
@@ -832,7 +833,6 @@ class TwigCore {
 
     filter(filter, value, params) {
         const state = this;
-        // console.log("filter",filter,"value",value,"params",params);
         if (!this.filters[filter]) {
             throw new this.Error('Unable to find filter ' + filter);
         }

@@ -2,6 +2,7 @@
 //
 
 // This file handles parsing filters.
+import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
 
 export default function (Twig) {
@@ -280,7 +281,7 @@ export default function (Twig) {
                     templateFound = true;
                 }
             } catch (error) {
-                Twig.log.debug('Twig.functions.source: ', 'Problem loading template  ', error);
+                TwigCore.log.debug('Twig.functions.source: ', 'Problem loading template  ', error);
             }
 
             // If the template was NOT found AND we are not ignoring missing templates, return the same message

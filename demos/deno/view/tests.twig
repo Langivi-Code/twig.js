@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tests</title>
+  </head>
+  <body>
+    <div>
+      <p>Function defined</p>
+      <div>
+        {% set foo = "fooo" %}
+        {% if foo is defined %}
+            Defined
+        {% endif %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function divisibleby</p>
+      <div>
+        {% if 6 is divisibleby(3) %}
+            Divisibleby
+        {% endif %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function empty </p>
+      <div>
+         {% set foos = "" %}
+        {% if foos is empty %}
+            empty
+        {% endif %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function even  </p>
+      <div>
+        {% set var = 2 %}
+        {{ var is even }}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function iterable  </p>
+      <div>
+        {% set it = [1,2,3,4,5,6,7,8] %}
+        {{ it is iterable }}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function null  </p>
+      <div>
+        {% set n = null %}
+        {{ n is null }}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function odd </p>
+      <div>
+        {% set a = 11 %}
+        {{ a is odd }}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+    <div>
+      <p>Function same as </p>
+      <div>
+        {% set b = 12 %}
+        {% if b is same as(12) %}
+            b equals twelve
+        {% endif %}
+      </div>
+      <hr style="border-top: 2px dotted black" />
+    </div>
+  </body>
+</html>

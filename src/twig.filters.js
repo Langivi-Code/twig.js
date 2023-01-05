@@ -622,7 +622,7 @@ export class TwigFilters {
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
-            return new this.Twig.Markup(rawValue, 'html');
+            return  this.Twig.Markup(rawValue, 'html');
         }
 
         if (strategy === 'js') {
@@ -734,7 +734,7 @@ export class TwigFilters {
 
         value = this.Twig.lib.replaceAll(value, linebreakTag, '\n');
 
-        return new this.Twig.Markup(value);
+        return  this.Twig.Markup(value);
     }
 
     /**
@@ -974,7 +974,7 @@ export class TwigFilters {
         return value[value.length - 1];
     }
     raw(value) {
-        return new this.Twig.Markup(value || '');
+        return  this.Twig.Markup(value || '');
     }
     batch(items, params) {
         let size = params.shift();

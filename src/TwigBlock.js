@@ -1,4 +1,5 @@
 import {TwigCore} from "./twig.core.js";
+import {twig} from "./twig.js";
 export default class TwigBlock {
     /**
      * A wrapper for template blocks.
@@ -33,10 +34,10 @@ export default class TwigBlock {
 
         return promise
             .then(value => {
-                return TwigCore.expression.parseAsync.call(
+                return twig.expression.parseAsync.call(
                     parseState,
                     {
-                        type: TwigCore.expression.type.string,
+                        type: twig.expression.type.string,
                         value
                     },
                     context

@@ -1,6 +1,7 @@
 // ## twig.logic.js
 //
 // This file handles tokenizing, compiling and parsing logic tokens. {% ... %}
+import { TwigCore } from "./twig.core.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigError from "./TwigError.js";
 export default function (Twig) {
@@ -1238,7 +1239,7 @@ export default function (Twig) {
                         return Twig.expression.parseAsync.call(state, token.stack, embedContext);
                     })
                     .then(fileName => {
-                        const embedOverrideTemplate = new TwigTemplate(Twig, {
+                        const embedOverrideTemplate = new TwigTemplate({
                             data: token.output,
                             id: state.template.id,
                             base: state.template.base,
@@ -1443,7 +1444,7 @@ export default function (Twig) {
         // Check if the token needs compiling
         if (tokenTemplate.compile) {
             token = tokenTemplate.compile.call(this, token);
-            Twig.log.trace('Twig.logic.compile: ', 'Compiled logic token to ', token);
+            TwigCore.log.trace('Twig.logic.compile: ', 'Compiled logic token to ', token);
         }
 
         return token;
@@ -1487,7 +1488,7 @@ export default function (Twig) {
                 for (regexI = 0; regexI < regexLen; regexI++) {
                     match = regexArray[regexI].exec(expression);
                     if (match !== null) {
-                        Twig.log.trace('Twig.logic.tokenize: ', 'Matched a ', tokenType, ' regular expression of ', match);
+                        TwigCore.log.trace('Twig.logic.tokenize: ', 'Matched a ', tokenType, ' regular expression of ', match);
                         return {
                             type: tokenType,
                             match
@@ -1523,7 +1524,7 @@ export default function (Twig) {
      */
     Twig.logic.parse = function (token, context, chain, allowAsync) {
         return Twig.async.potentiallyAsync(this, allowAsync, function () {
-            Twig.log.debug('Twig.logic.parse: ', 'Parsing logic token ', token);
+            TwigCore.log.debug('Twig.logic.parse: ', 'Parsing logic token ', token);
 
             const tokenTemplate = Twig.logic.handler[token.type];
             let result;

@@ -179,16 +179,16 @@ export default class TwigParseState {
             }
         }
 
-        promise = TwigCore.async.forEach(tokens, token => {
+        promise = twig.async.forEach(tokens, token => {
             TwigCore.log.debug('Twig.ParseState.parse: ', 'Parsing token: ', token);
 
             switch (token.type) {
                 case TwigCore.token.type.raw:
-                    output.push(TwigCore.filters.raw(token.value));
+                    output.push(twig.filters.raw(token.value));
                     break;
 
                 case TwigCore.token.type.logic:
-                    return TwigCore.logic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
+                    return twig.logic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
                         .then(parseTokenLogic);
                 case TwigCore.token.type.comment:
                     // Do nothing, comments should be ignored
@@ -201,7 +201,7 @@ export default class TwigParseState {
                 case TwigCore.token.type.output:
                     TwigCore.log.debug('Twig.ParseState.parse: ', 'Output token: ', token.stack);
                     // Parse the given expression in the given context
-                    return TwigCore.expression.parseAsync.call(state, token.stack, state.context)
+                    return twig.expression.parseAsync.call(state, token.stack, state.context)
                         .then(outputPush);
                 default:
                     break;
