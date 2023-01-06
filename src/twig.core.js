@@ -359,7 +359,7 @@ class TwigCore {
         return tokens;
     }
 
-    compile(tokens) {
+    compile(tokens,options,id) {
         // const self = this;
         try {
             // Output and intermediate stacks
@@ -401,11 +401,11 @@ class TwigCore {
 
             const compileLogic = (token) => {
                 // Compile the logic token
-                logicToken = twig.logic.compile.call(this, token);
+                logicToken = this.logic.compile.call(this, token);
 
                 type = logicToken.type;
-                open = twig.logic.handler[type].open;
-                next = twig.logic.handler[type].next;
+                open = this.logic.handler[type].open;
+                next = this.logic.handler[type].next;
 
                 TwigCore.log.trace('Twig.compile: ', 'Compiled logic token to ', logicToken,
                     ' next is: ', next, ' open is : ', open);
@@ -413,7 +413,7 @@ class TwigCore {
                 // Not a standalone token, check logic stack to see if this is expected
                 if (open !== undefined && !open) {
                     prevToken = stack.pop();
-                    prevTemplate = twig.logic.handler[prevToken.type];
+                    prevTemplate = this.logic.handler[prevToken.type];
 
                     if (!prevTemplate.next.includes(type)) {
                         throw new Error(type + ' not expected after a ' + prevToken.type);
@@ -570,12 +570,11 @@ class TwigCore {
                 throw new Error('Unable to find an end tag for ' + unclosedToken.type +
                     ', expecting one of ' + unclosedToken.next);
             }
-
             return output;
         } catch (error) {
-            if (this.options.rethrow) {
+            if (options.rethrow) {
                 if (error.type === 'TwigException' && !error.file) {
-                    error.file = this.id;
+                    error.file = id;
                 }
 
                 throw error;
@@ -597,14 +596,15 @@ class TwigCore {
      *
      * @return {Array} The compiled tokens.
      */
-    prepare(data) {
+    prepare(data,options,id) {
         // Tokenize
+
         TwigCore.log.debug('Twig.prepare: ', 'Tokenizing ', data);
-        const rawTokens = twig.tokenize(data);
+        const rawTokens = this.tokenize(data);
 
         // Compile
         TwigCore.log.debug('Twig.prepare: ', 'Compiling ', rawTokens);
-        const tokens = twig.compile.call(this,rawTokens);
+        const tokens = this.compile(rawTokens,options,id);
 
         TwigCore.log.debug('Twig.prepare: ', 'Compiled ', tokens);
 

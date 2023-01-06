@@ -3,7 +3,7 @@
  */
 
 export default class TwigError {
-    message = message;
+    message;
     name = 'TwigException';
     type = 'TwigException';
     file;

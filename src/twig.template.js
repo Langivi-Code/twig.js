@@ -47,7 +47,7 @@ export class TwigTemplate{
 
         if (twigLib.is('String', data)) {
             //Problematic place because it is transmitted this and afrer this form template
-            this.tokens = twig.prepare.call(this, data);
+            this.tokens = twig.prepare(data,this.options,this.id);
         } else {
             this.tokens = data;
         }

@@ -1,3 +1,4 @@
+import TwigError from "./TwigError.js";
 export default function (Twig) {
     Twig.Templates.registerLoader('fs', function (location, params) {
         let data = null;
@@ -11,7 +12,7 @@ export default function (Twig) {
             params.path = params.path || location;
 
             // Template is in data
-            const  template = parser.call(this, params);
+            const  template = parser(params);
             return template;
         };
 
@@ -25,7 +26,7 @@ export default function (Twig) {
                         return parseTemplateFn(data);
                     }
                 } catch (e) {
-                    throw new Twig.Error('Unable to find template file ' + params.path);
+                    throw new TwigError('Unable to find template file ' + params.path);
                 }
             })();
         }
