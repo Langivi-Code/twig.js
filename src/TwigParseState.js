@@ -1,6 +1,7 @@
 import TwigError from "./TwigError.js";
 import {TwigCore} from "./twig.core.js";
 import {twig} from "./twig.js";
+import { AsyncTwig } from "./async/twig.async.js";
 
 function handleException(state, ex) {
     if (state.template.options.rethrow) {
@@ -179,7 +180,7 @@ export default class TwigParseState {
             }
         }
 
-        promise = twig.async.forEach(tokens, token => {
+        promise = AsyncTwig.forEach(tokens, token => {
             TwigCore.log.debug('Twig.ParseState.parse: ', 'Parsing token: ', token);
 
             switch (token.type) {
@@ -236,5 +237,9 @@ export default class TwigParseState {
         }
 
         return output;
+    };
+
+    parseAsync (tokens, context) {
+        return this.parse(tokens, context, true);
     };
 }

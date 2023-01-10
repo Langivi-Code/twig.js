@@ -17,7 +17,6 @@ import loaderajax from "./twig.loader.ajax.js";
 import loaderfs from "./twig.loader.fs.js";
 import {TwigTests} from "./twig.tests.js";
 import logic from "./twig.logic.js";
-import async from "./twig.async.js";
 import {TwigCore} from "./twig.core.js";
 import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
@@ -44,7 +43,6 @@ function factory(twig) {
     functions(twig);
     expression(twig);
     logic(twig);
-    async(twig);
     loaderajax(twig);
     loaderfs(twig);
     twig.Templates.registerParser('twig', params => {

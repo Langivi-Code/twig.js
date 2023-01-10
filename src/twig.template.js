@@ -2,7 +2,7 @@ import {twig} from "./twig.js";
 import {twigLib} from "./TwigLib.js";
 import {twigPath} from "./TwigPath.js";
 import TwigError from "./TwigError.js";
-
+import { AsyncTwig } from "./async/twig.async.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -116,7 +116,7 @@ export class TwigTemplate{
 
         params = params || {};
 
-        return twig.async.potentiallyAsync(template, allowAsync, () => {
+        return AsyncTwig.potentiallyAsync(template, allowAsync, () => {
             const state = new twig.ParseState(template, params.blocks);
 
             return state.parseAsync(template.tokens, context)

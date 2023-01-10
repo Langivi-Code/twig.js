@@ -3,7 +3,9 @@
 // This file handles tokenizing, compiling and parsing expressions.
 import { TwigCore } from './twig.core.js';
 import ExpressionOperator from './twig.expression.operator.js';
+import { AsyncTwig } from "./async/twig.async.js";
 import TwigError from "./TwigError.js";
+import { TwigPromise } from './async/twig.promise.js';
 export default function (Twig) {
     'use strict';
 
@@ -12,7 +14,7 @@ export default function (Twig) {
             return Twig.expression.parseAsync.call(state, params, context);
         }
 
-        return Twig.Promise.resolve(false);
+        return TwigPromise.resolve(false);
     }
 
     /**
@@ -1047,10 +1049,10 @@ export default function (Twig) {
         const state = this;
 
         if (typeof value !== 'function') {
-            return Twig.Promise.resolve(value);
+            return TwigPromise.resolve(value);
         }
 
-        let promise = Twig.Promise.resolve(params);
+        let promise = TwigPromise.resolve(params);
 
         /*
         If value is a function, it will have been impossible during the compile stage to determine that a following
@@ -1082,7 +1084,7 @@ export default function (Twig) {
     };
 
     Twig.expression.resolve = function (value, context, params, nextToken, object) {
-        return Twig.async.potentiallyAsync(this, false, function () {
+        return AsyncTwig.potentiallyAsync(this, false, function () {
             return Twig.expression.resolveAsync.call(this, value, context, params, nextToken, object);
         });
     };
@@ -1316,8 +1318,8 @@ export default function (Twig) {
         const loopTokenFixups = [];
         const binaryOperator = Twig.expression.type.operator.binary;
 
-        return Twig.async.potentiallyAsync(state, allowAsync, () => {
-            return Twig.async.forEach(tokens, (token, index) => {
+        return AsyncTwig.potentiallyAsync(state, allowAsync, () => {
+            return AsyncTwig.forEach(tokens, (token, index) => {
                 let tokenTemplate = null;
                 let nextToken = null;
                 let result;
@@ -1370,6 +1372,13 @@ export default function (Twig) {
                     return stack.pop();
                 });
         });
+    };
+
+
+    Twig.expression.parseAsync = function (tokens, context, tokensAreParameters) {
+        const state = this;
+
+        return Twig.expression.parse.call(state, tokens, context, tokensAreParameters, true);
     };
 
     return Twig;

@@ -977,6 +977,12 @@ class TwigCore {
         fn(this);
     };
 
+     /**
+     * Checks for `thenable` objects
+     */
+    isPromise(obj) {
+        return obj && obj.then && (typeof obj.then === 'function');
+    };
     /**
      * Provide an extension for use with express 2.
      *

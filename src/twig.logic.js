@@ -4,6 +4,8 @@
 import { TwigCore } from "./twig.core.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigError from "./TwigError.js";
+import { AsyncTwig } from "./async/twig.async.js";
+import { TwigPromise } from "./async/twig.promise.js";
 export default function (Twig) {
     'use strict';
 
@@ -177,7 +179,7 @@ export default function (Twig) {
             ],
             open: false,
             parse(token, context, chain) {
-                let promise = Twig.Promise.resolve('');
+                let promise = TwigPromise.resolve('');
                 const state = this;
 
                 if (chain) {
@@ -294,7 +296,7 @@ export default function (Twig) {
                     innerContext.loop = buildLoop(index, len);
 
                     const promise = conditional === undefined ?
-                        Twig.Promise.resolve(true) :
+                        TwigPromise.resolve(true) :
                         Twig.expression.parseAsync.call(state, conditional, innerContext);
 
                     return promise.then(condition => {
@@ -324,7 +326,7 @@ export default function (Twig) {
                     .then(result => {
                         if (Array.isArray(result)) {
                             len = result.length;
-                            return Twig.async.forEach(result, value => {
+                            return AsyncTwig.forEach(result, value => {
                                 const key = index;
 
                                 return loop(key, value);
@@ -339,7 +341,7 @@ export default function (Twig) {
                             }
 
                             len = keyset.length;
-                            return Twig.async.forEach(keyset, key => {
+                            return AsyncTwig.forEach(keyset, key => {
                             // Ignore the _keys property, it's internal to twig.js
                                 if (key === '_keys') {
                                     return;
@@ -629,7 +631,7 @@ export default function (Twig) {
             },
             parse(token, context, chain) {
                 const state = this;
-                let promise = Twig.Promise.resolve();
+                let promise = TwigPromise.resolve();
 
                 state.template.blocks.defined[token.blockName] = new Twig.Block(state.template, token);
 
@@ -834,7 +836,7 @@ export default function (Twig) {
                 const result = {chain, output: ''};
 
                 if (typeof token.withStack === 'undefined') {
-                    promise = Twig.Promise.resolve();
+                    promise = TwigPromise.resolve();
                 } else {
                     promise = Twig.expression.parseAsync.call(state, token.withStack, context)
                         .then(withContext => {
@@ -1014,7 +1016,7 @@ export default function (Twig) {
                     };
                     // Save arguments
 
-                    return Twig.async.forEach(token.parameters, function (prop, i) {
+                    return AsyncTwig.forEach(token.parameters, function (prop, i) {
                         // Add parameters from context to macroContext
                         if (typeof args[i] !== 'undefined') {
                             macroContext[prop] = args[i];
@@ -1025,7 +1027,7 @@ export default function (Twig) {
                             return Twig.expression.parseAsync.call(this, token.defaults[prop], context)
                                 .then(value => {
                                     macroContext[prop] = value;
-                                    return Twig.Promise.resolve();
+                                    return TwigPromise.resolve();
                                 });
                         }
 
@@ -1150,7 +1152,7 @@ export default function (Twig) {
                 let promise;
 
                 if (token.expression === '_self') {
-                    promise = Twig.Promise.resolve(state.macros);
+                    promise = TwigPromise.resolve(state.macros);
                 } else {
                     promise = Twig.expression.parseAsync.call(state, token.stack, context)
                         .then(filePath => {
@@ -1221,7 +1223,7 @@ export default function (Twig) {
             },
             parse(token, context, chain) {
                 let embedContext = {};
-                let promise = Twig.Promise.resolve();
+                let promise = TwigPromise.resolve();
                 let state = this;
 
                 if (!token.only) {
@@ -1325,7 +1327,7 @@ export default function (Twig) {
                 let innerContext = {};
                 let i;
                 const state = this;
-                let promise = Twig.Promise.resolve();
+                let promise = TwigPromise.resolve();
 
                 if (!token.only) {
                     innerContext = {...context};
@@ -1523,7 +1525,7 @@ export default function (Twig) {
      *                        chain is closed and no further cases should be parsed.
      */
     Twig.logic.parse = function (token, context, chain, allowAsync) {
-        return Twig.async.potentiallyAsync(this, allowAsync, function () {
+        return AsyncTwig.potentiallyAsync(this, allowAsync, function () {
             TwigCore.log.debug('Twig.logic.parse: ', 'Parsing logic token ', token);
 
             const tokenTemplate = Twig.logic.handler[token.type];
@@ -1550,6 +1552,10 @@ export default function (Twig) {
             return result;
         });
     };
+    Twig.logic.parseAsync = function (token, context, chain) {
+        const state = this;
 
+        return Twig.logic.parse.call(state, token, context, chain, true);
+    };
     return Twig;
 };
