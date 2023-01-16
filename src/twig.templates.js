@@ -13,15 +13,9 @@ export class TwigTemplates {
      */
     parsers;
 
-    /**
-     * Cached / loaded templates
-     * @type {Object}
-     */
-    registry;
     #twig;
 
     constructor(twig) {
-        this.registry = {};
         this.loaders = {};
         this.parsers = {};
         this.#twig = twig;
@@ -174,11 +168,10 @@ export class TwigTemplates {
      * @return {Twig.Template} A twig.js template stored with the provided ID.
      */
     load(id) {
-        if (!Object.hasOwnProperty.call(this.registry, id)) {
+        if(!this.#twig.cacher.findCacheFile(id)){
             return null;
         }
-
-        return this.registry[id];
+        return this.#twig.cacher.buildTemplateForCache(this.#twig.cacher.getCache(id));
     };
 
     /**
@@ -203,16 +196,7 @@ export class TwigTemplates {
      */
     loadRemote(location, params) {
         // Default to the URL so the template is cached.
-        const id =
-            typeof params.id === "undefined"
-                ? this.#twig.lib
-                      .hasher("md5")
-                      .update(location)
-                      .toString()
-                : this.#twig.lib
-                .hasher("md5")
-                .update(params.id)
-                .toString();
+        const id = typeof params.id === 'undefined' ? location : params.id;
           // Default to async
         if (typeof params.async === 'undefined') {
             params.async = true;

@@ -703,7 +703,7 @@ export default  function (Twig) {
     Twig.validateId = function (id) {
         if (id === 'prototype') {
             throw new Twig.Error(id + ' is not a valid twig identifier');
-        } else if (Twig.cache && Object.hasOwnProperty.call(Twig.Templates.registry, id)) {
+        } else if (Twig.cache && Twig.cacher.findCacheFile(id)) {
             throw new Twig.Error('There is already a template with the ID ' + id);
         }
 

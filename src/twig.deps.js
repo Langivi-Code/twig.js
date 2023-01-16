@@ -25,8 +25,9 @@ import slug from "slug";
 import timeZoneName from "timeZoneName";
 import {createHash} from "hasher";
 import {ensureDir} from "ensureDir";
+import {emptyDirSync} from "emptyDirSync";
 
 
 const require = createRequire(Deno.realPathSync("."));
-export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, encode, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName,createHash,ensureDir}
+export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, encode, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName,createHash,ensureDir, emptyDirSync}
 export default require;

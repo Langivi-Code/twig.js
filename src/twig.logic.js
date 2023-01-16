@@ -630,10 +630,9 @@ export default function (Twig) {
                 let promise = Twig.Promise.resolve();
 
                 state.template.blocks.defined[token.blockName] = new Twig.Block(state.template, token);
-
                 if (
                     state.template.parentTemplate === null ||
-                    state.template.parentTemplate instanceof Twig.Template
+                    state.template.parentTemplate instanceof TwigTemplate
                 ) {
                     promise = state.getBlock(token.blockName).render(state, context);
                 }

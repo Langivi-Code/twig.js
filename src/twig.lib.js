@@ -6,7 +6,7 @@
 // LICENSES.md file.
 //
 
-import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName, getLanguageNameWithCountry, showdown, slug, timeZoneName, encode, createHash, ensureDir} from './twig.deps.js';
+import {sprintf, vsprintf, strip_tags, round, max, min, strtotime, date, boolval, clm, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName, getLanguageNameWithCountry, showdown, slug, timeZoneName, encode, createHash, ensureDir, emptyDirSync} from './twig.deps.js';
 
 
 class TwigLib {
@@ -37,6 +37,7 @@ class TwigLib {
         this.slug = slug;
         this.timeZoneName = timeZoneName;
         this.ensureDir = ensureDir;
+        this.emptyDirSync = emptyDirSync;
     }
 
     is(type, obj) {
