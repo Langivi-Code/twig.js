@@ -613,35 +613,26 @@ Deno.test('Context ->', async (t) => {
     });
 });
 
-// Deno.test('Imports ->', async (t)=>{
-//     await t.step('should load an inline include when the file exists', async(t) => {
-//         /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
-//         const template = await twig.twig({
-//             allowInlineIncludes: true,
-//             async: false,
-//             rethrow: true,
-//             data: '{% include \'test/templates/simple.twig\' %}'
-//         });
-//         console.log("Result ",template.render());
-//         assertEquals(template.render(),{
-//             message: "There is already a template with the ID included",
-//             name: "TwigException",
-//             type: "TwigException",
-//             file: undefined
-//           });
-//         assertThrows(()=>{
-//            template.render({})
-//         },Error,"error")
-//     });
+Deno.test('Imports ->', async (t)=>{
+    await t.step('should load an inline include when the file exists', async(t) => {
+        /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
+        const template = await twig.twig({
+            allowInlineIncludes: true,
+            async: false,
+            rethrow: true,
+            data: '{% include \'./templates/simple.twig\' %}'
+        });
+        assertEquals(template.render(),"Twig.js!");
+    });
 
-//     await t.step('should throw when trying to load an inline include and the file does not exist', async()=> {
-//         /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
-//         const template = await twig.twig({
-//             allowInlineIncludes: true,
-//             async: false,
-//             rethrow: true,
-//             data: '{% include \'test/templates/doesnt-exist-ever.twig\' %}'
-//         });
-//         assertThrows(()=>{template.render({})},twig.Error);
-//     });
-// });
+    await t.step('should throw when trying to load an inline include and the file does not exist', async()=> {
+        /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
+        const template = await twig.twig({
+            allowInlineIncludes: true,
+            async: false,
+            rethrow: true,
+            data: '{% include \'./templates/doesnt-exist-ever.twig\' %}'
+        });
+        assertThrows(()=>{template.render({})});
+    });
+});
