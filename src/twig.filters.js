@@ -217,10 +217,9 @@ export class TwigFilters {
         }
 
         if (this.Twig.lib.is('Object', value)) {
-            const serialize = function (obj, prefix) {
+            const serialize = (obj, prefix) => {
                 const result = [];
                 const keyset = obj._keys || Object.keys(obj);
-
                 keyset.forEach(key => {
                     if (!Object.prototype.hasOwnProperty.call(obj, key)) {
                         return;
@@ -228,7 +227,6 @@ export class TwigFilters {
 
                     const resultKey = prefix ? prefix + '[' + key + ']' : key;
                     const resultValue = obj[key];
-
                     result.push(
                         (this.Twig.lib.is('Object', resultValue) || Array.isArray(resultValue)) ?
                             serialize(resultValue, resultKey) :
