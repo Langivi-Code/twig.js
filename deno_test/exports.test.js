@@ -1,23 +1,23 @@
-import { assertEquals, assertThrows } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
-Deno.test("Twig.js Exports __express ->", async (t) => {
+Deno.test("Twig.js Exports __express ->",   async (t) => {
     await t.step('should return a string (and not a String)', async () => {
-        twig.__express('./templates/test.twig', {
+            twig.__express('./templates/test.twig', {
             settings: {
                 'twig options': {
                     autoescape: 'html'
                 }
             }
-        }, (err, response) => {
-            assertEquals((err === null), true);
-            const responseType = (typeof response);
-            assertEquals(responseType, 'string');
+            }, (err, response) => {
+                assertEquals((err === null), true);
+                const responseType = (typeof response);
+                assertEquals(responseType, 'string');
             
-        });
+            });
     })
 
-    await t.step('', async () => {
+    await t.step('', () => {
         twig.__express('./templates/test-async.twig', {
             settings: {
                 'twig options': {

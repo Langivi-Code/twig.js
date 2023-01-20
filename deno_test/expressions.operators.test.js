@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test('Twig.js Expression Operators ->  Precedence ->', async (t) => {
@@ -12,21 +12,21 @@ Deno.test('Twig.js Expression Operators ->  Precedence ->', async (t) => {
 });
 
 Deno.test('// ->', async (t) => {
-    await t.step('should handle positive values', async (t) => {
+    await t.step('should handle positive values', async () => {
         const testTemplate = await twig.twig({data: '{{ 20 // 7 }}'});
         const output = testTemplate.render({});
 
         assertEquals(output, '2');
     });
 
-    await t.step('should handle negative values', async (t) => {
+    await t.step('should handle negative values', async () => {
         const testTemplate = await twig.twig({data: '{{ -20 // -7 }}'});
         const output = testTemplate.render({});
 
         assertEquals(output, '2');
     });
 
-    await t.step('should handle mixed sign values', async (t) => {
+    await t.step('should handle mixed sign values', async () => {
         const testTemplate = await twig.twig({data: '{{ -20 // 7 }}'});
         const output = testTemplate.render({});
 

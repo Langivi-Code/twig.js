@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 const numericTestData = [
@@ -35,7 +35,7 @@ Deno.test('Twig.js Expressions ->', async (t) => {
         assertEquals(output,(d.a - (d.b + 1 + d.c)).toString());
     });
 
-    await t.step('should add numbers', async (t) => {
+    await t.step('should add numbers', async () => {
         const testTemplate = await twig.twig({data: '{{ a + b }}'});
         numericTestData.forEach(pair => {
             const output = testTemplate.render(pair);
@@ -43,7 +43,7 @@ Deno.test('Twig.js Expressions ->', async (t) => {
         });
     });
 
-    await t.step('should subtract numbers', async (t) => {
+    await t.step('should subtract numbers', async () => {
             const testTemplate = await twig.twig({data: '{{ a - b }}'});
             numericTestData.forEach(pair => {
                 const output = testTemplate.render(pair);
@@ -51,7 +51,7 @@ Deno.test('Twig.js Expressions ->', async (t) => {
             });
     });
 
-    await t.step('should multiply numbers', async (t) => {
+    await t.step('should multiply numbers', async () => {
             const testTemplate = await twig.twig({data: '{{ a * b }}'});
             numericTestData.forEach(pair => {
                 const output = testTemplate.render(pair);
@@ -184,7 +184,7 @@ Deno.test('Comparison Operators ->', async (t) => {
         {a: false, b: false}
     ];
 
-    await t.step('should support less then', async (t) => {
+    await t.step('should support less then', async () => {
         const testTemplate = await twig.twig({data: '{{ a < b }}'});
         numericTestData.forEach(pair => {
             const output = testTemplate.render(pair);

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows, assertObjectMatch } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 
@@ -315,17 +315,19 @@ Deno.test('Twig.js Filters -> url_encode ->', async (t) => {
         });
 
         await t.step('should escape words and characters in the date format (twig:ref)]', async () => {
-            await twig.twig({
-                id: 'escape-date-format',
-                path: './templates/escape-date-format.twig',
-                async: false,
-                load(){
-                },
-                error(e){
-                    console.log(e);
-                }
+            await new Promise((res,rej) => {
+                twig.twig({
+                    id: 'escape-date-format',
+                    path: './templates/escape-date-format.twig',
+                    async: false,
+                    load(template){
+                        res(template);
+                    },
+                    error(e){
+                        rej(e);
+                    }
+                });
             });
-
             // Load the template
             const testTemplate = await twig.twig({ref: 'escape-date-format'});
             assertEquals(testTemplate.render({}), 'January 1st at 12:00am');

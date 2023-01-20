@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows} from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test('Twig.js Rethrow ->', async (t) => {

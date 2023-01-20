@@ -192,5 +192,6 @@ Deno.test('Twig.js Tests ->', async (t) => {
         await t.step('should pass when test.test returns 123', async () => {
             let testTemplate = await twig.twig({data: '{{test.test}}'});
             assertEquals(testTemplate.render({test: foobar}), '123');
+            twig.cacher.emptyCacheDir();
         });
 });

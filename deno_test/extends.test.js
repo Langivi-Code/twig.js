@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows, assertObjectMatch } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals, assertObjectMatch } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test('Twig.js Extensions ->', async (t) => {
@@ -145,17 +145,18 @@ Deno.test('Twig.js Extensions ->', async (t) => {
     });
 
     await t.step('should extend the parent context when extending', async () => {
-        let template ;
-        await twig.twig({
-            path: './templates/extender.twig',
-            async: false,
-            load(tem){
-               template = tem;
-            },
-            error(e){
-                console.log(e);
-            }
+        const testTemplate = await new Promise((res,rej) => {
+            twig.twig({
+                path: './templates/extender.twig',
+                async: false,
+                load(tem){
+                    res(tem);
+                },
+                error(e){
+                    rej(e);
+                }
+            });
         });
-        assertEquals(template.render().trim(), 'ok!')
+        assertEquals(testTemplate.render().trim(), 'ok!')
     });
 });

@@ -1,4 +1,4 @@
-import { assertEquals, assertArrayIncludes, assertThrows, assertObjectMatch, assertExists } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 import { TwigTemplate } from "../src/twig.template.js";
 

@@ -1,17 +1,20 @@
-import { assertEquals, assertThrows } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test('Twig.js Embed ->', async (t)=>{
-   await t.step('it should load embed and render', async()=>{
-        twig.cacher.emptyCacheDir();
-        await twig.twig({
-            id: 'embed',
-            path: './templates/embed-simple.twig',
-            async: false,
-            load(){},
-            error(e){
-                console.log("Error:",e);
-            }
+   await t.step('it should load embed and render', async () => {
+        await new Promise((res,rej) => {
+            twig.twig({
+                id: 'embed',
+                path: './templates/embed-simple.twig',
+                async: false,
+                load(template){
+                    res(template);
+                },
+                error(e){
+                    rej(e);
+                }
+            });
         });
         const template = await twig.twig({ref: 'embed'});
         assertEquals(template.render({ }).trim(),[
@@ -59,7 +62,6 @@ Deno.test('Twig.js Embed ->', async (t)=>{
     });
 
    await t.step('should include the correct context using "with" and "only"', async()=>{
-        twig.cacher.emptyCacheDir();
         await twig.twig({
             data: '|{{ foo }}||{{ baz }}|',
             id: 'embed1.twig'
@@ -130,6 +132,7 @@ Deno.test('Twig.js Embed ->', async (t)=>{
     });
     
    await t.step('should support multiple inheritance and embeds', async()=>{
+        twig.cacher.emptyCacheDir();
         await twig.twig({
             data: '<{% block header %}base-header{% endblock %}>{% block body %}<base-body>{% endblock %}<{% block footer %}base-footer{% endblock %}>',
             id: 'base.twig'

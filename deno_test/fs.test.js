@@ -1,19 +1,24 @@
-import { assertEquals, assertThrows, assertObjectMatch, assertExists } from "https://deno.land/std@0.143.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test('Twig.js Loader ->', async (t) => {
     await t.step('should load a template from the filesystem asynchronously', async () => {
-        await twig.twig({
-            id: 'fs-node-async',
-            path: './templates/test.twig',
-            load(template) {
-                // Render the template
-                assertEquals(template.render({
-                    test: 'yes',
-                    flag: true
-                }),'Test template = yes\n\nFlag set!');
-            }
+        const testTemplate = await new Promise((res,rej) => {
+            twig.twig({
+                id: 'fs-node-async',
+                path: './templates/test.twig',
+                load(template) {
+                    res(template);
+                },
+                error(e){
+                    rej(e);
+                }
+            });
         });
+        assertEquals(testTemplate.render({
+            test: 'yes',
+            flag: true
+        }),'Test template = yes\n\nFlag set!');
     });
 
     await t.step('should load a template from the filesystem synchronously', async () => {

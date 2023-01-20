@@ -3,7 +3,7 @@ import { Twig } from "../src/twig.exports.js";
 import { twig } from "../src/twig.js";
 
 Deno.test("Twig.js Core ->", async (t) => {
-    await t.step("should save and load a template by reference", async (t) => {
+    await t.step("should save and load a template by reference", async () => {
         // Define and save a template
         await twig.twig({
             id: "test",
@@ -15,21 +15,21 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(result.render(), "test");
     });
 
-    await t.step("should ignore comments", async (t) => {
+    await t.step("should ignore comments", async () => {
         let template = await twig.twig({ data: "good {# comment #}morning" });
         assertEquals(template.render(), "good morning");
         template = await twig.twig({ data: "good{#comment#}morning" });
         assertEquals(template.render(), "goodmorning");
     });
 
-    await t.step("should ignore output tags within comments", async (t) => {
+    await t.step("should ignore output tags within comments", async () => {
         let template = await twig.twig({ data: 'good {# {{ "Hello" }} #}morning' });
         assertEquals(template.render(),"good morning");
         template = await twig.twig({ data: "good{#c}}om{{m{{ent#}morning" });
         assertEquals(template.render(), "goodmorning");
     });
 
-    await t.step("should ignore logic tags within comments", async (t) => {
+    await t.step("should ignore logic tags within comments", async () => {
         let template = await twig.twig({data: "test {# {% bad syntax if not in comment %} #}test"});
         assertEquals(template.render(), "test test");
         template = await twig.twig({ data: "{##}{##}test{# %}}}%}%{%{{% #}pass" });
@@ -37,7 +37,7 @@ Deno.test("Twig.js Core ->", async (t) => {
     });
 
     // https://github.com/justjohn/twig.js/issues/95
-    await t.step("should ignore quotation marks within comments", async (t) => {
+    await t.step("should ignore quotation marks within comments", async () => {
         let template = await twig.twig({ data: "good {# don't stop #}morning" })
         assertEquals(template.render(), "good morning");
         template = await twig.twig({ data: 'good{#"dont stop"#}morning' });
@@ -52,7 +52,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "a b c");
     });
 
-    await t.step("should be able to parse output tags with tag ends in strings", async (t) => {
+    await t.step("should be able to parse output tags with tag ends in strings", async () => {
             // Really all we care about here is not throwing exceptions.
             let template = await twig.twig({ data: '{{ "test" }}' });
             assertEquals(template.render(), "test");
@@ -71,7 +71,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         }
     );
 
-    await t.step("should be able to parse whitespace control output tags", async (t) => {
+    await t.step("should be able to parse whitespace control output tags", async () => {
         let template = await twig.twig({ data: ' {{- "test" -}}' })
         assertEquals(template.render(), "test");
         template = await twig.twig({ data: ' {{- "test" -}} ' });
@@ -102,7 +102,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "<>test<>");
     });
 
-    await t.step("should be able to parse mismatched opening whitespace control output tags", async (t) => {
+    await t.step("should be able to parse mismatched opening whitespace control output tags", async () => {
         let template = await twig.twig({ data: ' {{- "test" }}' });
         assertEquals(template.render(), "test");
         template = await twig.twig({ data: '{{- "test" }}\n' });
@@ -126,7 +126,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         }
     );
 
-    await t.step("should be able to parse mismatched closing whitespace control output tags", async (t) => {
+    await t.step("should be able to parse mismatched closing whitespace control output tags", async () => {
         let template = await twig.twig({ data: ' {{ "test" -}}' });
         assertEquals(template.render(), " test");
         template = await twig.twig({ data: '\n{{ "test" -}}\n' });
@@ -149,7 +149,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "test<>");
     });
 
-    await t.step("should be able to parse whitespace control logic tags", async (t) => {
+    await t.step("should be able to parse whitespace control logic tags", async () => {
         // Newlines directly after logic tokens are ignored
         // So use double newlines
         let template = await twig.twig({ data: '{%- if true -%}{{ "test" }}{% endif %}' });
@@ -175,7 +175,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         }
     );
 
-    await t.step("should be able to parse mismatched opening whitespace control logic tags", async (t) => {
+    await t.step("should be able to parse mismatched opening whitespace control logic tags", async () => {
         let template = await twig.twig({ data: '{%- if true %}{{ "test" }}{% endif %}' });
         assertEquals(template.render(), "test");
         template = await twig.twig({ data: '{%- if true %}{{ "test" }}{% endif %}' });
@@ -198,7 +198,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "<>test");
     });
 
-    await t.step("should be able to parse mismatched closing whitespace control logic tags", async (t) => {
+    await t.step("should be able to parse mismatched closing whitespace control logic tags", async () => {
         let template = await twig.twig({ data: '{% if true %}{{ "test" }}{% endif %}' });
         assertEquals(template.render(), "test");
         template = await twig.twig({ data: '{% if true -%} {{ "test" }}{% endif %}' });
@@ -221,7 +221,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals( template.render(), "<>test");
     });
 
-    await t.step("should be able to output numbers", async (t) => {
+    await t.step("should be able to output numbers", async () => {
         let template = await twig.twig({ data: "{{ 12 }}" });
         assertEquals(template.render(), "12");
         template = await twig.twig({ data: "{{ 12.64 }}" });
@@ -230,14 +230,14 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "0.64");
     });
 
-    await t.step("should be able to output booleans", async (t) => {
+    await t.step("should be able to output booleans", async () => {
         let template = await twig.twig({ data: "{{ true }}" });
         assertEquals(template.render(), "true");
         template =  await twig.twig({ data: "{{ false }}" });
         assertEquals(template.render(), "false");
     });
 
-    await t.step("should be able to output strings", async (t) => {
+    await t.step("should be able to output strings", async () => {
         let template = await twig.twig({ data: '{{ "double" }}' });
         assertEquals(template.render(), "double");
         template = await twig.twig({ data: "{{ 'single' }}" });
@@ -252,11 +252,11 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render(), "sin'gle");
     });
 
-    await t.step("should be able to output strings with newlines", async (t) => {
+    await t.step("should be able to output strings with newlines", async () => {
         const template = await twig.twig({ data: "{{ 'a\nb\rc\r\nd' }}" });
         assertEquals(template.render(), "a\nb\rc\r\nd");
     });
-    await t.step("should be able to output arrays", async (t) => {
+    await t.step("should be able to output arrays", async () => {
         let template = await twig.twig({ data: "{{ [1] }}" });
         assertEquals(template.render(), "1");
         template = await twig.twig({ data: "{{ [1,2 ,3 ] }}" });
@@ -268,7 +268,7 @@ Deno.test("Twig.js Core ->", async (t) => {
         template = await twig.twig({ data: '{{ ["[to",\'the\' ,"str\\"ing]" ] }}' });
         assertEquals(template.render(), '[to,the,str"ing]');
     });
-    await t.step("should be able to output parse expressions in an array", async (t) => {
+    await t.step("should be able to output parse expressions in an array", async () => {
         let template = await twig.twig({ data: "{{ [1,2 ,1+2 ] }}" });
         assertEquals(template.render(), "1,2,3");
         template = await twig.twig({ data: '{{ [1,2 ,3 , "-", [4,5, 6] ] }}' });
@@ -280,14 +280,14 @@ Deno.test("Twig.js Core ->", async (t) => {
         template =  await twig.twig({ data: "{{ [a, not b] }}" });
         assertEquals(template.render({ a: true, b: false }),"true,true");
     });
-    await t.step("should be able to output variables", async (t) => {
+    await t.step("should be able to output variables", async () => {
         let template = await twig.twig({ data: "{{ orp }}" });
         assertEquals(template.render({orp: 'test'}), "test");
         template = await twig.twig({ data: "{{ val }}" });
         assertEquals(template.render({val() {return "test"}}),"test");
     });
 
-    await t.step("should recognize null", async (t) => {
+    await t.step("should recognize null", async () => {
         let template = await twig.twig({ data: "{{ null == val }}" });
         assertEquals(template.render({ val: null }), "true");
         template = await twig.twig({ data: "{{ null == val }}" });
@@ -300,37 +300,37 @@ Deno.test("Twig.js Core ->", async (t) => {
         assertEquals(template.render({ val: false }), "false");
     });
 
-    await t.step("should recognize object literals", async (t) => {
+    await t.step("should recognize object literals", async () => {
         const template = await twig.twig({data:'{% set at = {"foo": "test", bar: "other", 1:"zip"} %}{{ at.foo ~ at.bar ~ at.1 }}'});
         assertEquals(template.render(), "testotherzip");
     });
 
-    await t.step("should allow newlines in object literals", async (t) => {
+    await t.step("should allow newlines in object literals", async () => {
         const template = await twig.twig({data:'{% set at = {\n"foo": "test",\rbar: "other",\r\n1:"zip"\n} %}{{ at.foo ~ at.bar ~ at.1 }}'});
         assertEquals(template.render(), "testotherzip");
     });
 
-    await t.step("should recognize null in an object", async (t) => {
+    await t.step("should recognize null in an object", async () => {
         const template = await twig.twig({data: '{% set at = {"foo": null} %}{{ at.foo == val }}'});
         assertEquals(template.render({ val: null }), "true");
     });
 
-    await t.step("should allow int 0 as a key in an object", async (t) => {
+    await t.step("should allow int 0 as a key in an object", async () => {
         const template = await twig.twig({ data: '{% set at = {0: "value"} %}{{ at.0 }}' });
         assertEquals(template.render(), "value");
     });
 
-    await t.step("should support set capture", async (t) => {
+    await t.step("should support set capture", async () => {
         const template =  await twig.twig({ data: "{% set foo %}bar{% endset %}{{foo}}" });
         assertEquals(template.render(),"bar");
     });
 
-    await t.step("should support raw data", async (t) => {
+    await t.step("should support raw data", async () => {
         const template = await twig.twig({data:"before {% raw %}{{ test }} {% test2 %} {{{% endraw %} after"});
         assertEquals(template.render(), "before {{ test }} {% test2 %} {{ after");
     });
 
-    await t.step("should support raw data using 'verbatim' tag", async (t) => {
+    await t.step("should support raw data using 'verbatim' tag", async () => {
         let template = await twig.twig({data:"before {% verbatim %}{{ test }} {% test2 %} {{{% endverbatim %} after"});
         assertEquals(template.render(), "before {{ test }} {% test2 %} {{ after");
     });

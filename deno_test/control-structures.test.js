@@ -2,7 +2,7 @@ import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 
 Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
-    await t.step( "should parse the contents of the if block if the expression is true", async (t) => {
+    await t.step( "should parse the contents of the if block if the expression is true", async () => {
             const testTemplate = await twig.twig({
                 data: "{% if test %}true{% endif%}"
             });
@@ -11,7 +11,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
         }
     );
 
-    await t.step( 'should call the if or else blocks based on the expression result', async (t) => {
+    await t.step( 'should call the if or else blocks based on the expression result', async () => {
             const testTemplate = await twig.twig({
                 data: "{% if test %}true{% endif%}"
             });
@@ -20,7 +20,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
         }
     );
 
-    await t.step( 'should support elseif', async (t) => {
+    await t.step( 'should support elseif', async () => {
             const testTemplate = await twig.twig({
                 data: '{% if test %}1{% elseif other %}2{%else%}3{% endif%}'
             });
@@ -31,7 +31,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
         }
     );
 
-    await t.step( 'should be able to nest', async (t) => {
+    await t.step( 'should be able to nest', async () => {
             const testTemplate = await twig.twig({
                 data: '{% if test %}{% if test2 %}true{% else %}false{% endif%}{% else %}not{% endif%}'
             });
@@ -42,7 +42,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
         }
     );
 
-    await t.step( 'should support newlines in if statement', async (t) => {
+    await t.step( 'should support newlines in if statement', async () => {
             const testTemplate = await twig.twig({
                 data: '{% if test or\r\nother %}true{% endif%}'
             });
@@ -51,7 +51,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
         }
     );
 
-    await t.step( 'should support values which are not booleans', async (t) => {
+    await t.step( 'should support values which are not booleans', async () => {
             const testTemplate = await twig.twig({
                 data: '{% if test %}test_true{% elseif other %}other_true{% else %}all_false{% endif %}'
             });
@@ -72,7 +72,7 @@ Deno.test("Twig.js Control Structures -> if tag ->", async (t) => {
 });
 
 Deno.test('for tag ->', async (t)=>{
-    await t.step('should provide value only for array input', async (t)=>{
+    await t.step('should provide value only for array input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for value in test %}{{ value }}{% endfor %}'
         });
@@ -81,7 +81,7 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: []}), '');
     });
 
-    await t.step('should provide both key and value for array input', async (t)=>{
+    await t.step('should provide both key and value for array input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for key,value in test %}{{key}}:{{ value }}{% endfor %}'
         });
@@ -91,7 +91,7 @@ Deno.test('for tag ->', async (t)=>{
     })
 
 
-    await t.step('should provide both key and value for multiline array input', async (t)=>{
+    await t.step('should provide both key and value for multiline array input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for key,value in [\n"foo",\n"bar\n","baz"] %}{{key}}:{{ value }}{% endfor %}'
         });
@@ -99,7 +99,7 @@ Deno.test('for tag ->', async (t)=>{
     })
 
 
-    await t.step('should provide value only for object input', async (t)=>{
+    await t.step('should provide value only for object input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for value in test %}{{ value }}{% endfor %}'
         });
@@ -107,7 +107,7 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: {}}), '');
     })
 
-    await t.step('should provide both key and value for object input', async (t)=>{
+    await t.step('should provide both key and value for object input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for key, value in test %}{{key}}:{{ value }}{% endfor %}'
         });
@@ -115,14 +115,14 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: {}}), '');
     })
 
-    await t.step('should provide both key and value for multiline object input', async (t)=>{
+    await t.step('should provide both key and value for multiline object input', async () => {
         const testTemplate = await twig.twig({
             data:'{% for key,value in {\n"foo":"bar\n",\n"baz":"bar"\n} %}{{key}}:{{ value }}{% endfor %}'
         });
         assertEquals(testTemplate.render({test: {}}), 'foo:bar\nbaz:bar');
     })
 
-    await t.step('should support else if the input is empty', async (t)=>{
+    await t.step('should support else if the input is empty', async () => {
         const testTemplate = await twig.twig({
             data: '{% for key,value in test %}{{ value }}{% else %}else{% endfor %}'
         });
@@ -130,7 +130,7 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: []}), 'else');
     })
 
-    await t.step('should be able to nest', async (t)=>{
+    await t.step('should be able to nest', async ()=>{
         const testTemplate = await twig.twig({
             data: '{% for key,list in test %}{% for val in list %}{{ val }}{%endfor %}.{% else %}else{% endfor %}'
         });
@@ -138,7 +138,7 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: []}), 'else');
     })
 
-    await t.step('should have a loop context item available for arrays', async (t)=>{
+    await t.step('should have a loop context item available for arrays', async () => {
         let testTemplate = await twig.twig({
             data: '{% for key,value in test %}{{ loop.index }}{% endfor %}'
         });
@@ -157,7 +157,7 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: [1, 2, 3, 4]}), 'falsefalsefalsetrue');
     })
 
-    await t.step('should have a loop context item available for objects', async (t)=>{
+    await t.step('should have a loop context item available for objects', async () => {
         let testTemplate = await twig.twig({
             data:  '{% for key,value in test %}{{ loop.index }}{% endfor %}'
         });
@@ -176,12 +176,12 @@ Deno.test('for tag ->', async (t)=>{
         assertEquals(testTemplate.render({test: {a: 1, b: 2, c: 3, d: 4}}), 'falsefalsefalsetrue');
     })
 
-    await t.step('should have a loop context item available in child loops objects', async (t)=>{
+    await t.step('should have a loop context item available in child loops objects', async () => {
         let testTemplate = await twig.twig({data: '{% for value in test %}{% for value in inner %}({{ loop.parent.loop.index }},{{ loop.index }}){% endfor %}{% endfor %}'});
         assertEquals(testTemplate.render({test: {a: 1, b: 2}, inner: [1, 2, 3]}), '(1,1)(1,2)(1,3)(2,1)(2,2)(2,3)');
     })
 
-    await t.step('should support conditionals on for loops', async (t)=>{
+    await t.step('should support conditionals on for loops', async () => {
         let testTemplate = await twig.twig({
             data:  '{% for value in test if false %}{{ value }},{% endfor %}'
         });

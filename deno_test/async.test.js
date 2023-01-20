@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals,assertThrows,assertRejects,assertObjectMatch} from 'https://deno.land/std@0.143.0/testing/asserts.ts';
+import { assertEquals, assertThrows } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 import {twig} from "../src/twig.js";
 
 Deno.test('Twig.js Async',async (t)=>{
@@ -22,21 +22,21 @@ Deno.test('Twig.js Async',async (t)=>{
         return Promise.reject(new Error('async error test'));
     });
 
-    await t.step('should throw when detecting async behaviour in sync mode',async (t)=>{
+    await t.step('should throw when detecting async behaviour in sync mode',async ()=>{
         const template = await twig.twig({
             data: '{{ echoAsync("hello world") }}'
         });
         assertThrows(()=>{template.render()})
     })
 
-    await t.step("should handle functions that return promises", async (t) => {
+    await t.step("should handle functions that return promises", async () => {
         const template = await twig.twig({
             data: '{{ echoAsync("hello world") }}'
         });
         template.renderAsync().then(output => assertEquals(output,"hello world"))
     })
 
-    await t.step("should handle functions that return rejected promises", async (t) => {
+    await t.step("should handle functions that return rejected promises", async () => {
         const template = await twig.twig({
             data: '{{ rejectAsync("hello world") }}',
             rethrow: true
