@@ -1,4 +1,4 @@
-## LICENSE for the sprintf and vsprintf functions is src/lib/twig.lib.js
+## LICENSE for the sprintf and vsprintf functions is src/lib/TwigLib.js
 
 
     Copyright (c) Alexandru Marasteanu <alexaholic [at) gmail (dot] com>
@@ -27,7 +27,7 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-## LICENSE for the Date.format function is src/lib/twig.lib.js
+## LICENSE for the Date.format function is src/lib/TwigLib.js
 
     Copyright (c) 2010 Christopher West
 
@@ -50,7 +50,7 @@
     THE SOFTWARE.
 
 
-## LICENSE for the strip_tags function in src/twig.lib.js and range function
+## LICENSE for the strip_tags function in src/TwigLib.js and range function
 ## in src/twig.functions.js
 
     This is version: 3.26

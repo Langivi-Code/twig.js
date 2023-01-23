@@ -2,6 +2,9 @@
 //
 
 // This file handles parsing filters.
+import { TwigCore } from "./twig.core.js";
+import TwigError from "./TwigError.js";
+
 export default function (Twig) {
     /**
      * @constant
@@ -106,7 +109,7 @@ export default function (Twig) {
                 }else{
                     throw new Error(`The html_classes function argument ${element} should be either a string or an array`)
                 }
-                
+
             });
             return classes.join(" ");
 
@@ -207,7 +210,7 @@ export default function (Twig) {
                 // Timestamp
                 dateObj = new Date(date * 1000);
             } else {
-                throw new Twig.Error('Unable to parse date ' + date);
+                throw new TwigError('Unable to parse date ' + date);
             }
 
             return dateObj;
@@ -279,7 +282,7 @@ export default function (Twig) {
                     templateFound = true;
                 }
             } catch (error) {
-                Twig.log.debug('Twig.functions.source: ', 'Problem loading template  ', error);
+                TwigCore.log.debug('Twig.functions.source: ', 'Problem loading template  ', error);
             }
 
             // If the template was NOT found AND we are not ignoring missing templates, return the same message
@@ -443,7 +446,7 @@ export default function (Twig) {
 
     Twig._function = function (_function, value, params) {
         if (!Twig.functions[_function]) {
-            throw new Twig.Error('Unable to find function ' + _function);
+            throw new TwigError('Unable to find function ' + _function);
         }
 
         return Twig.functions[_function](value, params);

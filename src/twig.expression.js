@@ -1,7 +1,11 @@
 // ## twig.expression.js
 //
 // This file handles tokenizing, compiling and parsing expressions.
+import { TwigCore } from './twig.core.js';
 import ExpressionOperator from './twig.expression.operator.js';
+import { AsyncTwig } from "./async/twig.async.js";
+import TwigError from "./TwigError.js";
+import { TwigPromise } from './async/twig.promise.js';
 export default function (Twig) {
     'use strict';
 
@@ -10,7 +14,7 @@ export default function (Twig) {
             return Twig.expression.parseAsync.call(state, params, context);
         }
 
-        return Twig.Promise.resolve(false);
+        return TwigPromise.resolve(false);
     }
 
     /**
@@ -237,7 +241,7 @@ export default function (Twig) {
                 const { value } = token;
                 const operator = Twig.expression.operator.lookup(value, token);
 
-                Twig.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
+                TwigCore.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
                     (stack[stack.length - 1].type === Twig.expression.type.operator.unary || stack[stack.length - 1].type === Twig.expression.type.operator.binary) &&
@@ -273,7 +277,7 @@ export default function (Twig) {
                                 keyToken.type === Twig.expression.type.subexpression.end)) {
                             token.params = keyToken.params;
                         } else {
-                            throw new Twig.Error('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
+                            throw new TwigError('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
                         }
 
                         output.push(token);
@@ -359,7 +363,7 @@ export default function (Twig) {
                 }
 
                 token.value = value.slice(1, -1).replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-                Twig.log.trace('Twig.expression.compile: ', 'String value: ', token.value);
+                TwigCore.log.trace('Twig.expression.compile: ', 'String value: ', token.value);
                 output.push(token);
             },
             parse: Twig.expression.fn.parse.pushValue
@@ -485,7 +489,7 @@ export default function (Twig) {
                         });
                 }
 
-                throw new Twig.Error('Unexpected subexpression end when token is not marked as an expression');
+                throw new TwigError('Unexpected subexpression end when token is not marked as an expression');
             }
         },
         {
@@ -580,7 +584,7 @@ export default function (Twig) {
                 }
 
                 if (!arrayEnded) {
-                    throw new Twig.Error('Expected end of parameter set.');
+                    throw new TwigError('Expected end of parameter set.');
                 }
 
                 stack.push(newArray);
@@ -664,7 +668,7 @@ export default function (Twig) {
                 }
 
                 if (!arrayEnded) {
-                    throw new Twig.Error('Expected end of array.');
+                    throw new TwigError('Expected end of array.');
                 }
 
                 stack.push(newArray);
@@ -725,7 +729,7 @@ export default function (Twig) {
 
                     if (token && token.type && (token.type === Twig.expression.type.operator.binary || token.type === Twig.expression.type.operator.unary) && token.key) {
                         if (!hasValue) {
-                            throw new Twig.Error('Missing value for key \'' + token.key + '\' in object definition.');
+                            throw new TwigError('Missing value for key \'' + token.key + '\' in object definition.');
                         }
 
                         newObject[token.key] = value;
@@ -749,7 +753,7 @@ export default function (Twig) {
                 }
 
                 if (!objectEnded) {
-                    throw new Twig.Error('Unexpected end of object.');
+                    throw new TwigError('Unexpected end of object.');
                 }
 
                 stack.push(newObject);
@@ -821,7 +825,7 @@ export default function (Twig) {
                             // Get the function from the user/context defined functions
                             value = context[fn](...params);
                         } else {
-                            throw new Twig.Error(fn + ' function does not exist and is not defined in the context');
+                            throw new TwigError(fn + ' function does not exist and is not defined in the context');
                         }
 
                         return value;
@@ -864,11 +868,11 @@ export default function (Twig) {
                     return Twig.expression.resolveAsync.call(state, context[token.value], context)
                         .then(value => {
                             if (state.template.options.strictVariables && value === undefined) {
-                                throw new Twig.Error('Variable "' + token.value + '" does not exist.');
+                                throw new TwigError('Variable "' + token.value + '" does not exist.');
                             }
                             stack.push(value);
                         });
-                
+
             }
         },
         {
@@ -893,9 +897,9 @@ export default function (Twig) {
                 if (object && !Object.prototype.hasOwnProperty.call(object, key) && state.template.options.strictVariables) {
                     const keys = Object.keys(object);
                     if (keys.length > 0) {
-                        throw new Twig.Error('Key "' + key + '" for object with keys "' + Object.keys(object).join(', ') + '" does not exist.');
+                        throw new TwigError('Key "' + key + '" for object with keys "' + Object.keys(object).join(', ') + '" does not exist.');
                     } else {
-                        throw new Twig.Error('Key "' + key + '" does not exist as the object is empty.');
+                        throw new TwigError('Key "' + key + '" does not exist as the object is empty.');
                     }
                 }
 
@@ -964,9 +968,9 @@ export default function (Twig) {
                         if (object && !Object.prototype.hasOwnProperty.call(object, key) && state.template.options.strictVariables) {
                             const keys = Object.keys(object);
                             if (keys.length > 0) {
-                                throw new Twig.Error('Key "' + key + '" for array with keys "' + keys.join(', ') + '" does not exist.');
+                                throw new TwigError('Key "' + key + '" for array with keys "' + keys.join(', ') + '" does not exist.');
                             } else {
-                                throw new Twig.Error('Key "' + key + '" does not exist as the array is empty.');
+                                throw new TwigError('Key "' + key + '" does not exist as the array is empty.');
                             }
                         } else if (object === null || object === undefined) {
                             return null;
@@ -1044,10 +1048,10 @@ export default function (Twig) {
         const state = this;
 
         if (typeof value !== 'function') {
-            return Twig.Promise.resolve(value);
+            return TwigPromise.resolve(value);
         }
 
-        let promise = Twig.Promise.resolve(params);
+        let promise = TwigPromise.resolve(params);
 
         /*
         If value is a function, it will have been impossible during the compile stage to determine that a following
@@ -1079,7 +1083,7 @@ export default function (Twig) {
     };
 
     Twig.expression.resolve = function (value, context, params, nextToken, object) {
-        return Twig.async.potentiallyAsync(this, false, function () {
+        return AsyncTwig.potentiallyAsync(this, false, function () {
             return Twig.expression.resolveAsync.call(this, value, context, params, nextToken, object);
         });
     };
@@ -1121,7 +1125,7 @@ export default function (Twig) {
      */
     Twig.expression.extend = function (definition) {
         if (!definition.type) {
-            throw new Twig.Error('Unable to extend logic definition. No type provided for ' + definition);
+            throw new TwigError('Unable to extend logic definition. No type provided for ' + definition);
         }
 
         Twig.expression.handler[definition.type] = definition;
@@ -1163,7 +1167,7 @@ export default function (Twig) {
                 match[matchI] = args[matchI];
             }
 
-            Twig.log.trace('Twig.expression.tokenize',
+            TwigCore.log.trace('Twig.expression.tokenize',
                 'Matched a ', type, ' regular expression of ', match);
 
             if (next && !next.includes(type)) {
@@ -1205,8 +1209,7 @@ export default function (Twig) {
 
             return '';
         };
-
-        Twig.log.debug('Twig.expression.tokenize', 'Tokenizing expression ', expression);
+        TwigCore.log.debug('Twig.expression.tokenize', 'Tokenizing expression ', expression);
 
         while (expression.length > 0) {
             expression = expression.trim();
@@ -1214,7 +1217,7 @@ export default function (Twig) {
                 if (Object.hasOwnProperty.call(Twig.expression.handler, type)) {
                     tokenNext = Twig.expression.handler[type].next;
                     regex = Twig.expression.handler[type].regex;
-                    Twig.log.trace('Checking type ', type, ' on ', expression);
+                    TwigCore.log.trace('Checking type ', type, ' on ', expression);
                     matchFound = false;
                     if (Array.isArray(regex)) {
                         regexI = regex.length;
@@ -1234,14 +1237,14 @@ export default function (Twig) {
             }
             if (!matchFound) {
                 if (invalidMatches.length > 0) {
-                    throw new Twig.Error(invalidMatches.join(' OR '));
+                    throw new TwigError(invalidMatches.join(' OR '));
                 } else {
-                    throw new Twig.Error('Unable to parse \'' + expression + '\' at template position' + expOffset);
+                    throw new TwigError('Unable to parse \'' + expression + '\' at template position' + expOffset);
                 }
             }
         }
 
-        Twig.log.trace('Twig.expression.tokenize', 'Tokenized to ', tokens);
+        TwigCore.log.trace('Twig.expression.tokenize', 'Tokenized to ', tokens);
         return tokens;
     };
 
@@ -1261,7 +1264,7 @@ export default function (Twig) {
         const stack = [];
         let tokenTemplate = null;
 
-        Twig.log.trace('Twig.expression.compile: ', 'Compiling ', expression);
+        TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', expression);
 
         // Push tokens into RPN stack using the Shunting-yard algorithm
         // See http://en.wikipedia.org/wiki/Shunting_yard_algorithm
@@ -1270,20 +1273,20 @@ export default function (Twig) {
             token = tokens.shift();
             tokenTemplate = Twig.expression.handler[token.type];
 
-            Twig.log.trace('Twig.expression.compile: ', 'Compiling ', token);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', token);
 
             // Compile the template
             tokenTemplate.compile(token, stack, output);
 
-            Twig.log.trace('Twig.expression.compile: ', 'Stack is', stack);
-            Twig.log.trace('Twig.expression.compile: ', 'Output is', output);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Stack is', stack);
+            TwigCore.log.trace('Twig.expression.compile: ', 'Output is', output);
         }
 
         while (stack.length > 0) {
             output.push(stack.pop());
         }
 
-        Twig.log.trace('Twig.expression.compile: ', 'Final output is', output);
+        TwigCore.log.trace('Twig.expression.compile: ', 'Final output is', output);
 
         rawToken.stack = output;
         delete rawToken.value;
@@ -1314,8 +1317,8 @@ export default function (Twig) {
         const loopTokenFixups = [];
         const binaryOperator = Twig.expression.type.operator.binary;
 
-        return Twig.async.potentiallyAsync(state, allowAsync, () => {
-            return Twig.async.forEach(tokens, (token, index) => {
+        return AsyncTwig.potentiallyAsync(state, allowAsync, () => {
+            return AsyncTwig.forEach(tokens, (token, index) => {
                 let tokenTemplate = null;
                 let nextToken = null;
                 let result;
@@ -1368,6 +1371,13 @@ export default function (Twig) {
                     return stack.pop();
                 });
         });
+    };
+
+
+    Twig.expression.parseAsync = function (tokens, context, tokensAreParameters) {
+        const state = this;
+
+        return Twig.expression.parse.call(state, tokens, context, tokensAreParameters, true);
     };
 
     return Twig;

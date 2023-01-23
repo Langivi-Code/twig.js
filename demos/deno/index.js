@@ -1,8 +1,8 @@
 import opine from "https://deno.land/x/opine@2.1.3/mod.ts";
-import {renderToString} from "../../src/twig.js";
+import {twig} from "../../src/twig.js";
 const app = opine();
 
-app.engine('twig', renderToString);
+app.engine('twig', twig.renderToString.bind(twig));
 app.set('views',"./view");
 app.set('view engine', 'twig');
 app.set('view cache', true);
