@@ -12,7 +12,7 @@ Deno.test('Twig.js Optional Functionality ->', async (t) => {
             allowInlineIncludes: true,
             data: 'template with {% include "other" %}'
         });
-        const output = template.render();
+        const output = await template.render();
 
         assertEquals(output, 'template with another template');
     });

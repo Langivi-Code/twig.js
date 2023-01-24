@@ -5,8 +5,8 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
     await t.step('should support namespaces defined with ::', async () => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
-                namespaces: {test: './templates/namespaces/'},
-                path: './templates/namespaces_coloncolon.twig',
+                namespaces: {test: './deno_test/templates/namespaces/'},
+                path: './deno_test/templates/namespaces_coloncolon.twig',
                 load(template) { 
                     res(template);
                 },
@@ -21,8 +21,8 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
     await t.step('should support namespaces defined with :: and  without slash at the end of path', async () => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
-                namespaces: {test: './templates/namespaces'},
-                path: './templates/namespaces_coloncolon.twig',
+                namespaces: {test: './deno_test/templates/namespaces'},
+                path: './deno_test/templates/namespaces_coloncolon.twig',
                 load(template) {
                     res(template);
                 },
@@ -37,8 +37,8 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
     await t.step('should support namespaces defined with @', async () => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
-                namespaces: {test: './templates/namespaces/'},
-                path: './templates/namespaces_@.twig',
+                namespaces: {test: './deno_test/templates/namespaces/'},
+                path: './deno_test/templates/namespaces_@.twig',
                 load(template) {
                     res(template);
                 },
@@ -53,8 +53,8 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
     await t.step('should support namespaces defined with @ and  without slash at the end of path', async () => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
-                namespaces: {test: './templates/namespaces'},
-                path: './templates/namespaces_@.twig',
+                namespaces: {test: './deno_test/templates/namespaces'},
+                path: './deno_test/templates/namespaces_@.twig',
                 load(template) {
                     res(template);
                 },
@@ -69,8 +69,8 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
     await t.step('should support non-namespaced includes with namespaces configured', async () => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
-                namespaces: {test: './templates/namespaces/'},
-                path: './templates/namespaces_without_namespace.twig',
+                namespaces: {test: './deno_test/templates/namespaces/'},
+                path: './deno_test/templates/namespaces_without_namespace.twig',
                 load(template) {
                     res(template);
                 },
@@ -86,10 +86,10 @@ Deno.test('Twig.js Namespaces ->', async (t) => {
         const testTemplate = await new Promise ((res,rej) => {
             twig.twig({
                 namespaces: {
-                    one: './templates/namespaces/one/',
-                    two: './templates/namespaces/two/'
+                    one: './deno_test/templates/namespaces/one/',
+                    two: './deno_test/templates/namespaces/two/'
                 },
-                path: './templates/namespaces_multiple.twig',
+                path: './deno_test/templates/namespaces_multiple.twig',
                 load(template) {
                     res(template);
                 },

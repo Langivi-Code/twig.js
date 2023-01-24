@@ -6,7 +6,7 @@ Deno.test('Twig.js Embed ->', async (t)=>{
         await new Promise((res,rej) => {
             twig.twig({
                 id: 'embed',
-                path: './templates/embed-simple.twig',
+                path: './deno_test/templates/embed-simple.twig',
                 async: false,
                 load(template){
                     res(template);

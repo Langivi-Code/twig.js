@@ -1,11 +1,11 @@
 import { assertEquals, assertThrows} from "https://deno.land/std@0.143.0/testing/asserts.ts";
-import { twig } from "../src/twig.js";
+import { twigPath } from "../src/TwigPath.js";
 
 Deno.test('Twig.js Path ->', async (t) => {
     let relativePath;
 
     (function () {
-        relativePath = twig.path.relativePath;
+        relativePath = twigPath.relativePath;
     })();
 
     await t.step('relativePath -> should throw an error if trying to get a relative path in an inline template', function () {
@@ -16,18 +16,18 @@ Deno.test('Twig.js Path ->', async (t) => {
     });
 
     await t.step('should give the full path to a file when file is passed', function () {
-        assertEquals(relativePath({url: 'http://www.test.com/test.twig'}, 'templates/myFile.twig'), 'http://www.test.com/templates/myFile.twig');
-        assertEquals(relativePath({path: 'test/test.twig'}, 'templates/myFile.twig'), ('test/templates/myFile.twig'));
+        assertEquals(relativePath({url: 'http://www.test.com/test.twig'}, './deno_test/templates/myFile.twig'), 'http://www.test.com/deno_test/templates/myFile.twig');
+        assertEquals(relativePath({path: 'deno_test/test.twig'}, 'templates/myFile.twig'), ('deno_test/templates/myFile.twig'));
     });
 
     await t.step('should ascend directories', function () {
         assertEquals(relativePath({url: 'http://www.test.com/templates/../test.twig'}, 'myFile.twig'), 'http://www.test.com/myFile.twig');
-        assertEquals(relativePath({path: 'test/templates/../test.twig'}, 'myFile.twig'), ('test/myFile.twig'));
+        assertEquals(relativePath({path: './deno_test/templates/../test.twig'}, 'myFile.twig'), ('deno_test/myFile.twig'));
     });
 
     await t.step('should respect relative directories', function () {
         assertEquals(relativePath({url: 'http://www.test.com/templates/./test.twig'}, 'myFile.twig'), 'http://www.test.com/templates/myFile.twig');
-        assertEquals(relativePath({path: 'test/templates/./test.twig'}, 'myFile.twig'), ('test/templates/myFile.twig'));
+        assertEquals(relativePath({path: './deno_test/templates/./test.twig'}, 'myFile.twig'), ('deno_test/templates/myFile.twig'));
     });
 
         

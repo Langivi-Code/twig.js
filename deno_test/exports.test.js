@@ -3,43 +3,47 @@ import { twig } from "../src/twig.js";
 
 Deno.test("Twig.js Exports __express ->",   async (t) => {
     await t.step('should return a string (and not a String)', async () => {
-            twig.__express('./templates/test.twig', {
+        const testTemplate =  await new Promise ((res,rej) => {
+            twig.__express('./deno_test/templates/test.twig', {
             settings: {
                 'twig options': {
                     autoescape: 'html'
                 }
             }
-            }, (err, response) => {
-                assertEquals((err === null), true);
-                const responseType = (typeof response);
-                assertEquals(responseType, 'string');
-            
+            }, (err, html) => {
+               if(err){
+                rej(err);
+               } else if (html) {
+                res(html);
+               }
             });
+        })
+        const responseType = (typeof testTemplate);
+        assertEquals(responseType, 'string');
     })
 
-    await t.step('', () => {
-        twig.__express('./templates/test-async.twig', {
-            settings: {
-                'twig options': {
-                    allowAsync: true
+    await t.step('', async () => {
+        const templateTest = await new Promise((res,rej) => {
+            twig.__express('./deno_test/templates/test-async.twig', {
+                settings: {
+                    'twig options': {
+                        allowAsync: true
+                    }
+                },
+                /* eslint-disable-next-line camelcase */
+                hello_world() {
+                    return Promise.resolve('hello world');
                 }
-            },
-            /* eslint-disable-next-line camelcase */
-            hello_world() {
-                return Promise.resolve('hello world');
-            }
-        }, (err, response) => {
-            if (err) {
-                return;
-            }
-
-            try {
-                const responseType = (typeof response);
-                assertEquals(responseType, 'string');
-                assertEquals(response, 'hello world\n');
-            } catch (error) {
-               console.log(error);
-            }
+            }, (err, html) => {
+                if (err) {
+                    rej(err);
+                } else {
+                    res(html);
+                }
+            });
         });
-    })
+        const responseType = (typeof templateTest);
+        assertEquals(responseType, 'string');
+        assertEquals(templateTest, 'hello world\n');
+    });
 })

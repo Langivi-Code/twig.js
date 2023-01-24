@@ -318,7 +318,7 @@ Deno.test('Twig.js Filters -> url_encode ->', async (t) => {
             await new Promise((res,rej) => {
                 twig.twig({
                     id: 'escape-date-format',
-                    path: './templates/escape-date-format.twig',
+                    path: './deno_test/templates/escape-date-format.twig',
                     async: false,
                     load(template){
                         res(template);
