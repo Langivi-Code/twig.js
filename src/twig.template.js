@@ -1,5 +1,4 @@
 import {twig} from "./twig.js";
-import twigLogic from "./twig.logic.js";
 import {twigLib} from "./TwigLib.js";
 import {twigPath} from "./TwigPath.js";
 import TwigError from "./TwigError.js";
@@ -141,7 +140,7 @@ export class TwigTemplate{
                             if(twig.cacher.findCacheFile(template.parentTemplate)){
                                 parentTemplate = twig.cacher.buildTemplateForCache(twig.cacher.getCache(template.parentTemplate))
                             }else{
-                                url = twig.path.parsePath(template, template.parentTemplate);
+                                url = twigPath.parsePath(template, template.parentTemplate);
 
                                 parentTemplate = twig.Templates.loadRemote(url, {
                                     method: template.getLoaderMethod(),

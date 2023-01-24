@@ -321,7 +321,7 @@ export default function (Twig) {
                 const { value } = token;
                 const operator = Twig.expression.operator.lookup(value, token);
 
-                Twig.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
+                TwigCore.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
                     (stack[stack.length - 1].type === Twig.expression.type.operator.unary || stack[stack.length - 1].type === Twig.expression.type.operator.binary) &&

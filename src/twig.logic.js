@@ -932,7 +932,7 @@ export default function (Twig) {
                         // Replace all space between closing and opening html tags
                         let output = tokenOutput.replace(rBetweenTagSpaces, '><').trim();
                         // Rewrap output as a Twig.Markup
-                        output = new Twig.Markup(output);
+                        output =  Twig.Markup(output);
                         return {
                             chain,
                             output

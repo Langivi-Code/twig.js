@@ -1,8 +1,7 @@
 // ## twig.filters.js
 //
 // This file handles parsing filters.
-
-
+import {twig} from './twig.js';
 // Determine object type
 import TwigError from "./TwigError.js";
 
@@ -655,7 +654,7 @@ export class TwigFilters {
                 }
             }
 
-            return new this.Twig.Markup(result, 'js');
+            return twig.Markup(result, 'js');
         }
 
         if (strategy === 'css') {
@@ -671,12 +670,12 @@ export class TwigFilters {
                 }
             }
 
-            return new this.Twig.Markup(result, 'css');
+            return twig.Markup(result, 'css');
         }
 
         if (strategy === 'url') {
             const result = this.Twig.filters.url_encode(value);
-            return new this.Twig.Markup(result, 'url');
+            return twig.Markup(result, 'url');
         }
 
         if (strategy === 'html_attr') {
@@ -706,7 +705,7 @@ export class TwigFilters {
                 }
             }
 
-            return new this.Twig.Markup(result, 'html_attr');
+            return twig.Markup(result, 'html_attr');
         }
 
         throw new TwigError('escape strategy unsupported');

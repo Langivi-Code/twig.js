@@ -27,7 +27,7 @@ export default class TwigBlock {
         parseState.template = this.template;
 
         if (this.token.expression) {
-            promise = TwigCore.expression.parseAsync.call(parseState, this.token.output, context);
+            promise = twig.expression.parseAsync.call(parseState, this.token.output, context);
         } else {
             promise = parseState.parseAsync(this.token.output, context);
         }

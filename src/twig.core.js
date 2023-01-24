@@ -634,7 +634,7 @@ class TwigCore {
                 (str.twigMarkup !== true && str.twigMarkup !== strategy) &&
                 !(strategy === 'html' && str.twigMarkup === 'html_attr')
             ) {
-                str = this.filters.escape(str, [strategy]);
+                str = twig.filters.escape(str, [strategy]);
             }
 
             return str;
@@ -648,8 +648,7 @@ class TwigCore {
         if (joinedOutput.length === 0) {
             return '';
         }
-
-        return new this.Markup(joinedOutput, true);
+        return twig.Markup(joinedOutput, true);
     };
 
     /**
@@ -710,7 +709,7 @@ class TwigCore {
     validateId(id) {
         if (id === 'prototype') {
             throw new TwigError(id + ' is not a valid twig identifier');
-        } else if (this.cache && this.Templates.registry.hasOwnProperty(id)) {
+        } else if (this.cache && this.cacher.findCacheFile(id)) {
             throw new TwigError('There is already a template with the ID ' + id);
         }
 
@@ -876,7 +875,7 @@ class TwigCore {
     filter(filter, value, params) {
         const state = this;
         if (!this.filters[filter]) {
-            throw new this.Error('Unable to find filter ' + filter);
+            throw new TwigError('Unable to find filter ' + filter);
         }
 
         return this.filters[filter](value, params);
