@@ -747,6 +747,10 @@ class TwigCore {
         this.tests = testssSetter(this);
         return this;
     }
+    setExpression(expressionSetter) {
+        this.expression = expressionSetter(this);
+        return this;
+    }
 
     setCacheClass(cacherSetter) {
         this.cacher = cacherSetter(this);

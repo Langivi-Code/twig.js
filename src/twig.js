@@ -25,6 +25,7 @@ import { TwigTemplate } from "./twig.template.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
 import { TwigCache } from "./twig.cache.js";
+import {TwigExpression} from "./TwigExpression.js";
 
 
 const twig = new TwigCore('1.16.2');
@@ -40,8 +41,8 @@ function factory(twig) {
     twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
     twig.setCacheClass((t)=>new TwigCache(t));
+    twig.setExpression((t)=>new TwigExpression(t));
     functions(twig);
-    expression(twig);
     logic(twig);
     loaderajax(twig);
     loaderfs(twig);
