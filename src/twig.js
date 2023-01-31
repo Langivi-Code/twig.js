@@ -10,7 +10,6 @@
 //
 // This file handles creating the Twig library
 
-import functions from "./twig.functions.js";
 import {TwigLib} from "./TwigLib.js";
 import loaderajax from "./twig.loader.ajax.js";
 import loaderfs from "./twig.loader.fs.js";
@@ -39,7 +38,6 @@ function factory(twig) {
     twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
     twig.setCacheClass((t)=>new TwigCache(t));
-    functions(twig);
     logic(twig);
     loaderajax(twig);
     loaderfs(twig);

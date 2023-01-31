@@ -4,6 +4,7 @@
 import {twig} from './twig.js';
 // Determine object type
 import TwigError from "./TwigError.js";
+import { twigFunctions } from './TwigFunctions.js';
 
 function is(type, obj) {
     const clas = Object.prototype.toString.call(obj).slice(8, -1);
@@ -421,7 +422,7 @@ export class TwigFilters {
     }
 
     date(value, params) {
-        const date = this.Twig.functions.date(value);
+        const date = twigFunctions.date(value);
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return this.Twig.lib.date(format.replace(/\\\\/g, '\\'), date);
     }
