@@ -1,5 +1,6 @@
 import { assertEquals, assertObjectMatch } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigExpression } from "../src/TwigExpression.js";
 
 Deno.test('Twig.js Extensions ->', async (t) => {
 
@@ -16,8 +17,8 @@ Deno.test('Twig.js Extensions ->', async (t) => {
                     const expression = token.match[1];
 
                     // Compile the expression.
-                    token.stack = Reflect.apply(Twig.expression.compile, this, [{
-                        type: Twig.expression.type.expression,
+                    token.stack = Reflect.apply(twigExpression.compile, this, [{
+                        type: twigExpression.type.expression,
                         value: expression
                     }]).stack;
 
@@ -25,7 +26,7 @@ Deno.test('Twig.js Extensions ->', async (t) => {
                     return token;
                 },
                 parse(token, context, _) {
-                    const name = Reflect.apply(Twig.expression.parse, this, [token.stack, context]);
+                    const name = Reflect.apply(twigExpression.parse, this, [token.stack, context]);
                     const output = '';
 
                     flags[name] = true;
@@ -65,8 +66,8 @@ Deno.test('Twig.js Extensions ->', async (t) => {
                     const expression = token.match[1];
 
                     // Turn the string expression into tokens.
-                    token.stack = Reflect.apply(Twig.expression.compile, this, [{
-                        type: Twig.expression.type.expression,
+                    token.stack = Reflect.apply(twigExpression.compile, this, [{
+                        type: twigExpression.type.expression,
                         value: expression
                     }]).stack;
 
@@ -74,7 +75,7 @@ Deno.test('Twig.js Extensions ->', async (t) => {
                     return token;
                 },
                 parse(token, context, chain) {
-                    const level = Reflect.apply(Twig.expression.parse, this, [token.stack, context]);
+                    const level = Reflect.apply(twigExpression.parse, this, [token.stack, context]);
                     let output = '';
 
                     if (App.users[App.currentUser].level === level) {

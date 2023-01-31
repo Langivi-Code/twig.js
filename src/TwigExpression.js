@@ -14,7 +14,7 @@ function parseParams(state, params, context) {
     return TwigPromise.resolve(false);
 }
 
-export class TwigExpression {
+class TwigExpression {
     constructor (){
         this.handler = {};
         while (this.definitions.length > 0) {

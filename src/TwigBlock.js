@@ -1,5 +1,6 @@
 import {TwigCore} from "./twig.core.js";
 import {twig} from "./twig.js";
+import { twigExpression } from "./TwigExpression.js";
 export default class TwigBlock {
     /**
      * A wrapper for template blocks.
@@ -27,17 +28,17 @@ export default class TwigBlock {
         parseState.template = this.template;
 
         if (this.token.expression) {
-            promise = twig.expression.parseAsync.call(parseState, this.token.output, context);
+            promise = twigExpression.parseAsync.call(parseState, this.token.output, context);
         } else {
             promise = parseState.parseAsync(this.token.output, context);
         }
 
         return promise
             .then(value => {
-                return twig.expression.parseAsync.call(
+                return twigExpression.parseAsync.call(
                     parseState,
                     {
-                        type: twig.expression.type.string,
+                        type: twigExpression.type.string,
                         value
                     },
                     context
