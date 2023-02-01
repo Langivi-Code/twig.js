@@ -4,6 +4,7 @@ import {twigPath} from "./TwigPath.js";
 import TwigError from "./TwigError.js";
 import { AsyncTwig } from "./async/twig.async.js";
 import { twigTemplates } from "./twig.templates.js";
+import { twigCache } from "./twig.cache.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -138,8 +139,8 @@ export class TwigTemplate{
 
                         // Check for the template file via include
                         if (!parentTemplate) {
-                            if(twig.cacher.findCacheFile(template.parentTemplate)){
-                                parentTemplate = twig.cacher.buildTemplateForCache(twig.cacher.getCache(template.parentTemplate))
+                            if(twigCache.findCacheFile(template.parentTemplate)){
+                                parentTemplate = twigCache.buildTemplateForCache(twigCache.getCache(template.parentTemplate))
                             }else{
                                 url = twigPath.parsePath(template, template.parentTemplate);
 

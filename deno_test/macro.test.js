@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigCache } from "../src/twig.cache.js";
 
 Deno.test("Twig.js Macro ->", async t => {
     // Test loading a template from a remote endpoint
@@ -166,7 +167,7 @@ Deno.test("Twig.js Macro ->", async t => {
     );
 
     await t.step("it should run wrapped macro inside blocks", async () => {
-        twig.cacher.emptyCacheDir();
+        twigCache.emptyCacheDir();
         await new Promise((res, rej) => {
             twig.twig({
                 id: "import-macro-inside-block",

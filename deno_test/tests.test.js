@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
-
+import { twigCache } from "../src/twig.cache.js";
 Deno.test('Twig.js Tests ->', async (t) => {
 
         await t.step(' empty test ->  should identify numbers as not empty', async () => {
@@ -192,6 +192,6 @@ Deno.test('Twig.js Tests ->', async (t) => {
         await t.step('should pass when test.test returns 123', async () => {
             let testTemplate = await twig.twig({data: '{{test.test}}'});
             assertEquals(testTemplate.render({test: foobar}), '123');
-            twig.cacher.emptyCacheDir();
+            twigCache.emptyCacheDir();
         });
 });

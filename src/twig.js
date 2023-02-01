@@ -19,7 +19,6 @@ import {TwigCompiler} from "./twig.compiler.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
-import { TwigCache } from "./twig.cache.js";
 import { twigTemplates } from "./twig.templates.js";
 
 const twig = new TwigCore('1.16.2');
@@ -32,7 +31,6 @@ function factory(twig) {
     twig.setCompile((t) => new TwigCompiler(t));
     twig.setLibClass((t) => new TwigLib(t));
     twig.setTestsClass((t) => new TwigTests(t));
-    twig.setCacheClass((t)=>new TwigCache(t));
     loaderajax(twig);
     loaderfs(twig);
     twigTemplates.registerParser('twig', params => {

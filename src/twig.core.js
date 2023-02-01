@@ -10,6 +10,7 @@ import {twigFunctions} from "./TwigFunctions.js";
 import { twigLogic } from "./TwigLogic.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigFilters } from "./twig.filters.js";
+import { twigCache } from "./twig.cache.js"; 
 class TwigCore {
     VERSION;
     compiler;
@@ -18,7 +19,6 @@ class TwigCore {
     logic;
     lib;
     path;
-    cacher;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -665,7 +665,7 @@ class TwigCore {
     validateId (id) {
         if (id === 'prototype') {
             throw new TwigError(id + ' is not a valid twig identifier');
-        } else if (this.cache && this.cacher.findCacheFile(id)) {
+        } else if (this.cache && twigCache.findCacheFile(id)) {
             throw new  TwigError('There is already a template with the ID ' + id);
         }
 
@@ -712,7 +712,7 @@ class TwigCore {
     validateId(id) {
         if (id === 'prototype') {
             throw new TwigError(id + ' is not a valid twig identifier');
-        } else if (this.cache && this.cacher.findCacheFile(id)) {
+        } else if (this.cache && twigCache.findCacheFile(id)) {
             throw new TwigError('There is already a template with the ID ' + id);
         }
 
@@ -743,11 +743,6 @@ class TwigCore {
     }
     setExpression(expressionSetter) {
         this.expression = expressionSetter(this);
-        return this;
-    }
-
-    setCacheClass(cacherSetter) {
-        this.cacher = cacherSetter(this);
         return this;
     }
 

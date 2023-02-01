@@ -1,5 +1,6 @@
 import TwigError from "./TwigError.js";
 import { twig } from "./twig.js";
+import { twigCache } from "./twig.cache.js";
 class TwigTemplates {
     // Namespace for template storage and retrieval
 
@@ -154,10 +155,10 @@ class TwigTemplates {
         }
         
         const jsonTemplate = JSON.stringify(template);
-        if (await twig.cacher.findCacheFile(template.id)) {
+        if (await twigCache.findCacheFile(template.id)) {
             return;
         } else {
-            await twig.cacher.setCache(template.id,jsonTemplate);
+            await twigCache.setCache(template.id,jsonTemplate);
         }
     }
 
@@ -169,10 +170,10 @@ class TwigTemplates {
      * @return {Twig.Template} A twig.js template stored with the provided ID.
      */
     load(id) {
-        if(!twig.cacher.findCacheFile(id)){
+        if(!twigCache.findCacheFile(id)){
             return null;
         }
-        return twig.cacher.buildTemplateForCache(twig.cacher.getCache(id));
+        return twigCache.buildTemplateForCache(twigCache.getCache(id));
     };
 
     /**
@@ -204,11 +205,11 @@ class TwigTemplates {
         }
 
         let cached;
-        if(twig.cacher.findCacheFile(id)){
-            cached = twig.cacher.getCache(id);
+        if(twigCache.findCacheFile(id)){
+            cached = twigCache.getCache(id);
         }
         if (cached) {
-            const buildcache = twig.cacher.buildTemplateForCache(cached);
+            const buildcache = twigCache.buildTemplateForCache(cached);
             if(!params.async ){
                 return buildcache;
             }
