@@ -16,7 +16,6 @@ import loaderfs from "./twig.loader.fs.js";
 import {TwigTests} from "./twig.tests.js";
 import {TwigCore} from "./twig.core.js";
 import {TwigCompiler} from "./twig.compiler.js";
-import {TwigFilters} from "./twig.filters.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
@@ -31,7 +30,6 @@ function factory(twig) {
     twig.ParseState = TwigParseState;
 
     twig.setCompile((t) => new TwigCompiler(t));
-    twig.setFilterClass((t) => new TwigFilters(t));
     twig.setLibClass((t) => new TwigLib(t));
     twig.setTestsClass((t) => new TwigTests(t));
     twig.setCacheClass((t)=>new TwigCache(t));

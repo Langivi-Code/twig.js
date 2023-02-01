@@ -4,6 +4,7 @@ import {twig} from "./twig.js";
 import { AsyncTwig } from "./async/twig.async.js";
 import { twigExpression } from "./TwigExpression.js";
 import { twigLogic } from "./TwigLogic.js";
+import { twigFilters } from "./twig.filters.js";
 
 function handleException(state, ex) {
     if (state.template.options.rethrow) {
@@ -187,7 +188,7 @@ export default class TwigParseState {
 
             switch (token.type) {
                 case TwigCore.token.type.raw:
-                    output.push(twig.filters.raw(token.value));
+                    output.push(twigFilters.raw(token.value));
                     break;
 
                 case TwigCore.token.type.logic:

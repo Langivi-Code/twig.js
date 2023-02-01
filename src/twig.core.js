@@ -9,10 +9,10 @@ import {twigExpression} from "./TwigExpression.js";
 import {twigFunctions} from "./TwigFunctions.js";
 import { twigLogic } from "./TwigLogic.js";
 import { twigTemplates } from "./twig.templates.js";
+import { twigFilters } from "./twig.filters.js";
 class TwigCore {
     VERSION;
     compiler;
-    filters;
     _function;
     tests;
     logic;
@@ -637,7 +637,7 @@ class TwigCore {
                 (str.twigMarkup !== true && str.twigMarkup !== strategy) &&
                 !(strategy === 'html' && str.twigMarkup === 'html_attr')
             ) {
-                str = twig.filters.escape(str, [strategy]);
+                str = twigFilters.escape(str, [strategy]);
             }
 
             return str;
@@ -728,11 +728,6 @@ class TwigCore {
 
     setCompile(compilerSetter) {
         this.compiler = compilerSetter(this);
-        return this;
-    }
-
-    setFilterClass(filterSetter) {
-        this.filters = filterSetter(this);
         return this;
     }
 
@@ -877,16 +872,16 @@ class TwigCore {
 
     filter(filter, value, params) {
         const state = this;
-        if (!this.filters[filter]) {
+        if (!twigFilters[filter]) {
             throw new TwigError('Unable to find filter ' + filter);
         }
 
-        return this.filters[filter](value, params);
+        return twigFilters[filter](value, params);
     }
 
     // Extend Twig with a new filter.
     extendFilter(filter, definition) {
-        TwigFilters.addFilter(this.filters, filter, definition)
+        TwigFilters.addFilter(twigFilters, filter, definition)
     }
 
     // Extend Twig with a new function.
