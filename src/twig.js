@@ -15,14 +15,12 @@ import loaderfs from "./twig.loader.fs.js";
 import {TwigTests} from "./twig.tests.js";
 import {TwigCore} from "./twig.core.js";
 import { TwigTemplate } from "./twig.template.js";
-import TwigParseState from "./TwigParseState.js";
 import { twigTemplates } from "./twig.templates.js";
 
 const twig = new TwigCore('1.16.2');
 
 function factory(twig) {
 
-    twig.ParseState = TwigParseState;
     twig.setTestsClass((t) => new TwigTests(t));
     loaderajax(twig);
     loaderfs(twig);

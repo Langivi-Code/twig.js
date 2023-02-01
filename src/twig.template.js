@@ -6,6 +6,7 @@ import { AsyncTwig } from "./async/twig.async.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigCache } from "./twig.cache.js";
 import { twigCompiler } from "./twig.compiler.js";
+import TwigParseState from "./TwigParseState.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -120,7 +121,7 @@ export class TwigTemplate{
         params = params || {};
 
         return AsyncTwig.potentiallyAsync(template, allowAsync, () => {
-            const state = new twig.ParseState(template, params.blocks);
+            const state = new TwigParseState(template, params.blocks);
 
             return state.parseAsync(template.tokens, context)
                 .then(output => {

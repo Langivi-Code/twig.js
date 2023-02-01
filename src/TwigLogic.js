@@ -10,6 +10,7 @@ import { twigExpression } from "./TwigExpression.js";
 import { twig } from "./twig.js";
 import { twigLib } from "./TwigLib.js";
 import TwigBlock from "./TwigBlock.js";
+import TwigParseState from "./TwigParseState.js";
 class TwigLogic {
 
     constructor(){
@@ -777,7 +778,7 @@ class TwigLogic {
 
                         const useTemplate = state.template.importFile(filePath);
 
-                        const useState = new twig.ParseState(useTemplate);
+                        const useState = new TwigParseState(useTemplate);
                         return useState.parseAsync(useTemplate.tokens)
                             .then(() => {
                                 state.template.blocks.imported = {
@@ -1101,7 +1102,7 @@ class TwigLogic {
                         return state.template.importFile(filePath || token.expression);
                     })
                     .then(importTemplate => {
-                        const importState = new twig.ParseState(importTemplate);
+                        const importState = new TwigParseState(importTemplate);
 
                         return importState.parseAsync(importTemplate.tokens).then(() => {
                             context[token.contextName] = importState.macros;
@@ -1162,7 +1163,7 @@ class TwigLogic {
                             return state.template.importFile(filePath || token.expression);
                         })
                         .then(importTemplate => {
-                            const importState = new twig.ParseState(importTemplate);
+                            const importState = new TwigParseState(importTemplate);
 
                             return importState.parseAsync(importTemplate.tokens).then(() => {
                                 return importState.macros;
