@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigTemplates } from "../src/twig.templates.js";
 
 Deno.test('Twig.js Parsers ->', async (t) => {
     await t.step('custom parser -> should define a custom parser', () => {
@@ -8,8 +9,8 @@ Deno.test('Twig.js Parsers ->', async (t) => {
                 return '[CUSTOM PARSER] ' + params.data;
             };
 
-            Twig.Templates.registerParser('custom', parser);
-            assertEquals(Twig.Templates.parsers.hasOwnProperty('custom'),true);
+            twigTemplates.registerParser('custom', parser);
+            assertEquals(twigTemplates.parsers.hasOwnProperty('custom'),true);
         });
     });
 
@@ -18,7 +19,7 @@ Deno.test('Twig.js Parsers ->', async (t) => {
             const params = {
                 data: 'This is a test template.'
             };
-            const template = Twig.Templates.parsers.custom(params);
+            const template = twigTemplates.parsers.custom(params);
 
             assertEquals(template,'[CUSTOM PARSER] This is a test template.');
         });
@@ -26,8 +27,8 @@ Deno.test('Twig.js Parsers ->', async (t) => {
 
     await t.step('should remove a registered parser', () => {
         twig.extend(Twig => {
-            Twig.Templates.unRegisterParser('custom');
-            assertEquals(Twig.Templates.parsers.hasOwnProperty('custom'), false);
+            twigTemplates.unRegisterParser('custom');
+            assertEquals(twigTemplates.parsers.hasOwnProperty('custom'), false);
         });
     });
 });

@@ -1,9 +1,9 @@
 import TwigError from "./TwigError.js";
-
+import { twigTemplates } from "./twig.templates.js";
 export default function (Twig) {
     'use strict';
 
-    Twig.Templates.registerLoader('ajax', function (location, params, callback, errorCallback) {
+    twigTemplates.registerLoader('ajax', function (location, params, callback, errorCallback) {
         let template;
         const {precompiled} = params;
         const parser = this.parsers[params.parser] || this.parser.twig;

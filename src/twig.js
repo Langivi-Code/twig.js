@@ -17,12 +17,11 @@ import {TwigTests} from "./twig.tests.js";
 import {TwigCore} from "./twig.core.js";
 import {TwigCompiler} from "./twig.compiler.js";
 import {TwigFilters} from "./twig.filters.js";
-import {TwigTemplates} from "./twig.templates.js";
 import { TwigTemplate } from "./twig.template.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
 import { TwigCache } from "./twig.cache.js";
-
+import { twigTemplates } from "./twig.templates.js";
 
 const twig = new TwigCore('1.16.2');
 
@@ -34,16 +33,15 @@ function factory(twig) {
     twig.setCompile((t) => new TwigCompiler(t));
     twig.setFilterClass((t) => new TwigFilters(t));
     twig.setLibClass((t) => new TwigLib(t));
-    twig.setTemplateStoreClass((t) => new TwigTemplates(t));
     twig.setTestsClass((t) => new TwigTests(t));
     twig.setCacheClass((t)=>new TwigCache(t));
     loaderajax(twig);
     loaderfs(twig);
-    twig.Templates.registerParser('twig', params => {
+    twigTemplates.registerParser('twig', params => {
         return new TwigTemplate(params);
     });
 
-    twig.Templates.registerParser('source', params => {
+    twigTemplates.registerParser('source', params => {
         return params.data || '';
     });
 }

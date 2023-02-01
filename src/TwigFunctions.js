@@ -6,6 +6,7 @@ import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
 import {twig} from "./twig.js";
 import { twigLogic } from "./TwigLogic.js";
+import { twigTemplates } from "./twig.templates.js";
 
 /**
  * @constant
@@ -280,7 +281,7 @@ class TwigFunctions {
         //
         // on exception, log it
         try {
-            templateTwig = twig.Templates.loadRemote(name, paramsLoad);
+            templateTwig = twigTemplates.loadRemote(name, paramsLoad);
             // If the template is undefined or null, set the template to an empty string and do NOT flip the
             // boolean indicating we found the template
             //
@@ -359,7 +360,7 @@ class TwigFunctions {
             template = '';
         }
 
-        return twig.Templates.parsers.twig({
+        return twigTemplates.parsers.twig({
             options: state.template.options,
             data: template
         });
@@ -433,7 +434,7 @@ class TwigFunctions {
         //
         // on exception, log it
         try {
-            templateSource = twig.Templates.loadRemote(name, params);
+            templateSource = twigTemplates.loadRemote(name, params);
 
             // If the template is undefined or null, set the template to an empty string and do NOT flip the
             // boolean indicating we found the template

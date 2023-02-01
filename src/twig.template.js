@@ -3,6 +3,7 @@ import {twigLib} from "./TwigLib.js";
 import {twigPath} from "./TwigPath.js";
 import TwigError from "./TwigError.js";
 import { AsyncTwig } from "./async/twig.async.js";
+import { twigTemplates } from "./twig.templates.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -53,7 +54,7 @@ export class TwigTemplate{
         }
 
         if (id !== undefined) {
-            twig.Templates.save(this);
+            twigTemplates.save(this);
         }
     }
 
@@ -129,7 +130,7 @@ export class TwigTemplate{
 
                         if (template.options.allowInlineIncludes) {
                             // The template is provided inline
-                            parentTemplate = twig.Templates.load(template.parentTemplate);
+                            parentTemplate = twigTemplates.load(template.parentTemplate);
                             if (parentTemplate) {
                                 parentTemplate.options = template.options;
                             }
@@ -142,7 +143,7 @@ export class TwigTemplate{
                             }else{
                                 url = twigPath.parsePath(template, template.parentTemplate);
 
-                                parentTemplate = twig.Templates.loadRemote(url, {
+                                parentTemplate = twigTemplates.loadRemote(url, {
                                     method: template.getLoaderMethod(),
                                     base: template.base,
                                     async: false,
@@ -174,10 +175,10 @@ export class TwigTemplate{
         let subTemplate;
         if (!this.url && this.options.allowInlineIncludes) {
             file = this.path ? twigPath.parsePath(this, file) : file;
-            subTemplate = twig.Templates.load(file);
+            subTemplate = twigTemplates.load(file);
 
             if (!subTemplate) {
-                subTemplate = twig.Templates.loadRemote(url, {
+                subTemplate = twigTemplates.loadRemote(url, {
                     id: file,
                     method: this.getLoaderMethod(),
                     async: false,
@@ -198,7 +199,7 @@ export class TwigTemplate{
         url = twigPath.parsePath(this, file);
 
         // Load blocks from an external file
-        subTemplate = twig.Templates.loadRemote(url, {
+        subTemplate = twigTemplates.loadRemote(url, {
             method: this.getLoaderMethod(),
             base: this.base,
             async: false,

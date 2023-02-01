@@ -1,6 +1,6 @@
 import TwigError from "./TwigError.js";
-
-export class TwigTemplates {
+import { twig } from "./twig.js";
+class TwigTemplates {
     // Namespace for template storage and retrieval
 
     /**
@@ -17,10 +17,9 @@ export class TwigTemplates {
 
     #twig;
 
-    constructor(twig) {
+    constructor() {
         this.loaders = {};
         this.parsers = {};
-        this.#twig = twig;
     }
 
     /**
@@ -155,10 +154,10 @@ export class TwigTemplates {
         }
         
         const jsonTemplate = JSON.stringify(template);
-        if (await this.#twig.cacher.findCacheFile(template.id)) {
+        if (await twig.cacher.findCacheFile(template.id)) {
             return;
         } else {
-            await this.#twig.cacher.setCache(template.id,jsonTemplate);
+            await twig.cacher.setCache(template.id,jsonTemplate);
         }
     }
 
@@ -170,10 +169,10 @@ export class TwigTemplates {
      * @return {Twig.Template} A twig.js template stored with the provided ID.
      */
     load(id) {
-        if(!this.#twig.cacher.findCacheFile(id)){
+        if(!twig.cacher.findCacheFile(id)){
             return null;
         }
-        return this.#twig.cacher.buildTemplateForCache(this.#twig.cacher.getCache(id));
+        return twig.cacher.buildTemplateForCache(twig.cacher.getCache(id));
     };
 
     /**
@@ -205,11 +204,11 @@ export class TwigTemplates {
         }
 
         let cached;
-        if(this.#twig.cacher.findCacheFile(id)){
-            cached = this.#twig.cacher.getCache(id);
+        if(twig.cacher.findCacheFile(id)){
+            cached = twig.cacher.getCache(id);
         }
         if (cached) {
-            const buildcache = this.#twig.cacher.buildTemplateForCache(cached);
+            const buildcache = twig.cacher.buildTemplateForCache(cached);
             if(!params.async ){
                 return buildcache;
             }
@@ -225,3 +224,6 @@ export class TwigTemplates {
         return loader.call(this,location,params);
     }
 }
+
+const twigTemplates = new TwigTemplates();
+export {twigTemplates};

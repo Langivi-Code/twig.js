@@ -1,6 +1,7 @@
+import { twigTemplates } from "./twig.templates.js";
 import TwigError from "./TwigError.js";
 export default function (Twig) {
-    Twig.Templates.registerLoader('fs', function (location, params) {
+    twigTemplates.registerLoader('fs', function (location, params) {
         let data = null;
         const {precompiled} = params;
         const parser = this.parsers[params.parser] || this.parser.twig;

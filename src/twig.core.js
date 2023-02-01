@@ -8,6 +8,7 @@ import {twig} from "./twig.js";
 import {twigExpression} from "./TwigExpression.js";
 import {twigFunctions} from "./TwigFunctions.js";
 import { twigLogic } from "./TwigLogic.js";
+import { twigTemplates } from "./twig.templates.js";
 class TwigCore {
     VERSION;
     compiler;
@@ -17,7 +18,6 @@ class TwigCore {
     logic;
     lib;
     path;
-    Templates;
     cacher;
     // Default caching to true for the improved performance it offers
     cache = true;
@@ -741,10 +741,6 @@ class TwigCore {
         return this;
     }
 
-    setTemplateStoreClass(tsSetter) {
-        this.Templates = tsSetter(this);
-        return this;
-    }
 
     setTestsClass(testssSetter) {
         this.tests = testssSetter(this);
@@ -804,7 +800,7 @@ class TwigCore {
         }
 
         if (params.data !== undefined) {
-            return this.Templates.parsers.twig({
+            return twigTemplates.parsers.twig({
                 data: params.data,
                 path: params.hasOwnProperty('path') ? params.path : undefined,
                 module: params.module,
@@ -818,15 +814,15 @@ class TwigCore {
                 throw new TwigError('Both ref and id cannot be set on a twig.js template.');
             }
 
-            return this.Templates.load(params.ref);
+            return twigTemplates.load(params.ref);
         }
 
         if (params.method !== undefined) {
-            if (!this.Templates.isRegisteredLoader(params.method)) {
+            if (!twigTemplates.isRegisteredLoader(params.method)) {
                 throw new TwigError('Loader for "' + params.method + '" is not defined.');
             }
             try{
-                const template = await this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
+                const template = await twigTemplates.loadRemote(params.name || params.href || params.path || id || undefined, {
                      id,
                      method: params.method,
                      parser: params.parser || 'twig',
@@ -844,7 +840,7 @@ class TwigCore {
 
         if (params.href !== undefined) {
             try{
-                const template = await this.Templates.loadRemote(params.href, {
+                const template = await twigTemplates.loadRemote(params.href, {
                 id,
                 method: 'ajax',
                 parser: params.parser || 'twig',
@@ -862,7 +858,7 @@ class TwigCore {
 
         if (params.path !== undefined) {
             try{ 
-                const template = await this.Templates.loadRemote(params.path, {
+                const template = await twigTemplates.loadRemote(params.path, {
                 id,
                 method: 'fs',
                 parser: params.parser || 'twig',
