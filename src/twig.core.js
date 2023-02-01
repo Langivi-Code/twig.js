@@ -11,10 +11,10 @@ import { twigLogic } from "./TwigLogic.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigFilters } from "./twig.filters.js";
 import { twigCache } from "./twig.cache.js"; 
+import { twigTest } from "./twig.tests.js";
 class TwigCore {
     VERSION;
     _function;
-    tests;
     logic;
     path;
     // Default caching to true for the improved performance it offers
@@ -723,15 +723,6 @@ class TwigCore {
         this.__express = this.renderFile;
     }
 
-    setTestsClass(testssSetter) {
-        this.tests = testssSetter(this);
-        return this;
-    }
-    setExpression(expressionSetter) {
-        this.expression = expressionSetter(this);
-        return this;
-    }
-
     merge(target, source, onlyChanged) {
         Object.keys(source).forEach(key => {
             if (onlyChanged && !(key in target)) {
@@ -870,17 +861,12 @@ class TwigCore {
         twigFunctions.extend(fn, definition);
     }
 
-    // Extend Twig with a new test.
-    extendTest(test, definition) {
-        this.tests[test] = definition;
-    }
-
     test(test, value, params) {
-        if (!this.tests[test]) {
+        if (!twigTest[test]) {
             throw this.Error('Test ' + test + ' is not defined.');
         }
 
-        return this.tests[test](value, params);
+        return twigTest[test](value, params);
     };
 
     // Extend Twig with a new definition.

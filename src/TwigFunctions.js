@@ -4,7 +4,6 @@
 // This file handles parsing filters.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
-import {twig} from "./twig.js";
 import { twigLogic } from "./TwigLogic.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigLib } from "./TwigLib.js";

@@ -1,8 +1,8 @@
 // ## twig.filters.js
 //
 // This file handles parsing filters.
-import {twig} from './twig.js';
 // Determine object type
+import {twig} from './twig.js';
 import TwigError from "./TwigError.js";
 import { twigFunctions } from './TwigFunctions.js';
 import { twigLib } from './TwigLib.js';

@@ -10,28 +10,10 @@
 //
 // This file handles creating the Twig library
 
-import loaderajax from "./twig.loader.ajax.js";
-import loaderfs from "./twig.loader.fs.js";
-import {TwigTests} from "./twig.tests.js";
+// import loaderajax from "./twig.loader.ajax.js";
+// import loaderfs from "./twig.loader.fs.js";
 import {TwigCore} from "./twig.core.js";
-import { TwigTemplate } from "./twig.template.js";
-import { twigTemplates } from "./twig.templates.js";
 
 const twig = new TwigCore('1.16.2');
 
-function factory(twig) {
-
-    twig.setTestsClass((t) => new TwigTests(t));
-    loaderajax(twig);
-    loaderfs(twig);
-    twigTemplates.registerParser('twig', params => {
-        return new TwigTemplate(params);
-    });
-
-    twigTemplates.registerParser('source', params => {
-        return params.data || '';
-    });
-}
-
-factory(twig);
 export {twig};

@@ -1,6 +1,8 @@
 import TwigError from "./TwigError.js";
-import { twig } from "./twig.js";
 import { twigCache } from "./twig.cache.js";
+import loaderajax from "./twig.loader.ajax.js";
+import loaderfs from "./twig.loader.fs.js";
+import { TwigTemplate } from "./twig.template.js";
 class TwigTemplates {
     // Namespace for template storage and retrieval
 
@@ -223,7 +225,27 @@ class TwigTemplates {
         const loader = this.loaders[params.method] || this.loaders.fs;
         return loader.call(this,location,params);
     }
+
+    set loaderAjax(ajax){
+        ajax();
+    }
+
+    set loaderFs(fs){
+        fs();
+    }
 }
 
 const twigTemplates = new TwigTemplates();
+
+twigTemplates.loaderAjax = loaderajax;
+twigTemplates.loaderFs = loaderfs;
+
+twigTemplates.registerParser('twig', params => {
+    return new TwigTemplate(params);
+});
+
+twigTemplates.registerParser('source', params => {
+    return params.data || '';
+});
+
 export {twigTemplates};

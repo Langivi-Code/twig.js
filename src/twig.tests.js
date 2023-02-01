@@ -2,7 +2,7 @@
 //
 // This file handles expression tests. (is empty, is not defined, etc...)
 import { twigLib } from "./TwigLib.js";
-export class TwigTests {
+class TwigTests {
 
     empty(value) {
         if (value === null || value === undefined) {
@@ -79,3 +79,5 @@ export class TwigTests {
     Constant ?
      */
 }
+const twigTest = new TwigTests();
+export{twigTest};

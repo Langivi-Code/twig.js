@@ -1,6 +1,7 @@
 import TwigError from "./TwigError.js";
 import { twigTemplates } from "./twig.templates.js";
-export default function (Twig) {
+import { TwigCore } from "./twig.core.js";
+export default function () {
     'use strict';
 
     twigTemplates.registerLoader('ajax', function (location, params, callback, errorCallback) {
@@ -19,7 +20,7 @@ export default function (Twig) {
 
             if (xmlhttp.readyState === 4) {
                 if (xmlhttp.status === 200 || (window.cordova && xmlhttp.status === 0)) {
-                    Twig.log.debug('Got template ', xmlhttp.responseText);
+                    TwigCore.log.debug('Got template ', xmlhttp.responseText);
 
                     if (precompiled === true) {
                         data = JSON.parse(xmlhttp.responseText);
