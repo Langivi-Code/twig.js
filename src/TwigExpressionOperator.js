@@ -3,8 +3,8 @@
 // This file handles operator lookups and parsing.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
-import {twig} from "./twig.js";
 import { twigFunctions } from "./TwigFunctions.js";
+import { twigLib } from "./TwigLib.js";
 
 class TwigExpressionOperator {
     operator = {
@@ -197,7 +197,7 @@ class TwigExpressionOperator {
 
                 break;
             case '?:':
-                if (twig.lib.boolval(a)) {
+                if (twigLib.boolval(a)) {
                     stack.push(a);
                 } else {
                     stack.push(b);
@@ -212,7 +212,7 @@ class TwigExpressionOperator {
                     c = undefined;
                 }
 
-                if (twig.lib.boolval(a)) {
+                if (twigLib.boolval(a)) {
                     stack.push(b);
                 } else {
                     stack.push(c);
@@ -263,7 +263,7 @@ class TwigExpressionOperator {
 
             case 'not':
             case '!':
-                stack.push(!twig.lib.boolval(b));
+                stack.push(!twigLib.boolval(b));
                 break;
 
             case '<':
@@ -301,7 +301,7 @@ class TwigExpressionOperator {
                 break;
 
             case 'or':
-                stack.push(twig.lib.boolval(a) || twig.lib.boolval(b));
+                stack.push(twigLib.boolval(a) || twigLib.boolval(b));
                 break;
 
             case 'b-or':
@@ -313,7 +313,7 @@ class TwigExpressionOperator {
                 break;
 
             case 'and':
-                stack.push(twig.lib.boolval(a) && twig.lib.boolval(b));
+                stack.push(twigLib.boolval(a) && twigLib.boolval(b));
                 break;
 
             case 'b-and':

@@ -5,6 +5,7 @@ import {twig} from './twig.js';
 // Determine object type
 import TwigError from "./TwigError.js";
 import { twigFunctions } from './TwigFunctions.js';
+import { twigLib } from './TwigLib.js';
 
 function is(type, obj) {
     const clas = Object.prototype.toString.call(obj).slice(8, -1);
@@ -22,7 +23,7 @@ export class TwigFilters {
         if (typeof value !== 'string') {
             return value;
         }
-        const country = twig.lib.clm.getCountryByAlpha2(value);
+        const country = twigLib.clm.getCountryByAlpha2(value);
         return country.name;
     }
 
@@ -30,7 +31,7 @@ export class TwigFilters {
         if (typeof value !== 'string') {
             return value;
         }
-        const currency = twig.lib.currenciesMap.names.get(value);
+        const currency = twigLib.currenciesMap.names.get(value);
         return currency;
     }
 
@@ -38,7 +39,7 @@ export class TwigFilters {
         if (typeof value !== 'string') {
             return value;
         }
-        const symbol = twig.lib.currenciesMap.symbols.get(value);
+        const symbol = twigLib.currenciesMap.symbols.get(value);
         return symbol;
     }
     upper(value) {
@@ -72,11 +73,11 @@ export class TwigFilters {
         });
     }
     length(value) {
-        if (twig.lib.is('Array', value) || typeof value === 'string') {
+        if (twigLib.is('Array', value) || typeof value === 'string') {
             return value.length;
         }
 
-        if (twig.lib.is('Object', value)) {
+        if (twigLib.is('Object', value)) {
             if (value._keys === undefined) {
                 return Object.keys(value).length;
             }
@@ -90,7 +91,7 @@ export class TwigFilters {
         if (params.length !== 2) {
             throw new TwigError("Two parameters expected");
         }
-        const encode = twig.lib.encode(value, params[1]);
+        const encode = twigLib.encode(value, params[1]);
         return encode.toString();
     }
 
@@ -187,9 +188,9 @@ export class TwigFilters {
         return output;
     }
     map(value, params) {
-        if (twig.lib.is("Array", value) && twig.lib.is("Function", params[0])) {
+        if (twigLib.is("Array", value) && twigLib.is("Function", params[0])) {
             return value.map(params[0]);
-        } else if (twig.lib.is("Object", value) && twig.lib.is("Function", params[0])) {
+        } else if (twigLib.is("Object", value) && twigLib.is("Function", params[0])) {
             if (Object.hasOwn(value, "_keys")) {
                 delete value._keys;
             }
@@ -199,12 +200,12 @@ export class TwigFilters {
         }
     }
     reduce(value, params) {
-        if (!twig.lib.is("Array", value)) {
+        if (!twigLib.is("Array", value)) {
             return;
         }
-        if (twig.lib.is("Function", params[0]) && params[1]) {
+        if (twigLib.is("Function", params[0]) && params[1]) {
             return value.reduce(params[0], params[1]);
-        } else if (twig.lib.is("Function", params[0])) {
+        } else if (twigLib.is("Function", params[0])) {
             return value.reduce(params[0])
         }
 
@@ -215,7 +216,7 @@ export class TwigFilters {
             return;
         }
 
-        if (twig.lib.is('Object', value)) {
+        if (twigLib.is('Object', value)) {
             const serialize = (obj, prefix) => {
                 const result = [];
                 const keyset = obj._keys || Object.keys(obj);
@@ -227,7 +228,7 @@ export class TwigFilters {
                     const resultKey = prefix ? prefix + '[' + key + ']' : key;
                     const resultValue = obj[key];
                     result.push(
-                        (twig.lib.is('Object', resultValue) || Array.isArray(resultValue)) ?
+                        (twigLib.is('Object', resultValue) || Array.isArray(resultValue)) ?
                             serialize(resultValue, resultKey) :
                             encodeURIComponent(resultKey) + '=' + encodeURIComponent(resultValue)
                     );
@@ -251,7 +252,7 @@ export class TwigFilters {
             return `data:"text/html";base64,${btoa(value)}`;
         } else {
             const content = Deno.readFileSync(value);
-            const data = `data:${twig.lib.lookup(value)};base64,${twig.lib.fromUint8Array(content)}`;
+            const data = `data:${twigLib.lookup(value)};base64,${twigLib.fromUint8Array(content)}`;
             return data;
         }
     }
@@ -421,10 +422,10 @@ export class TwigFilters {
     date(value, params) {
         const date = twigFunctions.date(value);
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
-        return twig.lib.date(format.replace(/\\\\/g, '\\'), date);
+        return twigLib.date(format.replace(/\\\\/g, '\\'), date);
     }
     format_date(value, [formatdate, timezone, local]) {
-        let date = twig.lib.datetime(value);
+        let date = twigLib.datetime(value);
         let formate = "";
         if (local) {
             date = date.setLocale(local);
@@ -445,7 +446,7 @@ export class TwigFilters {
         return resultDate;
     }
     format_datetime(value, [formatdate, formattime, local, timezone]) {
-        let date = twig.lib.datetime(value);
+        let date = twigLib.datetime(value);
         let formate = "";
         if (local) {
             date = date.setLocale(local);
@@ -476,7 +477,7 @@ export class TwigFilters {
     }
 
     format_time(value, [formattime, timezone, local]) {
-        let date = twig.lib.datetime(value);
+        let date = twigLib.datetime(value);
         let formate = "";
         if (local) {
             date = date.setLocale(local);
@@ -501,18 +502,18 @@ export class TwigFilters {
         if (!is("String", value)) {
             return;
         }
-        const parseString = new twig.lib.domParser();
-        const TurndownService = new twig.lib.turndown();
+        const parseString = new twigLib.domParser();
+        const TurndownService = new twigLib.turndown();
         const domDoc = parseString.parseFromString(value, 'text/html');
         if (!domDoc) { throw `failed to parse doc` }
         const mark = TurndownService.turndown(domDoc);
         return mark;
     }
     markdown_to_html(value) {
-        if(!twig.lib.is("String",value)){
+        if(!twigLib.is("String",value)){
             return;
         }
-        const converter = new twig.lib.showdown.Converter();
+        const converter = new twigLib.showdown.Converter();
         const html = converter.makeHtml(value.trim());
         if (html) {
             return html;
@@ -534,16 +535,16 @@ export class TwigFilters {
         const modifyText = params[0];
         let time;
 
-        if (twig.lib.is('Date', value)) {
-            time = twig.lib.strtotime(modifyText, value.getTime() / 1000);
+        if (twigLib.is('Date', value)) {
+            time = twigLib.strtotime(modifyText, value.getTime() / 1000);
         }
 
-        if (twig.lib.is('String', value)) {
-            time = twig.lib.strtotime(modifyText, twig.lib.strtotime(value));
+        if (twigLib.is('String', value)) {
+            time = twigLib.strtotime(modifyText, twigLib.strtotime(value));
         }
 
-        if (twig.lib.is('Number', value)) {
-            time = twig.lib.strtotime(modifyText, value);
+        if (twigLib.is('Number', value)) {
+            time = twigLib.strtotime(modifyText, value);
         }
 
         return new Date(time * 1000);
@@ -558,19 +559,19 @@ export class TwigFilters {
         let tag;
         for (tag in pairs) {
             if (Object.hasOwnProperty.call(pairs, tag) && tag !== '_keys') {
-                value = twig.lib.replaceAll(value, tag, pairs[tag]);
+                value = twigLib.replaceAll(value, tag, pairs[tag]);
             }
         }
 
         return value;
     }
     slug(value, params) {
-        if (twig.lib.is("String", value) && params[0] && params[1]) {
-            return twig.lib.slug(value, { replecement: params[0], locale: params[1] });
-        } else if (twig.lib.is("String", value) && params[0]) {
-            return twig.lib.slug(value, { replacement: params[0] })
-        } else if (twig.lib.is("String", value)) {
-            return twig.lib.slug(value);
+        if (twigLib.is("String", value) && params[0] && params[1]) {
+            return twigLib.slug(value, { replecement: params[0], locale: params[1] });
+        } else if (twigLib.is("String", value) && params[0]) {
+            return twigLib.slug(value, { replacement: params[0] })
+        } else if (twigLib.is("String", value)) {
+            return twigLib.slug(value);
         }
     }
     format(value, params) {
@@ -578,7 +579,7 @@ export class TwigFilters {
             return;
         }
 
-        return twig.lib.vsprintf(value, params);
+        return twigLib.vsprintf(value, params);
     }
     format_currency(value, params) {
         if (value === undefined || value === null) {
@@ -598,7 +599,7 @@ export class TwigFilters {
             return;
         }
 
-        return twig.lib.stripTags(value, allowed);
+        return twigLib.stripTags(value, allowed);
     }
 
     escape(value, params) {
@@ -647,7 +648,7 @@ export class TwigFilters {
                     if (shortMap[char]) {
                         result += shortMap[char];
                     } else {
-                        result += twig.lib.sprintf('\\u%04s', charCode.toString(16).toUpperCase());
+                        result += twigLib.sprintf('\\u%04s', charCode.toString(16).toUpperCase());
                     }
                 }
             }
@@ -696,9 +697,9 @@ export class TwigFilters {
                     if (charCode <= 0x1F && charCode !== 0x09 && charCode !== 0x0A && charCode !== 0x0D) {
                         result += '&#xFFFD;';
                     } else if (charCode < 0x80) {
-                        result += twig.lib.sprintf('&#x%02s;', charCode.toString(16).toUpperCase());
+                        result += twigLib.sprintf('&#x%02s;', charCode.toString(16).toUpperCase());
                     } else {
-                        result += twig.lib.sprintf('&#x%04s;', charCode.toString(16).toUpperCase());
+                        result += twigLib.sprintf('&#x%04s;', charCode.toString(16).toUpperCase());
                     }
                 }
             }
@@ -727,7 +728,7 @@ export class TwigFilters {
             .replace(/\r/g, br)
             .replace(/\n/g, br);
 
-        value = twig.lib.replaceAll(value, linebreakTag, '\n');
+        value = twigLib.replaceAll(value, linebreakTag, '\n');
 
         return  twig.Markup(value);
     }
@@ -845,7 +846,7 @@ export class TwigFilters {
         // Handle negative start values
         const startIndex = start >= 0 ? start : Math.max(value.length + start, 0);
 
-        if (twig.lib.is('Array', value)) {
+        if (twigLib.is('Array', value)) {
             const output = [];
             for (let i = startIndex; i < startIndex + length && i < value.length; i++) {
                 output.push(value[i]);
@@ -854,7 +855,7 @@ export class TwigFilters {
             return output;
         }
 
-        if (twig.lib.is('String', value)) {
+        if (twigLib.is('String', value)) {
             return value.slice(startIndex, startIndex + length);
         }
 
@@ -901,7 +902,7 @@ export class TwigFilters {
             throw new TwigError('split filter expects 1 or 2 argument');
         }
 
-        if (twig.lib.is('String', value)) {
+        if (twigLib.is('String', value)) {
             const delimiter = params[0];
             const limit = params[1];
             const split = value.split(delimiter);
@@ -949,7 +950,7 @@ export class TwigFilters {
         throw new TwigError('split filter expects value to be a string');
     }
     last(value) {
-        if (twig.lib.is('Object', value)) {
+        if (twigLib.is('Object', value)) {
             let keys;
 
             if (value._keys === undefined) {
@@ -961,7 +962,7 @@ export class TwigFilters {
             return value[keys[keys.length - 1]];
         }
 
-        if (twig.lib.is('Number', value)) {
+        if (twigLib.is('Number', value)) {
             return value.toString().slice(-1);
         }
 
@@ -977,17 +978,17 @@ export class TwigFilters {
         let last;
         let missing;
 
-        if (!twig.lib.is('Array', items)) {
+        if (!twigLib.is('Array', items)) {
             throw new TwigError('batch filter expects items to be an array');
         }
 
-        if (!twig.lib.is('Number', size)) {
+        if (!twigLib.is('Number', size)) {
             throw new TwigError('batch filter expects size to be a number');
         }
 
         size = Math.ceil(size);
 
-        const result = twig.lib.chunkArray(items, size);
+        const result = twigLib.chunkArray(items, size);
 
         if (fill && items.length % size !== 0) {
             last = result.pop();
@@ -1003,30 +1004,30 @@ export class TwigFilters {
         return result;
     }
     language_name(value, params) {
-        if (!params && twig.lib.is("String", value)) {
-            return twig.lib.getLanguageName(value);
-        } else if (value.match(/_/) && twig.lib.is("String", params[0]) && params[0].match(/_/)) {
-            const lang = twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0], false);
+        if (!params && twigLib.is("String", value)) {
+            return twigLib.getLanguageName(value);
+        } else if (value.match(/_/) && twigLib.is("String", params[0]) && params[0].match(/_/)) {
+            const lang = twigLib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0], false);
             return lang.languageName + " " + lang.countryName;
-        } else if (twig.lib.is("String", params[0])) {
-            return twig.lib.getLanguageName(value, params[0])
+        } else if (twigLib.is("String", params[0])) {
+            return twigLib.getLanguageName(value, params[0])
         }
     }
     locale_name(value, params) {
-        if (twig.lib.is("String", value) && !params) {
-            return twig.lib.getLanguageNameWithCountry(value).languageName;
-        } else if (twig.lib.is("String", value) && value.match(/_/) && twig.lib.is("String", params[0]) && params[0].match(/_/)) {
-            const { countryName, languageName } = twig.lib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0]);
+        if (twigLib.is("String", value) && !params) {
+            return twigLib.getLanguageNameWithCountry(value).languageName;
+        } else if (twigLib.is("String", value) && value.match(/_/) && twigLib.is("String", params[0]) && params[0].match(/_/)) {
+            const { countryName, languageName } = twigLib.getLanguageNameWithCountry(value.replace(/_/, "-"), params[0].split("_")[0]);
             return languageName + "(" + countryName + ")";
-        } else if (twig.lib.is("String", value) && twig.lib.is("String", params[0])) {
-            return twig.lib.getLanguageNameWithCountry(value, params[0]).languageName;
+        } else if (twigLib.is("String", value) && twigLib.is("String", params[0])) {
+            return twigLib.getLanguageNameWithCountry(value, params[0]).languageName;
         }
     }
     timezone_name(value) {
-        if (!twig.lib.is("String", value)) {
+        if (!twigLib.is("String", value)) {
             return;
         }
-        const local = twig.lib.timeZoneName.display(value);
+        const local = twigLib.timeZoneName.display(value);
         const country = value.split("/");
         return local.standard.name.replace("Standard", "") + ` (${country[1].replace("_", " ")})`;
     }
@@ -1039,15 +1040,15 @@ export class TwigFilters {
 
         value = parseFloat(value);
 
-        if (precision && !twig.lib.is('Number', precision)) {
+        if (precision && !twigLib.is('Number', precision)) {
             throw new TwigError('round filter expects precision to be a number');
         }
 
         if (method === 'common') {
-            return twig.lib.round(value, precision);
+            return twigLib.round(value, precision);
         }
 
-        if (!twig.lib.is('Function', Math[method])) {
+        if (!twigLib.is('Function', Math[method])) {
             throw new TwigError('round filter expects method to be \'floor\', \'ceil\', or \'common\'');
         }
 

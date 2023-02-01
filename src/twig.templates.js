@@ -16,7 +16,6 @@ class TwigTemplates {
      */
     parsers;
 
-    #twig;
 
     constructor() {
         this.loaders = {};

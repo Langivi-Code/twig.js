@@ -8,7 +8,7 @@ import { AsyncTwig } from "./async/twig.async.js";
 import { TwigPromise } from "./async/twig.promise.js";
 import { twigExpression } from "./TwigExpression.js";
 import { twig } from "./twig.js";
-
+import { twigLib } from "./TwigLib.js";
 class TwigLogic {
 
     constructor(){
@@ -107,7 +107,7 @@ class TwigLogic {
                     .then(result => {
                         chain = true;
 
-                        if (twig.lib.boolval(result)) {
+                        if (twigLib.boolval(result)) {
                             chain = false;
 
                             return state.parseAsync(token.output, context);
@@ -152,7 +152,7 @@ class TwigLogic {
 
                 return twigExpression.parseAsync.call(state, token.stack, context)
                     .then(result => {
-                        if (chain && twig.lib.boolval(result)) {
+                        if (chain && twigLib.boolval(result)) {
                             chain = false;
 
                             return state.parseAsync(token.output, context);
@@ -336,7 +336,7 @@ class TwigLogic {
                             });
                         }
 
-                        if (twig.lib.is('Object', result)) {
+                        if (twigLib.is('Object', result)) {
                             if (result._keys === undefined) {
                                 keyset = Object.keys(result);
                             } else {

@@ -17,7 +17,6 @@ class TwigCore {
     _function;
     tests;
     logic;
-    lib;
     path;
     // Default caching to true for the improved performance it offers
     cache = true;
@@ -730,12 +729,6 @@ class TwigCore {
         this.compiler = compilerSetter(this);
         return this;
     }
-
-    setLibClass(libSetter) {
-        this.lib = libSetter(this);
-        return this;
-    }
-
 
     setTestsClass(testssSetter) {
         this.tests = testssSetter(this);

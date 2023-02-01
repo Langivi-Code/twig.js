@@ -10,7 +10,6 @@
 //
 // This file handles creating the Twig library
 
-import {TwigLib} from "./TwigLib.js";
 import loaderajax from "./twig.loader.ajax.js";
 import loaderfs from "./twig.loader.fs.js";
 import {TwigTests} from "./twig.tests.js";
@@ -29,7 +28,6 @@ function factory(twig) {
     twig.ParseState = TwigParseState;
 
     twig.setCompile((t) => new TwigCompiler(t));
-    twig.setLibClass((t) => new TwigLib(t));
     twig.setTestsClass((t) => new TwigTests(t));
     loaderajax(twig);
     loaderfs(twig);

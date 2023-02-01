@@ -1,5 +1,4 @@
 import {TwigCore} from "./twig.core.js";
-import {twig} from "./twig.js";
 import { twigExpression } from "./TwigExpression.js";
 export default class TwigBlock {
     /**
