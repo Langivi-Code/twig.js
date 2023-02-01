@@ -2,12 +2,7 @@
 //
 // This file handles compiling templates into JS
 import TwigError from "./TwigError.js";
-
-export class TwigCompiler {
-
-    constructor(Twig) {
-        this.Twig = Twig
-    }
+class TwigCompiler {
 
     compile(template, options) {
         // Get tokens
@@ -30,12 +25,14 @@ export class TwigCompiler {
     module = {
         amd: (id, tokens, pathToTwig) => 'define(["' + pathToTwig + '"], function (Twig) {\n\tvar twig, templates;\ntwig = Twig.twig;\ntemplates = ' + this.wrap(id, tokens) + '\n\treturn templates;\n});',
 
-        node: (id, tokens) => 'var twig = require("twig").twig;\nexports.template = ' + this.Twig.compiler.wrap(id, tokens),
+        node: (id, tokens) => 'var twig = require("twig").twig;\nexports.template = ' + twigCompiler.wrap(id, tokens),
 
-        cjs2: (id, tokens, pathToTwig) => 'module.declare([{ twig: "' + pathToTwig + '" }], function (require, exports, module) {\n\tvar twig = require("twig").twig;\n\texports.template = ' + this.Twig.compiler.wrap(id, tokens) + '\n});',
+        cjs2: (id, tokens, pathToTwig) => 'module.declare([{ twig: "' + pathToTwig + '" }], function (require, exports, module) {\n\tvar twig = require("twig").twig;\n\texports.template = ' + twigCompiler.wrap(id, tokens) + '\n});',
     }
 
     wrap(id, tokens) {
         return 'twig({id:"' + id.replace('"', '\\"') + '", data:' + tokens + ', precompiled: true});\n';
     }
 }
+const twigCompiler = new TwigCompiler();
+export {twigCompiler};

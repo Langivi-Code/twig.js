@@ -13,7 +13,6 @@ import { twigFilters } from "./twig.filters.js";
 import { twigCache } from "./twig.cache.js"; 
 class TwigCore {
     VERSION;
-    compiler;
     _function;
     tests;
     logic;
@@ -722,12 +721,6 @@ class TwigCore {
         this.VERSION = version;
         // Express 3 handler
         this.__express = this.renderFile;
-    }
-
-
-    setCompile(compilerSetter) {
-        this.compiler = compilerSetter(this);
-        return this;
     }
 
     setTestsClass(testssSetter) {

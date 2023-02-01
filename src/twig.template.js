@@ -5,6 +5,7 @@ import TwigError from "./TwigError.js";
 import { AsyncTwig } from "./async/twig.async.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigCache } from "./twig.cache.js";
+import { twigCompiler } from "./twig.compiler.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -225,7 +226,7 @@ export class TwigTemplate{
 
     compile(){
         // Compile the template into raw JS
-        return twig.compiler.compile(this, options);
+        return twigCompiler.compile(this, options);
     }
 
     renderAsync(context, params){

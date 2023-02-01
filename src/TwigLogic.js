@@ -9,6 +9,7 @@ import { TwigPromise } from "./async/twig.promise.js";
 import { twigExpression } from "./TwigExpression.js";
 import { twig } from "./twig.js";
 import { twigLib } from "./TwigLib.js";
+import TwigBlock from "./TwigBlock.js";
 class TwigLogic {
 
     constructor(){
@@ -636,7 +637,7 @@ class TwigLogic {
                 const state = this;
                 let promise = TwigPromise.resolve();
 
-                state.template.blocks.defined[token.blockName] = new twig.Block(state.template, token);
+                state.template.blocks.defined[token.blockName] = new TwigBlock(state.template, token);
                 if (
                     state.template.parentTemplate === null ||
                     state.template.parentTemplate instanceof TwigTemplate
