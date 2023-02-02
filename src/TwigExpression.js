@@ -22,7 +22,7 @@ export default class TwigExpression {
             this.extend(this.definitions.shift());
         }
     }
-    reservedWords = [
+    static reservedWords = [
         'true', 'false', 'null', 'TRUE', 'FALSE', 'NULL', '_context', 'and', 'b-and', 'or', 'b-or', 'b-xor', 'in', 'not in', 'if', 'matches', 'starts', 'ends', 'with'
     ];
 
@@ -107,7 +107,7 @@ export default class TwigExpression {
         ]
     };
 
-    fn = {
+    static fn = {
         compile: {
             push(token, stack, output) {
                 output.push(token);
@@ -196,7 +196,7 @@ export default class TwigExpression {
                 token.value = Number(token.value);
                 output.push(token);
             },
-            parse: this.fn.parse.pushValue
+            parse: TwigExpression.fn.parse.pushValue
         },
         {
             type: TwigExpression.type.operator.binary,
@@ -349,7 +349,7 @@ export default class TwigExpression {
                 TwigCore.log.trace('this.compile: ', 'String value: ', token.value);
                 output.push(token);
             },
-            parse: this.fn.parse.pushValue
+            parse: TwigExpression.fn.parse.pushValue
         },
         {
             /**
@@ -371,7 +371,7 @@ export default class TwigExpression {
                 output.push(token);
                 stack.push(token);
             },
-            parse: this.fn.parse.push
+            parse: TwigExpression.fn.parse.push
         },
         {
             /**
@@ -488,10 +488,10 @@ export default class TwigExpression {
                 }
                 const lastToken = tokens[tokens.length - 1];
                 // We can't use the regex to test if we follow a space because expression is trimmed
-                return lastToken && (!twigExpression.reservedWords.includes(lastToken.value.trim()));
+                return lastToken && (!TwigExpression.reservedWords.includes(lastToken.value.trim()));
             },
-            compile: this.fn.compile.pushBoth,
-            parse: this.fn.parse.push
+            compile: TwigExpression.fn.compile.pushBoth,
+            parse: TwigExpression.fn.parse.push
         },
         {
             /**
@@ -609,8 +609,8 @@ export default class TwigExpression {
             type: TwigExpression.type.array.start,
             regex: /^\[/,
             next: TwigExpression.set.expressions.concat([TwigExpression.type.array.end]),
-            compile: this.fn.compile.pushBoth,
-            parse: this.fn.parse.push
+            compile: TwigExpression.fn.compile.pushBoth,
+            parse: TwigExpression.fn.parse.push
         },
         {
             /**
@@ -667,8 +667,8 @@ export default class TwigExpression {
             type: TwigExpression.type.object.start,
             regex: /^\{/,
             next: TwigExpression.set.expressions.concat([TwigExpression.type.object.end]),
-            compile: this.fn.compile.pushBoth,
-            parse: this.fn.parse.push
+            compile: TwigExpression.fn.compile.pushBoth,
+            parse: TwigExpression.fn.parse.push
         },
 
         // Token that represents the end of a Hash Map '}'
@@ -780,7 +780,7 @@ export default class TwigExpression {
             next: TwigExpression.type.parameter.start,
             validate(match) {
                 // Make sure this function is not a reserved word
-                return match[1] && (!twigExpression.reservedWords.includes(match[1]));
+                return match[1] && (!TwigExpression.reservedWords.includes(match[1]));
             },
             transform() {
                 return '(';
@@ -834,12 +834,12 @@ export default class TwigExpression {
             next: TwigExpression.set.operationsExtended.concat([
                 TwigExpression.type.parameter.start
             ]),
-            compile: this.fn.compile.push,
+            compile: TwigExpression.fn.compile.push,
             validate(match) {
                 if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$\>\<\>=\<=]\s{0,2}\w*)/g).test(match)) {
                     return true;
                 } else {
-                    return (!twigExpression.reservedWords.includes(match[0]));
+                    return (!TwigExpression.reservedWords.includes(match[0]));
                 }
             },
             parse(token, stack, context) {
@@ -987,7 +987,7 @@ export default class TwigExpression {
                 token.value = null;
                 output.push(token);
             },
-            parse: this.fn.parse.pushValue
+            parse: TwigExpression.fn.parse.pushValue
         },
         {
             /**
@@ -998,7 +998,7 @@ export default class TwigExpression {
             next: TwigExpression.set.operationsExtended.concat([
                 TwigExpression.type.parameter.start
             ]),
-            compile: this.fn.compile.push,
+            compile: TwigExpression.fn.compile.push,
             parse(token, stack, context) {
                 stack.push(context);
             }
@@ -1015,7 +1015,7 @@ export default class TwigExpression {
                 delete token.match;
                 output.push(token);
             },
-            parse: this.fn.parse.pushValue
+            parse: TwigExpression.fn.parse.pushValue
         }
     ];
 
