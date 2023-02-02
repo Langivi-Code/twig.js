@@ -27,41 +27,41 @@ class TwigExpression {
     ];
 
     type = {
-        comma: 'Twig.expression.type.comma',
+        comma: 'TwigExpression.type.comma',
         operator: {
-            unary: 'Twig.expression.type.operator.unary',
-            binary: 'Twig.expression.type.operator.binary'
+            unary: 'TwigExpression.type.operator.unary',
+            binary: 'TwigExpression.type.operator.binary'
         },
-        string: 'Twig.expression.type.string',
-        bool: 'Twig.expression.type.bool',
-        slice: 'Twig.expression.type.slice',
+        string: 'TwigExpression.type.string',
+        bool: 'TwigExpression.type.bool',
+        slice: 'TwigExpression.type.slice',
         array: {
-            start: 'Twig.expression.type.array.start',
-            end: 'Twig.expression.type.array.end'
+            start: 'TwigExpression.type.array.start',
+            end: 'TwigExpression.type.array.end'
         },
         object: {
-            start: 'Twig.expression.type.object.start',
-            end: 'Twig.expression.type.object.end'
+            start: 'TwigExpression.type.object.start',
+            end: 'TwigExpression.type.object.end'
         },
         parameter: {
-            start: 'Twig.expression.type.parameter.start',
-            end: 'Twig.expression.type.parameter.end'
+            start: 'TwigExpression.type.parameter.start',
+            end: 'TwigExpression.type.parameter.end'
         },
         subexpression: {
-            start: 'Twig.expression.type.subexpression.start',
-            end: 'Twig.expression.type.subexpression.end'
+            start: 'TwigExpression.type.subexpression.start',
+            end: 'TwigExpression.type.subexpression.end'
         },
         key: {
-            period: 'Twig.expression.type.key.period',
-            brackets: 'Twig.expression.type.key.brackets'
+            period: 'TwigExpression.type.key.period',
+            brackets: 'TwigExpression.type.key.brackets'
         },
-        filter: 'Twig.expression.type.filter',
-        _function: 'Twig.expression.type._function',
-        variable: 'Twig.expression.type.variable',
-        number: 'Twig.expression.type.number',
-        _null: 'Twig.expression.type.null',
-        context: 'Twig.expression.type.context',
-        test: 'Twig.expression.type.test'
+        filter: 'TwigExpression.type.filter',
+        _function: 'TwigExpression.type._function',
+        variable: 'TwigExpression.type.variable',
+        number: 'TwigExpression.type.number',
+        _null: 'TwigExpression.type.null',
+        context: 'TwigExpression.type.context',
+        test: 'TwigExpression.type.test'
     };
 
     set = {
