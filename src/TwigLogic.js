@@ -11,6 +11,7 @@ import { twig } from "./twig.js";
 import { twigLib } from "./TwigLib.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
+import TwigExpression from "./TwigExpression.js";
 class TwigLogic {
 
     constructor(){
@@ -96,7 +97,7 @@ class TwigLogic {
                 const expression = token.match[1];
                 // Compile the expression.
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
                 delete token.match;
@@ -143,7 +144,7 @@ class TwigLogic {
                 const expression = token.match[1];
                 // Compile the expression.
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
                 delete token.match;
@@ -250,14 +251,14 @@ class TwigLogic {
 
                 // Compile the expression.
                 token.expression = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
                 // Compile the conditional (if available)
                 if (conditional) {
                     token.conditional = twigExpression.compile.call(this, {
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: conditional
                     }).stack;
                 }
@@ -394,7 +395,7 @@ class TwigLogic {
                 const expression = token.match[2];
                 // Compile the expression.
                 const expressionStack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -491,7 +492,7 @@ class TwigLogic {
                 const expression = '|' + token.match[1].trim();
                 // Compile the expression.
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
                 delete token.match;
@@ -503,7 +504,7 @@ class TwigLogic {
                 return state.parseAsync(token.output, context)
                     .then(output => {
                         const stack = [{
-                            type: twigExpression.type.string,
+                            type: TwigExpression.type.string,
                             value: output
                         }].concat(token.stack);
 
@@ -544,7 +545,7 @@ class TwigLogic {
                 const expression = '|' + token.match[1].trim();
                 // Compile the expression.
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
                 delete token.match;
@@ -556,7 +557,7 @@ class TwigLogic {
                 return state.parseAsync(token.output, context)
                     .then(output => {
                         const stack = [{
-                            type: twigExpression.type.string,
+                            type: TwigExpression.type.string,
                             value: output
                         }].concat(token.stack);
 
@@ -595,7 +596,7 @@ class TwigLogic {
                 const expression = token.match[1];
                 // Compile the expression.
                 const expressionStack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -669,7 +670,7 @@ class TwigLogic {
 
                 token.expression = token.match[2].trim();
                 token.output = twigExpression.compile({
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: token.expression
                 }).stack;
 
@@ -707,7 +708,7 @@ class TwigLogic {
                 delete token.match;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -762,7 +763,7 @@ class TwigLogic {
                 delete token.match;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -818,13 +819,13 @@ class TwigLogic {
                 token.ignoreMissing = ignoreMissing;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
                 if (withContext !== undefined) {
                     token.withStack = twigExpression.compile.call(this, {
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: withContext.trim()
                     }).stack;
                 }
@@ -996,7 +997,7 @@ class TwigLogic {
 
                     if (expression) {
                         defaults[key] = twigExpression.compile.call(this, {
-                            type: twigExpression.type.expression,
+                            type: TwigExpression.type.expression,
                             value: expression
                         }).stack;
                     } else {
@@ -1079,7 +1080,7 @@ class TwigLogic {
                 token.contextName = contextName;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -1145,7 +1146,7 @@ class TwigLogic {
                 token.macroNames = macroNames;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
@@ -1212,13 +1213,13 @@ class TwigLogic {
                 token.ignoreMissing = ignoreMissing;
 
                 token.stack = twigExpression.compile.call(this, {
-                    type: twigExpression.type.expression,
+                    type: TwigExpression.type.expression,
                     value: expression
                 }).stack;
 
                 if (withContext !== undefined) {
                     token.withStack = twigExpression.compile.call(this, {
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: withContext.trim()
                     }).stack;
                 }
@@ -1319,7 +1320,7 @@ class TwigLogic {
 
                 if (withContext !== undefined) {
                     token.withStack = twigExpression.compile.call(this, {
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: withContext.trim()
                     }).stack;
                 }

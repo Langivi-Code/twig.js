@@ -1,5 +1,6 @@
 import {TwigCore} from "./twig.core.js";
 import { twigExpression } from "./TwigExpression.js";
+import TwigExpression  from "./TwigExpression.js";
 export default class TwigBlock {
     /**
      * A wrapper for template blocks.
@@ -37,7 +38,7 @@ export default class TwigBlock {
                 return twigExpression.parseAsync.call(
                     parseState,
                     {
-                        type: twigExpression.type.string,
+                        type: TwigExpression.type.string,
                         value
                     },
                     context

@@ -15,7 +15,7 @@ function parseParams(state, params, context) {
     return TwigPromise.resolve(false);
 }
 
-class TwigExpression {
+export default class TwigExpression {
     constructor (){
         this.handler = {};
         while (this.definitions.length > 0) {
@@ -26,7 +26,7 @@ class TwigExpression {
         'true', 'false', 'null', 'TRUE', 'FALSE', 'NULL', '_context', 'and', 'b-and', 'or', 'b-or', 'b-xor', 'in', 'not in', 'if', 'matches', 'starts', 'ends', 'with'
     ];
 
-    type = {
+    static type = {
         comma: 'TwigExpression.type.comma',
         operator: {
             unary: 'TwigExpression.type.operator.unary',
@@ -64,46 +64,46 @@ class TwigExpression {
         test: 'TwigExpression.type.test'
     };
 
-    set = {
+    static set = {
         // What can follow an expression (in general)
         operations: [
-            this.type.filter,
-            this.type.operator.unary,
-            this.type.operator.binary,
-            this.type.array.end,
-            this.type.object.end,
-            this.type.parameter.end,
-            this.type.subexpression.end,
-            this.type.comma,
-            this.type.test
+            TwigExpression.type.filter,
+            TwigExpression.type.operator.unary,
+            TwigExpression.type.operator.binary,
+            TwigExpression.type.array.end,
+            TwigExpression.type.object.end,
+            TwigExpression.type.parameter.end,
+            TwigExpression.type.subexpression.end,
+            TwigExpression.type.comma,
+            TwigExpression.type.test
         ],
         expressions: [
-            this.type._function,
-            this.type.bool,
-            this.type.string,
-            this.type.variable,
-            this.type.number,
-            this.type._null,
-            this.type.context,
-            this.type.parameter.start,
-            this.type.array.start,
-            this.type.object.start,
-            this.type.subexpression.start,
-            this.type.operator.unary
+            TwigExpression.type._function,
+            TwigExpression.type.bool,
+            TwigExpression.type.string,
+            TwigExpression.type.variable,
+            TwigExpression.type.number,
+            TwigExpression.type._null,
+            TwigExpression.type.context,
+            TwigExpression.type.parameter.start,
+            TwigExpression.type.array.start,
+            TwigExpression.type.object.start,
+            TwigExpression.type.subexpression.start,
+            TwigExpression.type.operator.unary
         ],
         operationsExtended: [
-            this.type.filter,
-            this.type.operator.unary,
-            this.type.operator.binary,
-            this.type.array.end,
-            this.type.object.end,
-            this.type.parameter.end,
-            this.type.subexpression.end,
-            this.type.comma,
-            this.type.test,
-            this.type.key.period,
-            this.type.key.brackets,
-            this.type.slice
+            TwigExpression.type.filter,
+            TwigExpression.type.operator.unary,
+            TwigExpression.type.operator.binary,
+            TwigExpression.type.array.end,
+            TwigExpression.type.object.end,
+            TwigExpression.type.parameter.end,
+            TwigExpression.type.subexpression.end,
+            TwigExpression.type.comma,
+            TwigExpression.type.test,
+            TwigExpression.type.key.period,
+            TwigExpression.type.key.brackets,
+            TwigExpression.type.slice
         ]
     };
 
@@ -130,9 +130,9 @@ class TwigExpression {
 
     definitions = [
         {
-            type: this.type.test,
+            type: TwigExpression.type.test,
             regex: /^is\s+(not)?\s*([a-zA-Z_]\w*(\s?as)?)/,
-            next: this.set.operations.concat([this.type.parameter.start]),
+            next: TwigExpression.set.operations.concat([TwigExpression.type.parameter.start]),
             compile(token, stack, output) {
                 token.filter = token.match[2];
                 token.modifier = token.match[1];
@@ -157,10 +157,10 @@ class TwigExpression {
             }
         },
         {
-            type: this.type.comma,
+            type: TwigExpression.type.comma,
             // Match a comma
             regex: /^,/,
-            next: this.set.expressions.concat([this.type.array.end, this.type.object.end]),
+            next: TwigExpression.set.expressions.concat([TwigExpression.type.array.end, TwigExpression.type.object.end]),
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
@@ -171,9 +171,9 @@ class TwigExpression {
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken.type === twigExpression.type.object.start ||
-                        stackToken.type === twigExpression.type.parameter.start ||
-                        stackToken.type === twigExpression.type.array.start) {
+                    if (stackToken.type === TwigExpression.type.object.start ||
+                        stackToken.type === TwigExpression.type.parameter.start ||
+                        stackToken.type === TwigExpression.type.array.start) {
                         stack.push(stackToken);
                         break;
                     }
@@ -188,10 +188,10 @@ class TwigExpression {
             /**
              * Match a number (integer or decimal)
              */
-            type: this.type.number,
+            type: TwigExpression.type.number,
             // Match a number
             regex: /^-?\d+(\.\d+)?/,
-            next: this.set.operations,
+            next: TwigExpression.set.operations,
             compile(token, stack, output) {
                 token.value = Number(token.value);
                 output.push(token);
@@ -199,11 +199,11 @@ class TwigExpression {
             parse: this.fn.parse.pushValue
         },
         {
-            type: this.type.operator.binary,
+            type: TwigExpression.type.operator.binary,
             // Match any of ??, ?:, +, *, /, -, %, ~, <, <=, >, >=, !=, ==, **, ?, :, and, b-and, or, b-or, b-xor, in, not in
             // and, or, in, not in, matches, starts with, ends with can be followed by a space or parenthesis
             regex: /(^\?\?|^\?:|^(b-and)|^(b-or)|^(b-xor)|^[+\-~%?]|^[:](?!\d\])|^[!=]==?|^[!<>]=?|^\*\*?|^\/\/?|^(and)[(|\s+]|^(or)[(|\s+]|^(in)[(|\s+]|^(not in)[(|\s+]|^(matches)|^(starts with)|^(ends with)|^\.\.)/,
-            next: this.set.expressions,
+            next: TwigExpression.set.expressions,
             transform(match, tokens) {
                 switch (match[0]) {
                     case 'and(':
@@ -227,7 +227,7 @@ class TwigExpression {
                 TwigCore.log.trace('this.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
-                    (stack[stack.length - 1].type === twigExpression.type.operator.unary || stack[stack.length - 1].type === twigExpression.type.operator.binary) &&
+                    (stack[stack.length - 1].type === TwigExpression.type.operator.unary || stack[stack.length - 1].type === TwigExpression.type.operator.binary) &&
                     (
                         (operator.associativity === twigExpressionOperator.operator.leftToRight &&
                             operator.precidence >= stack[stack.length - 1].precidence) ||
@@ -249,15 +249,15 @@ class TwigExpression {
                         //   when the assocated object is closed.
                         const keyToken = output.pop();
 
-                        if (keyToken.type === twigExpression.type.string ||
-                            keyToken.type === twigExpression.type.variable) {
+                        if (keyToken.type === TwigExpression.type.string ||
+                            keyToken.type === TwigExpression.type.variable) {
                             token.key = keyToken.value;
-                        } else if (keyToken.type === twigExpression.type.number) {
+                        } else if (keyToken.type === TwigExpression.type.number) {
                             // Convert integer keys into string keys
                             token.key = keyToken.value.toString();
                         } else if (keyToken.expression &&
-                            (keyToken.type === twigExpression.type.parameter.end ||
-                                keyToken.type === twigExpression.type.subexpression.end)) {
+                            (keyToken.type === TwigExpression.type.parameter.end ||
+                                keyToken.type === TwigExpression.type.subexpression.end)) {
                             token.params = keyToken.params;
                         } else {
                             throw new TwigError('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
@@ -293,10 +293,10 @@ class TwigExpression {
             }
         },
         {
-            type: this.type.operator.unary,
+            type: TwigExpression.type.operator.unary,
             // Match any of not
             regex: /(^not\s+)/,
-            next: this.set.expressions,
+            next: TwigExpression.set.expressions,
             compile(token, stack, output) {
                 delete token.match;
 
@@ -307,7 +307,7 @@ class TwigExpression {
                 TwigCore.log.trace('this.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
-                    (stack[stack.length - 1].type === twigExpression.type.operator.unary || stack[stack.length - 1].type === twigExpression.type.operator.binary) &&
+                    (stack[stack.length - 1].type === TwigExpression.type.operator.unary || stack[stack.length - 1].type === TwigExpression.type.operator.binary) &&
                     (
                         (operator.associativity === twigExpressionOperator.operator.leftToRight &&
                             operator.precidence >= stack[stack.length - 1].precidence) ||
@@ -330,10 +330,10 @@ class TwigExpression {
             /**
              * Match a string. This is anything between a pair of single or double quotes.
              */
-            type: this.type.string,
+            type: TwigExpression.type.string,
             // See: http://blog.stevenlevithan.com/archives/match-quoted-string
             regex: /^(["'])(?:(?=(\\?))\2[\s\S])*?\1/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             compile(token, stack, output) {
                 let { value } = token;
                 delete token.match;
@@ -355,9 +355,9 @@ class TwigExpression {
             /**
              * Match a subexpression set start.
              */
-            type: this.type.subexpression.start,
+            type: TwigExpression.type.subexpression.start,
             regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
-            next: this.set.expressions.concat([this.type.subexpression.end]),
+            next: TwigExpression.set.expressions.concat([TwigExpression.type.subexpression.end]),
             validate(match,tokens){
                 if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
@@ -377,9 +377,9 @@ class TwigExpression {
             /**
              * Match a subexpression set end.
              */
-            type: this.type.subexpression.end,
+            type: TwigExpression.type.subexpression.end,
             regex: /^\)/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             validate(match, tokens) {
                 // Iterate back through previous tokens to ensure we follow a subexpression start
                 let i = tokens.length - 1;
@@ -390,7 +390,7 @@ class TwigExpression {
                 while (!foundSubexpressionStart && i >= 0) {
                     const token = tokens[i];
 
-                    foundSubexpressionStart = token.type === twigExpression.type.subexpression.start;
+                    foundSubexpressionStart = token.type === TwigExpression.type.subexpression.start;
 
                     // If we have previously found a subexpression end, then this subexpression start is the start of
                     // that subexpression, not the subexpression we are searching for
@@ -400,11 +400,11 @@ class TwigExpression {
                     }
 
                     // Count parameter tokens to ensure we dont return truthy for a parameter opener
-                    if (token.type === twigExpression.type.parameter.start) {
+                    if (token.type === TwigExpression.type.parameter.start) {
                         unclosedParameterCount++;
-                    } else if (token.type === twigExpression.type.parameter.end) {
+                    } else if (token.type === TwigExpression.type.parameter.end) {
                         unclosedParameterCount--;
-                    } else if (token.type === twigExpression.type.subexpression.end) {
+                    } else if (token.type === TwigExpression.type.subexpression.end) {
                         nextSubexpressionStartInvalid = true;
                     }
 
@@ -423,14 +423,14 @@ class TwigExpression {
                 const endToken = token;
 
                 stackToken = stack.pop();
-                while (stack.length > 0 && stackToken.type !== twigExpression.type.subexpression.start) {
+                while (stack.length > 0 && stackToken.type !== TwigExpression.type.subexpression.start) {
                     output.push(stackToken);
                     stackToken = stack.pop();
                 }
 
                 // Move contents of parens into preceding filter
                 const paramStack = [];
-                while (token.type !== twigExpression.type.subexpression.start) {
+                while (token.type !== TwigExpression.type.subexpression.start) {
                     // Add token to arguments stack
                     paramStack.unshift(token);
                     token = output.pop();
@@ -443,10 +443,10 @@ class TwigExpression {
                 stackToken = stack[stack.length - 1];
 
                 if (stackToken === undefined ||
-                    (stackToken.type !== twigExpression.type._function &&
-                        stackToken.type !== twigExpression.type.filter &&
-                        stackToken.type !== twigExpression.type.test &&
-                        stackToken.type !== twigExpression.type.key.brackets)) {
+                    (stackToken.type !== TwigExpression.type._function &&
+                        stackToken.type !== TwigExpression.type.filter &&
+                        stackToken.type !== TwigExpression.type.test &&
+                        stackToken.type !== TwigExpression.type.key.brackets)) {
                     endToken.expression = true;
 
                     // Remove start and end token from stack
@@ -479,9 +479,9 @@ class TwigExpression {
             /**
              * Match a parameter set start.
              */
-            type: this.type.parameter.start,
+            type: TwigExpression.type.parameter.start,
             regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
-            next: this.set.expressions.concat([this.type.parameter.end]),
+            next: TwigExpression.set.expressions.concat([TwigExpression.type.parameter.end]),
             validate(match, tokens) {
                 if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
@@ -497,22 +497,22 @@ class TwigExpression {
             /**
              * Match a parameter set end.
              */
-            type: this.type.parameter.end,
+            type: TwigExpression.type.parameter.end,
             regex: /^\)/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             compile(token, stack, output) {
                 let stackToken;
                 const endToken = token;
 
                 stackToken = stack.pop();
-                while (stack.length > 0 && stackToken.type !== twigExpression.type.parameter.start) {
+                while (stack.length > 0 && stackToken.type !== TwigExpression.type.parameter.start) {
                     output.push(stackToken);
                     stackToken = stack.pop();
                 }
 
                 // Move contents of parens into preceding filter
                 const paramStack = [];
-                while (token.type !== twigExpression.type.parameter.start) {
+                while (token.type !== TwigExpression.type.parameter.start) {
                     // Add token to arguments stack
                     paramStack.unshift(token);
                     token = output.pop();
@@ -524,10 +524,10 @@ class TwigExpression {
                 token = output[output.length - 1];
 
                 if (token === undefined ||
-                    (token.type !== twigExpression.type._function &&
-                        token.type !== twigExpression.type.filter &&
-                        token.type !== twigExpression.type.test &&
-                        token.type !== twigExpression.type.key.brackets)) {
+                    (token.type !== TwigExpression.type._function &&
+                        token.type !== TwigExpression.type.filter &&
+                        token.type !== TwigExpression.type.test &&
+                        token.type !== TwigExpression.type.key.brackets)) {
                     endToken.expression = true;
 
                     // Remove start and end token from stack
@@ -558,7 +558,7 @@ class TwigExpression {
                 while (stack.length > 0) {
                     value = stack.pop();
                     // Push values into the array until the start of the array
-                    if (value && value.type && value.type === twigExpression.type.parameter.start) {
+                    if (value && value.type && value.type === TwigExpression.type.parameter.start) {
                         arrayEnded = true;
                         break;
                     }
@@ -574,9 +574,9 @@ class TwigExpression {
             }
         },
         {
-            type: this.type.slice,
+            type: TwigExpression.type.slice,
             regex: /^\[(\d*:\d*)\]/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             compile(token, stack, output) {
                 const sliceRange = token.match[1].split(':');
 
@@ -606,9 +606,9 @@ class TwigExpression {
             /**
              * Match an array start.
              */
-            type: this.type.array.start,
+            type: TwigExpression.type.array.start,
             regex: /^\[/,
-            next: this.set.expressions.concat([this.type.array.end]),
+            next: TwigExpression.set.expressions.concat([TwigExpression.type.array.end]),
             compile: this.fn.compile.pushBoth,
             parse: this.fn.parse.push
         },
@@ -616,16 +616,16 @@ class TwigExpression {
             /**
              * Match an array end.
              */
-            type: this.type.array.end,
+            type: TwigExpression.type.array.end,
             regex: /^\]/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken.type === twigExpression.type.array.start) {
+                    if (stackToken.type === TwigExpression.type.array.start) {
                         break;
                     }
 
@@ -642,7 +642,7 @@ class TwigExpression {
                 while (stack.length > 0) {
                     value = stack.pop();
                     // Push values into the array until the start of the array
-                    if (value && value.type && value.type === twigExpression.type.array.start) {
+                    if (value && value.type && value.type === TwigExpression.type.array.start) {
                         arrayEnded = true;
                         break;
                     }
@@ -664,9 +664,9 @@ class TwigExpression {
         //
         // Keys must be quoted (either single or double) and values can be any expression.
         {
-            type: this.type.object.start,
+            type: TwigExpression.type.object.start,
             regex: /^\{/,
-            next: this.set.expressions.concat([this.type.object.end]),
+            next: TwigExpression.set.expressions.concat([TwigExpression.type.object.end]),
             compile: this.fn.compile.pushBoth,
             parse: this.fn.parse.push
         },
@@ -676,9 +676,9 @@ class TwigExpression {
         // This is where the logic for building the internal
         // representation of a hash map is defined.
         {
-            type: this.type.object.end,
+            type: TwigExpression.type.object.end,
             regex: /^\}/,
-            next: this.set.operationsExtended,
+            next: TwigExpression.set.operationsExtended,
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
@@ -686,7 +686,7 @@ class TwigExpression {
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken && stackToken.type === twigExpression.type.object.start) {
+                    if (stackToken && stackToken.type === TwigExpression.type.object.start) {
                         break;
                     }
 
@@ -705,12 +705,12 @@ class TwigExpression {
                 while (stack.length > 0) {
                     token = stack.pop();
                     // Push values into the array until the start of the object
-                    if (token && token.type && token.type === twigExpression.type.object.start) {
+                    if (token && token.type && token.type === TwigExpression.type.object.start) {
                         objectEnded = true;
                         break;
                     }
 
-                    if (token && token.type && (token.type === twigExpression.type.operator.binary || token.type === twigExpression.type.operator.unary) && token.key) {
+                    if (token && token.type && (token.type === TwigExpression.type.operator.binary || token.type === twigExpression.type.operator.unary) && token.key) {
                         if (!hasValue) {
                             throw new TwigError('Missing value for key \'' + token.key + '\' in object definition.');
                         }
@@ -750,11 +750,11 @@ class TwigExpression {
         //
         // Filter parsing is done in the Twig.filters namespace.
         {
-            type: this.type.filter,
+            type: TwigExpression.type.filter,
             // Match a | then a letter or _, then any number of letters, numbers, _ or -
             regex: /^\|\s?([a-zA-Z_][a-zA-Z0-9_-]*)/,
-            next: this.set.operationsExtended.concat([
-                this.type.parameter.start
+            next: TwigExpression.set.operationsExtended.concat([
+                TwigExpression.type.parameter.start
             ]),
             compile(token, stack, output) {
                 token.value = token.match[1];
@@ -774,10 +774,10 @@ class TwigExpression {
             }
         },
         {
-            type: this.type._function,
+            type: TwigExpression.type._function,
             // Match any letter or _, then any number of letters, numbers, _ or - followed by (
             regex: /^([a-zA-Z_]\w*)\s*\(/,
-            next: this.type.parameter.start,
+            next: TwigExpression.type.parameter.start,
             validate(match) {
                 // Make sure this function is not a reserved word
                 return match[1] && (!twigExpression.reservedWords.includes(match[1]));
@@ -828,11 +828,11 @@ class TwigExpression {
         // the value of 'undefined' if the given variable doesn't
         // exist in the context.
         {
-            type: this.type.variable,
+            type: TwigExpression.type.variable,
             // Match any letter or _, then any number of letters, numbers, _ or -
             regex: /((^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$\>\<\>=\<=]\s{0,2}\w*)|^[a-zA-Z_]\w*)/g,
-            next: this.set.operationsExtended.concat([
-                this.type.parameter.start
+            next: TwigExpression.set.operationsExtended.concat([
+                TwigExpression.type.parameter.start
             ]),
             compile: this.fn.compile.push,
             validate(match) {
@@ -859,10 +859,10 @@ class TwigExpression {
             }
         },
         {
-            type: this.type.key.period,
+            type: TwigExpression.type.key.period,
             regex: /^\.(\w+)/,
-            next: this.set.operationsExtended.concat([
-                this.type.parameter.start
+            next: TwigExpression.set.operationsExtended.concat([
+                TwigExpression.type.parameter.start
             ]),
             compile(token, stack, output) {
                 token.key = token.match[1];
@@ -916,10 +916,10 @@ class TwigExpression {
             }
         },
         {
-            type: this.type.key.brackets,
+            type: TwigExpression.type.key.brackets,
             regex: /^\[([^\]:]*)\]/,
-            next: this.set.operationsExtended.concat([
-                this.type.parameter.start
+            next: TwigExpression.set.operationsExtended.concat([
+                TwigExpression.type.parameter.start
             ]),
             compile(token, stack, output) {
                 const match = token.match[1];
@@ -978,10 +978,10 @@ class TwigExpression {
             /**
              * Match a null value.
              */
-            type: this.type._null,
+            type: TwigExpression.type._null,
             // Match a number
             regex: /^(null|NULL|none|NONE)/,
-            next: this.set.operations,
+            next: TwigExpression.set.operations,
             compile(token, stack, output) {
                 delete token.match;
                 token.value = null;
@@ -993,10 +993,10 @@ class TwigExpression {
             /**
              * Match the context
              */
-            type: this.type.context,
+            type: TwigExpression.type.context,
             regex: /^_context/,
-            next: this.set.operationsExtended.concat([
-                this.type.parameter.start
+            next: TwigExpression.set.operationsExtended.concat([
+                TwigExpression.type.parameter.start
             ]),
             compile: this.fn.compile.push,
             parse(token, stack, context) {
@@ -1007,9 +1007,9 @@ class TwigExpression {
             /**
              * Match a boolean
              */
-            type: this.type.bool,
+            type: TwigExpression.type.bool,
             regex: /^(true|TRUE|false|FALSE)/,
-            next: this.set.operations,
+            next: TwigExpression.set.operations,
             compile(token, stack, output) {
                 token.value = (token.match[0].toLowerCase() === 'true');
                 delete token.match;
@@ -1046,7 +1046,7 @@ class TwigExpression {
 
         Those parameters will also need parsing in case they are actually an expression to pass as parameters.
             */
-        if (nextToken && nextToken.type === twigExpression.type.parameter.end) {
+        if (nextToken && nextToken.type === TwigExpression.type.parameter.end) {
             // When parsing these parameters, we need to get them all back, not just the last item on the stack.
             const tokensAreParameters = true;
 
@@ -1078,7 +1078,7 @@ class TwigExpression {
      * @param {string} type The name of the new type.
      */
      extendType(type) {
-        this.type[type] = 'Twig.expression.type.' + type;
+        TwigExpression.type[type] = 'Twig.expression.type.' + type;
     };
 
 
@@ -1087,7 +1087,7 @@ class TwigExpression {
      *
      * Token definitions follow this format:
      *  {
-     *      type:     One of this.type.[type], either pre-defined or added using
+     *      type:     One of TwigExpression.type.[type], either pre-defined or added using
      *                    this.extendType
      *
      *      next:     Array of types from this.type that can follow this token,
@@ -1294,7 +1294,7 @@ class TwigExpression {
         // The output stack
         const stack = [];
         const loopTokenFixups = [];
-        const binaryOperator = twigExpression.type.operator.binary;
+        const binaryOperator = TwigExpression.type.operator.binary;
 
         return AsyncTwig.potentiallyAsync(state, allowAsync, () => {
             return AsyncTwig.forEach(tokens, (token, index) => {
