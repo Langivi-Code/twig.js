@@ -4,7 +4,7 @@
 // This file handles parsing filters.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
-import { twigLogic } from "./TwigLogic.js";
+import { TwigLogic } from "./TwigLogic.js";
 import { twigTemplates } from "./twig.templates.js";
 import { twigLib } from "./TwigLib.js";
 
@@ -316,7 +316,7 @@ class TwigFunctions {
     parent() {
         const state = this;
 
-        return state.getBlock(state.getNestingStackToken(twigLogic.type.block).blockName, true).render(state, state.context);
+        return state.getBlock(state.getNestingStackToken(TwigLogic.type.block).blockName, true).render(state, state.context);
     }
 
     attribute(object, method, params) {

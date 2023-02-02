@@ -12,7 +12,7 @@ import { twigLib } from "./TwigLib.js";
 import TwigBlock from "./TwigBlock.js";
 import TwigParseState from "./TwigParseState.js";
 import TwigExpression from "./TwigExpression.js";
-class TwigLogic {
+export class TwigLogic {
 
     constructor(){
         this.handler = {};
@@ -23,38 +23,38 @@ class TwigLogic {
      /**
      * Logic token types.
      */
-    type = {
-        if_: 'Twig.logic.type.if',
-        endif: 'Twig.logic.type.endif',
-        for_: 'Twig.logic.type.for',
-        endfor: 'Twig.logic.type.endfor',
-        else_: 'Twig.logic.type.else',
-        elseif: 'Twig.logic.type.elseif',
-        set: 'Twig.logic.type.set',
-        setcapture: 'Twig.logic.type.setcapture',
-        endset: 'Twig.logic.type.endset',
-        filter: 'Twig.logic.type.filter',
-        endfilter: 'Twig.logic.type.endfilter',
-        apply: 'Twig.logic.type.apply',
-        endapply: 'Twig.logic.type.endapply',
-        do: 'Twig.logic.type.do',
-        shortblock: 'Twig.logic.type.shortblock',
-        block: 'Twig.logic.type.block',
-        endblock: 'Twig.logic.type.endblock',
-        extends_: 'Twig.logic.type.extends',
-        use: 'Twig.logic.type.use',
-        include: 'Twig.logic.type.include',
-        spaceless: 'Twig.logic.type.spaceless',
-        endspaceless: 'Twig.logic.type.endspaceless',
-        macro: 'Twig.logic.type.macro',
-        endmacro: 'Twig.logic.type.endmacro',
-        import_: 'Twig.logic.type.import',
-        from: 'Twig.logic.type.from',
-        embed: 'Twig.logic.type.embed',
-        endembed: 'Twig.logic.type.endembed',
-        with: 'Twig.logic.type.with',
-        endwith: 'Twig.logic.type.endwith',
-        deprecated: 'Twig.logic.type.deprecated'
+    static type = {
+        if_: 'TwigLogic.type.if',
+        endif: 'TwigLogic.type.endif',
+        for_: 'TwigLogic.type.for',
+        endfor: 'TwigLogic.type.endfor',
+        else_: 'TwigLogic.type.else',
+        elseif: 'TwigLogic.type.elseif',
+        set: 'TwigLogic.type.set',
+        setcapture: 'TwigLogic.type.setcapture',
+        endset: 'TwigLogic.type.endset',
+        filter: 'TwigLogic.type.filter',
+        endfilter: 'TwigLogic.type.endfilter',
+        apply: 'TwigLogic.type.apply',
+        endapply: 'TwigLogic.type.endapply',
+        do: 'TwigLogic.type.do',
+        shortblock: 'TwigLogic.type.shortblock',
+        block: 'TwigLogic.type.block',
+        endblock: 'TwigLogic.type.endblock',
+        extends_: 'TwigLogic.type.extends',
+        use: 'TwigLogic.type.use',
+        include: 'TwigLogic.type.include',
+        spaceless: 'TwigLogic.type.spaceless',
+        endspaceless: 'TwigLogic.type.endspaceless',
+        macro: 'TwigLogic.type.macro',
+        endmacro: 'TwigLogic.type.endmacro',
+        import_: 'TwigLogic.type.import',
+        from: 'TwigLogic.type.from',
+        embed: 'TwigLogic.type.embed',
+        endembed: 'TwigLogic.type.endembed',
+        with: 'TwigLogic.type.with',
+        endwith: 'TwigLogic.type.endwith',
+        deprecated: 'TwigLogic.type.deprecated'
     };
 
     // Regular expressions for handling logic tokens.
@@ -85,12 +85,12 @@ class TwigLogic {
              *
              *  Format: {% if expression %}
              */
-            type: this.type.if_,
+            type: TwigLogic.type.if_,
             regex: /^if\s?([\s\S]+)$/,
             next: [
-                this.type.else_,
-                this.type.elseif,
-                this.type.endif
+                TwigLogic.type.else_,
+                TwigLogic.type.elseif,
+                TwigLogic.type.endif
             ],
             open: true,
             compile(token) {
@@ -132,12 +132,12 @@ class TwigLogic {
              *
              *  Format: {% elseif expression %}
              */
-            type: this.type.elseif,
+            type: TwigLogic.type.elseif,
             regex: /^elseif\s?([^\s].*)$/,
             next: [
-                this.type.else_,
-                this.type.elseif,
-                this.type.endif
+                TwigLogic.type.else_,
+                TwigLogic.type.elseif,
+                TwigLogic.type.endif
             ],
             open: false,
             compile(token) {
@@ -177,11 +177,11 @@ class TwigLogic {
              *
              *  Format: {% else %}
              */
-            type: this.type.else_,
+            type: TwigLogic.type.else_,
             regex: /^else$/,
             next: [
-                this.type.endif,
-                this.type.endfor
+                TwigLogic.type.endif,
+                TwigLogic.type.endfor
             ],
             open: false,
             parse(token, context, chain) {
@@ -206,7 +206,7 @@ class TwigLogic {
              *
              *  Format: {% endif %}
              */
-            type: this.type.endif,
+            type: TwigLogic.type.endif,
             regex: /^endif$/,
             next: [],
             open: false
@@ -217,11 +217,11 @@ class TwigLogic {
              *
              *  Format: {% for expression %}
              */
-            type: this.type.for_,
+            type: TwigLogic.type.for_,
             regex: /^for\s+([a-zA-Z0-9_,\s]+)\s+in\s+([\S\s]+?)(?:\s+if\s+([^\s].*))?$/,
             next: [
-                this.type.else_,
-                this.type.endfor
+                TwigLogic.type.else_,
+                TwigLogic.type.endfor
             ],
             open: true,
             compile(token) {
@@ -375,7 +375,7 @@ class TwigLogic {
              *
              *  Format: {% endfor %}
              */
-            type: this.type.endfor,
+            type: TwigLogic.type.endfor,
             regex: /^endfor$/,
             next: [],
             open: false
@@ -386,7 +386,7 @@ class TwigLogic {
              *
              *  Format: {% set key = expression %}
              */
-            type: this.type.set,
+            type: TwigLogic.type.set,
             regex: /^set\s+([a-zA-Z0-9_,\s]+)\s*=\s*([\s\S]+)$/,
             next: [],
             open: true,
@@ -434,10 +434,10 @@ class TwigLogic {
              *
              *  Format: {% set key %}
              */
-            type: this.type.setcapture,
+            type: TwigLogic.type.setcapture,
             regex: /^set\s+([a-zA-Z0-9_,\s]+)$/,
             next: [
-                this.type.endset
+                TwigLogic.type.endset
             ],
             open: true,
             compile(token) {
@@ -471,7 +471,7 @@ class TwigLogic {
              *
              *  Format: {% endset %}
              */
-            type: this.type.endset,
+            type: TwigLogic.type.endset,
             regex: /^endset$/,
             next: [],
             open: false
@@ -482,10 +482,10 @@ class TwigLogic {
              *
              *  Format: {% filter upper %} or {% filter lower|escape %}
              */
-            type: this.type.filter,
+            type: TwigLogic.type.filter,
             regex: /^filter\s+(.+)$/,
             next: [
-                this.type.endfilter
+                TwigLogic.type.endfilter
             ],
             open: true,
             compile(token) {
@@ -524,7 +524,7 @@ class TwigLogic {
              *
              *  Format: {% endfilter %}
              */
-            type: this.type.endfilter,
+            type: TwigLogic.type.endfilter,
             regex: /^endfilter$/,
             next: [],
             open: false
@@ -535,10 +535,10 @@ class TwigLogic {
              *
              *  Format: {% apply upper %} or {% apply lower|escape %}
              */
-            type: this.type.apply,
+            type: TwigLogic.type.apply,
             regex: /^apply\s+(.+)$/,
             next: [
-                this.type.endapply
+                TwigLogic.type.endapply
             ],
             open: true,
             compile(token) {
@@ -577,7 +577,7 @@ class TwigLogic {
              *
              *  Format: {% endapply %}
              */
-            type: this.type.endapply,
+            type: TwigLogic.type.endapply,
             regex: /^endapply$/,
             next: [],
             open: false
@@ -588,7 +588,7 @@ class TwigLogic {
              *
              *  Format: {% do expression %}
              */
-            type: this.type.do,
+            type: TwigLogic.type.do,
             regex: /^do\s+([\S\s]+)$/,
             next: [],
             open: true,
@@ -623,10 +623,10 @@ class TwigLogic {
              *
              *  Format: {% block title %}
              */
-            type: this.type.block,
+            type: TwigLogic.type.block,
             regex: /^block\s+(\w+)$/,
             next: [
-                this.type.endblock
+                TwigLogic.type.endblock
             ],
             open: true,
             compile(token) {
@@ -661,7 +661,7 @@ class TwigLogic {
              *
              *  Format: {% block title expression %}
              */
-            type: this.type.shortblock,
+            type: TwigLogic.type.shortblock,
             regex: /^block\s+(\w+)\s+(.+)$/,
             next: [],
             open: true,
@@ -674,12 +674,12 @@ class TwigLogic {
                     value: token.expression
                 }).stack;
 
-                return twigLogic.handler[twigLogic.type.block].compile.apply(template, [token]);
+                return twigLogic.handler[TwigLogic.type.block].compile.apply(template, [token]);
             },
             parse(...args) {
                 const state = this;
 
-                return twigLogic.handler[twigLogic.type.block].parse.apply(state, args);
+                return twigLogic.handler[TwigLogic.type.block].parse.apply(state, args);
             }
         },
         {
@@ -688,7 +688,7 @@ class TwigLogic {
              *
              *  Format: {% endblock %}
              */
-            type: this.type.endblock,
+            type: TwigLogic.type.endblock,
             regex: /^endblock(?:\s+(\w+))?$/,
             next: [],
             open: false
@@ -699,7 +699,7 @@ class TwigLogic {
              *
              *  Format: {% extends "template.twig" %}
              */
-            type: this.type.extends_,
+            type: TwigLogic.type.extends_,
             regex: /^extends\s+(.+)$/,
             next: [],
             open: true,
@@ -754,7 +754,7 @@ class TwigLogic {
              *
              *  Format: {% use "template.twig" %}
              */
-            type: this.type.use,
+            type: TwigLogic.type.use,
             regex: /^use\s+(.+)$/,
             next: [],
             open: true,
@@ -802,7 +802,7 @@ class TwigLogic {
              *
              *  Format: {% includes "template.twig" [with {some: 'values'} only] %}
              */
-            type: this.type.include,
+            type: TwigLogic.type.include,
             regex: /^include\s+(.+?)(?:\s|$)(ignore missing(?:\s|$))?(?:with\s+([\S\s]+?))?(?:\s|$)(only)?$/,
             next: [],
             open: true,
@@ -919,10 +919,10 @@ class TwigLogic {
             }
         },
         {
-            type: this.type.spaceless,
+            type: TwigLogic.type.spaceless,
             regex: /^spaceless$/,
             next: [
-                this.type.endspaceless
+                TwigLogic.type.endspaceless
             ],
             open: true,
 
@@ -949,7 +949,7 @@ class TwigLogic {
 
         // Add the {% endspaceless %} token
         {
-            type: this.type.endspaceless,
+            type: TwigLogic.type.endspaceless,
             regex: /^endspaceless$/,
             next: [],
             open: false
@@ -961,10 +961,10 @@ class TwigLogic {
              * Format: {% macro input(name = default, value, type, size) %}
              *
              */
-            type: this.type.macro,
+            type: TwigLogic.type.macro,
             regex: /^macro\s+(\w+)\s*\(\s*((?:\w+(?:\s*=\s*([\s\S]+))?(?:,\s*)?)*)\s*\)$/,
             next: [
-                this.type.endmacro
+                TwigLogic.type.endmacro
             ],
             open: true,
             compile(token) {
@@ -1056,7 +1056,7 @@ class TwigLogic {
              *
              * Format: {% endmacro %}
              */
-            type: this.type.endmacro,
+            type: TwigLogic.type.endmacro,
             regex: /^endmacro$/,
             next: [],
             open: false
@@ -1067,7 +1067,7 @@ class TwigLogic {
             *
             * Format: {% import "template.twig" as form %}
             */
-            type: this.type.import_,
+            type: TwigLogic.type.import_,
             regex: /^import\s+(.+)\s+as\s+(\w+)$/,
             next: [],
             open: true,
@@ -1119,7 +1119,7 @@ class TwigLogic {
             *
             * Format: {% from "template.twig" import func as form %}
             */
-            type: this.type.from,
+            type: TwigLogic.type.from,
             regex: /^from\s+(.+)\s+import\s+([a-zA-Z0-9_, ]+)$/,
             next: [],
             open: true,
@@ -1194,10 +1194,10 @@ class TwigLogic {
              *
              *  Format: {% embed "template.twig" [with {some: 'values'} only] %}
              */
-            type: this.type.embed,
+            type: TwigLogic.type.embed,
             regex: /^embed\s+(.+?)(?:\s+(ignore missing))?(?:\s+with\s+([\S\s]+?))?(?:\s+(only))?$/,
             next: [
-                this.type.endembed
+                TwigLogic.type.endembed
             ],
             open: true,
             compile(token) {
@@ -1292,7 +1292,7 @@ class TwigLogic {
          *
          */
         {
-            type: this.type.endembed,
+            type: TwigLogic.type.endembed,
             regex: /^endembed$/,
             next: [],
             open: false
@@ -1303,10 +1303,10 @@ class TwigLogic {
              *
              *  Format: {% with {some: 'values'} [only] %}
              */
-            type: this.type.with,
+            type: TwigLogic.type.with,
             regex: /^(?:with\s+([\S\s]+?))(?:\s|$)(only)?$/,
             next: [
-                this.type.endwith
+                TwigLogic.type.endwith
             ],
             open: true,
             compile(token) {
@@ -1362,7 +1362,7 @@ class TwigLogic {
             }
         },
         {
-            type: this.type.endwith,
+            type: TwigLogic.type.endwith,
             regex: /^endwith$/,
             next: [],
             open: false
@@ -1373,7 +1373,7 @@ class TwigLogic {
              *
              *  Format: {% deprecated 'Description' %}
              */
-            type: this.type.deprecated,
+            type: TwigLogic.type.deprecated,
             regex: /^deprecated\s+(.+)$/,
             next: [],
             open: true,
@@ -1393,7 +1393,7 @@ class TwigLogic {
      */
     extendType(type, value) {
         value = value || ('Twig.logic.type' + type);
-        this.type[type] = value;
+        TwigLogic.type[type] = value;
     };
 
     /**
