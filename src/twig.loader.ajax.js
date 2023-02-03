@@ -1,7 +1,7 @@
 import TwigError from "./TwigError.js";
-import { twigTemplates } from "./twig.templates.js";
 import { TwigCore } from "./twig.core.js";
-export default function () {
+
+export default function (twigTemplates) {
     'use strict';
 
     twigTemplates.registerLoader('ajax', function (location, params, callback, errorCallback) {

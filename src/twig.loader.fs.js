@@ -1,6 +1,6 @@
-import { twigTemplates } from "./twig.templates.js";
 import TwigError from "./TwigError.js";
-export default function () {
+
+export default function (twigTemplates) {
     twigTemplates.registerLoader('fs', function (location, params) {
         let data = null;
         const {precompiled} = params;

@@ -22,6 +22,14 @@ class TwigTemplates {
     constructor() {
         this.loaders = {};
         this.parsers = {};
+        loaderajax(this);
+        loaderfs(this);
+        this.registerParser('twig', params => {
+            return new TwigTemplate(params);
+        });
+        this.registerParser('source', params => {
+            return params.data || '';
+        })
     }
 
     /**
@@ -236,16 +244,5 @@ class TwigTemplates {
 }
 
 const twigTemplates = new TwigTemplates();
-
-twigTemplates.loaderAjax = loaderajax;
-twigTemplates.loaderFs = loaderfs;
-
-twigTemplates.registerParser('twig', params => {
-    return new TwigTemplate(params);
-});
-
-twigTemplates.registerParser('source', params => {
-    return params.data || '';
-});
 
 export {twigTemplates};
