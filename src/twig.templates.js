@@ -233,14 +233,6 @@ class TwigTemplates {
         const loader = this.loaders[params.method] || this.loaders.fs;
         return loader.call(this,location,params);
     }
-
-    set loaderAjax(ajax){
-        ajax();
-    }
-
-    set loaderFs(fs){
-        fs();
-    }
 }
 
 const twigTemplates = new TwigTemplates();
