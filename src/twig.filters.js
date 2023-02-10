@@ -194,7 +194,7 @@ export class TwigFilters {
             if (Object.hasOwn(value, "_keys")) {
                 delete value._keys;
             }
-            return Object.entries(value).map(params[0]);
+            return Object.entries(value).reverse().map(params[0]);
         } else {
             return;
         }

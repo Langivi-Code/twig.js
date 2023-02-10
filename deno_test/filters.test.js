@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigCache } from "../src/twig.cache.js";
 
 
 Deno.test('Twig.js Filters -> url_encode ->', async (t) => {
@@ -15,6 +16,7 @@ Deno.test('Twig.js Filters -> url_encode ->', async (t) => {
     }
 
     await t.step('should encode URLs', async () => {
+        twigCache.emptyCacheDir();
         const testTemplate = await twig.twig({data: '{{ "http://google.com/?q=twig.js"|url_encode() }}'});
         assertEquals(testTemplate.render(), 'http%3A%2F%2Fgoogle.com%2F%3Fq%3Dtwig.js');
     });
@@ -806,4 +808,151 @@ Deno.test('Twig.js Filters -> url_encode ->', async (t) => {
         const testTemplate = await twig.twig({data: '{{ ["a", "b", "c"]|keys|reverse }}'});
         assertEquals(testTemplate.render(), '2,1,0');
     });
+
+    await t.step('country_name -> should return name country', async () =>{
+        const testTemplate = await twig.twig({data:"{{ 'FR'|country_name }}"});
+        assertEquals(testTemplate.render(), "France");   
+    })
+
+    await t.step('should return name country', async () => {
+        const testTemplate = await twig.twig({data:"{{ 'US'|country_name }}"});
+        assertEquals(testTemplate.render(), "United States")
+    })
+
+    await t.step ('currency_name -> should return name currency', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'EUR'|currency_name }}"});
+        assertEquals(testTemplate.render(), "euros")
+    })
+
+    await t.step ('should return name carrency', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'JPY'|currency_name }}"});
+        assertEquals(testTemplate.render(), "Japanese yen")
+    })
+
+    await t.step ('currency_symbol -> should return symbol carrency', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'EUR'|currency_symbol }}"});
+        assertEquals(testTemplate.render(), "€")
+    })
+
+    await t.step ('should return symbol carrency', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'JPY'|currency_symbol }}"});
+        assertEquals(testTemplate.render(), "¥")
+    })
+
+    await t.step ('convert_encoding -> should converts a string from one encoding to another', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'ENCODING STRING'|convert_encoding('UTF-8', 'cesu8')}}"});
+        assertEquals(testTemplate.render(), "ENCODING STRING")
+    })
+
+    await t.step ('filter -> should filters elements of a sequence or a mapping using an arrow function', async() => {
+        const testTemplate = await twig.twig({data:"{{ [34, 36, 38, 40, 42]|filter(v => v > 38)|join(', ') }}"});
+        assertEquals(testTemplate.render(), "40, 42")
+    })
+
+    await t.step (' should filters elements of a sequence or a mapping using an arrow function', async() => {
+        const testTemplate = await twig.twig({data:"{% for v in [34, 36, 38, 40, 42]|filter(v => v > 38) -%} {{ v }} {% endfor %}"});
+        assertEquals(testTemplate.render(), "40 42 ")
+    })
+
+    await t.step ('map -> should  filter applies an arrow function to the elements of a sequence or a mapping', async() => {
+        const testTemplate = await twig.twig({data:"{{ [{first: 'Bob', last: 'Smith'}, {first: 'Alice', last: 'Dupond'} ]|map(p => `${p.first} ${p.last}`)|join(', ') }}"});
+        assertEquals(testTemplate.render(), "Bob Smith, Alice Dupond")
+    })
+
+    await t.step ('should  filter applies an arrow function to the elements of a sequence or a mapping', async() => {
+        const testTemplate = await twig.twig({data:"{{ {'Bob': 'Smith', 'Alice': 'Dupond',}|map(([key, value]) => `${key} ${value}`)|join(', ') }}"});
+        assertEquals(testTemplate.render(), "Bob Smith, Alice Dupond")
+    })
+
+    await t.step ('format_date -> should  formats a date short', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07'|format_date('short', 'none', 'fr') }}"});
+        assertEquals(testTemplate.render(), "07/08/2019")
+    })
+
+    await t.step ('should  formats a date full', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07 '|format_date('full', 'full', 'fr') }}"});
+        assertEquals(testTemplate.render(), "mercredi 7 août 2019")
+    })
+
+    await t.step ('format_datetime -> should  formats a date full', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07 23:39:12'|format_datetime() }}"});
+        assertEquals(testTemplate.render(), "Aug 7, 2019, 11:39:12 PM ")
+    })
+
+    await t.step ('should  formats a date short', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07 23:39:12'|format_datetime('none', 'short', 'fr') }}"});
+        assertEquals(testTemplate.render(), " 23:39")
+    })
+
+    await t.step ('should  formats a date short', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07 23:39:12'|format_datetime('short', 'none', 'fr') }}"});
+        assertEquals(testTemplate.render(), "07/08/2019")
+    })
+
+    await t.step ('should  formats a date full', async() => {
+        const testTemplate = await twig.twig({data:"{{ '2019-08-07 23:39:12'|format_datetime('full', 'full', 'fr') }}"});
+        assertEquals(testTemplate.render(), "mercredi 7 août 201923:39:12 UTC+2")
+    })
+
+    await t.step ('markdown_to_html -> should return html from markdown ', async() => {
+        const testTemplate = await twig.twig({data:"{% apply markdown_to_html %} # hello, markdown! {% endapply %}"});
+        assertEquals(testTemplate.render(), '<h1 id="hellomarkdown">hello, markdown!</h1>')
+    })
+
+    await t.step ('markdown_to_html -> should return html from markdown ', async() => {
+        const testTemplate = await twig.twig({data:"{% apply html_to_markdown %} <html> <h1>Hello!</h1> </html> {% endapply %}"});
+        assertEquals(testTemplate.render(), 'Hello!\n======')
+    })
+
+    await t.step ('slug -> transforms a given string into another string that only includes safe ASCII characters. ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'Wôrķšƥáçè-sèťtïñğš'|slug }}"});
+        assertEquals(testTemplate.render(), 'Worksace-settings')
+    })
+
+    await t.step ('format_currency -> formats a number as a currency ', async() => {
+        const testTemplate = await twig.twig({data:"{{ '1000000'|format_currency('EUR') }}"});
+        assertEquals(testTemplate.render(), '€1,000,000.00')
+    })
+
+    await t.step ('formats a number as a currency ', async() => {
+        const testTemplate = await twig.twig({data:"{{ '12.340'|format_currency('EUR', {rounding_mode: 'floor'}) }}"});
+        assertEquals(testTemplate.render(), '€12.34')
+    })
+    await t.step ('format_number -> formats a number ', async() => {
+        const testTemplate = await twig.twig({data:"{{ '12.345'|format_number }}"});
+        assertEquals(testTemplate.render(), '12.345')
+    })
+    await t.step ('formats a number ', async() => {
+        const testTemplate = await twig.twig({data:"{{ '12.345'|format_number({maximumFractionDigits: 2}) }}"});
+        assertEquals(testTemplate.render(), '12.35')
+    })
+    await t.step ('column ->  returns the values from a single column in the input array ', async() => {
+        const testTemplate = await twig.twig({data:"{{ [{ 'fruit' : 'apple'}, {'fruit' : 'orange' }]|column('fruit') }}"});
+        assertEquals(testTemplate.render(), "apple,orange")
+    })
+
+    await t.step ('language_name ->  returns the language name given its two-letter code ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'de'|language_name }}"});
+        assertEquals(testTemplate.render(), "German")
+    })
+
+    await t.step ('returns the language name given its two-letter code ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'de'|language_name('fr') }}"});
+        assertEquals(testTemplate.render(), "allemand")
+    })
+
+    await t.step ('locale_name ->  returns the locale name given its two-letter code ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'de'|locale_name }}"});
+        assertEquals(testTemplate.render(), "German")
+    })
+
+    await t.step ('timezone_name ->  returns the timezone name given a timezone identifier ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'Europe/Paris'|timezone_name }}"});
+        assertEquals(testTemplate.render(), "Central European Time (Paris)")
+    })
+
+    await t.step (' returns the timezone name given a timezone identifier ', async() => {
+        const testTemplate = await twig.twig({data:"{{ 'America/Los_Angeles'|timezone_name }}"});
+        assertEquals(testTemplate.render(), "Pacific  Time (Los Angeles)")
+    })
 });
