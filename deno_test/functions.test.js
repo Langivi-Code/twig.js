@@ -353,6 +353,30 @@ Deno.test('Twig.js Functions ->', async (t) => {
         const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/simple.twig") }}'});
         assertEquals(testTemplate.render(), 'Twig.js!');
     });
+
+    await t.step('min, max ->  ', async () => {
+        let testTemplate = await twig.twig({data: '{{ min(2, 1, 3, 5, 4) }}'});
+        assertEquals(testTemplate.render(), '1');
+        testTemplate = await twig.twig({data: '{{ min([2, 1, 3, 5, 4]) }}'});
+        assertEquals(testTemplate.render(), '1');
+        testTemplate = await twig.twig({data: '{{ min({2:"two", 1:"one", 3:"three", 5:"five", 4:"four"}) }}'});
+        assertEquals(testTemplate.render(), 'five');
+    });
+
+    await t.step("country_timezones -> should  returns the names of the timezones associated with a given country code", async () => {
+        let testTemplate = await twig.twig({data: "{{ country_timezones('FR') }}"});
+        assertEquals(testTemplate.render(), 'France/FR');
+    })
+
+    await t.step("constant -> returns the constant value for a given string", async () => {
+        let testTemplate = await twig.twig({data: "{{ constant('newConstanta', 'some date') }}"});
+        assertEquals(testTemplate.render(), 'some date');
+    })
+
+    await t.step("html_classes  -> returns a string by conditionally joining class names together", async () => {
+        let testTemplate = await twig.twig({data: "<p class='{{ html_classes('a-class', 'another-class') }}'>Class</p>"});
+        assertEquals(testTemplate.render(), "<p class='a-class another-class'>Class</p>");
+    })
         
 });
 
