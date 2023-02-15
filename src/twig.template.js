@@ -1,4 +1,5 @@
 import {twig} from "./twig.js";
+import twigLogic from "./twig.logic.js";
 
 export class TwigTemplate{
     base;
@@ -127,8 +128,7 @@ export class TwigTemplate{
 
                         if (template.options.allowInlineIncludes) {
                             // The template is provided inline
-                            parentTemplate = this.Templates.load(template.parentTemplate);
-
+                            parentTemplate = twig.Templates.load(template.parentTemplate);
                             if (parentTemplate) {
                                 parentTemplate.options = template.options;
                             }
@@ -136,19 +136,22 @@ export class TwigTemplate{
 
                         // Check for the template file via include
                         if (!parentTemplate) {
-                            url = twig.path.parsePath(template, template.parentTemplate);
+                            if(twig.cacher.findCacheFile(template.parentTemplate)){
+                                parentTemplate = twig.cacher.buildTemplateForCache(twig.cacher.getCache(template.parentTemplate))
+                            }else{
+                                url = twig.path.parsePath(template, template.parentTemplate);
 
-                            parentTemplate = twig.Templates.loadRemote(url, {
-                                method: template.getLoaderMethod(),
-                                base: template.base,
-                                async: false,
-                                id: url,
-                                options: template.options
-                            });
+                                parentTemplate = twig.Templates.loadRemote(url, {
+                                    method: template.getLoaderMethod(),
+                                    base: template.base,
+                                    async: false,
+                                    id: url,
+                                    options: template.options
+                                });
+                            }
                         }
 
                         template.parentTemplate = parentTemplate;
-
                         return template.parentTemplate.renderAsync(
                             state.context,
                             {
@@ -157,11 +160,9 @@ export class TwigTemplate{
                             }
                         );
                     }
-
                     if (params.isInclude === true) {
                         return output;
                     }
-
                     return output.valueOf();
                 });
         });
@@ -171,6 +172,7 @@ export class TwigTemplate{
         let url = null;
         let subTemplate;
         if (!this.url && this.options.allowInlineIncludes) {
+          
             file = this.path ? twig.path.parsePath(this, file) : file;
             subTemplate = twig.Templates.load(file);
 

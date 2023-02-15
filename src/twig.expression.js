@@ -612,8 +612,7 @@ export default function (Twig) {
                 const input = stack.pop();
                 const { params } = token;
                 const state = this;
-
-                stack.push(Twig.filter.call(state, token.value, input, params));
+                stack.push(Twig.filter(token.value, input, params));
             }
         },
         {

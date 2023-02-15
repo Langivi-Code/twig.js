@@ -1,0 +1,36 @@
+START
+{% embed "embed-base.twig" %}
+{% block header %}
+new header
+{% endblock %}
+{% endembed %}
+
+{% embed "embed-base.twig" %}
+{% block footer %}
+{{ parent() }}extended
+{% endblock %}
+{% endembed %}
+
+{% embed "embed-base.twig" %}
+{% block header %}
+{{ parent() }}extended
+{% endblock %}
+
+{% block footer %}
+{{ parent() }}extended
+{% endblock %}
+{% endembed %}
+
+{% embed "embed-base.twig" %}
+{% block header %}
+{% embed "embed-include.twig" %}
+{% block header %}
+Super cool new header
+{% endblock %}
+{% endembed %}
+{% endblock %}
+{% block footer%}
+Cool footer
+{% endblock %}
+{% endembed %}
+END

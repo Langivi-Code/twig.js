@@ -15,7 +15,8 @@ class TwigCache {
 
     findCacheFile(id) {
         try {
-            Deno.statSync(`${this.#cacheDir}/${id}.txt`);
+            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
+            Deno.statSync(`${this.#cacheDir}/${hashId}.txt`);
             return true;
         } catch (e) {
             if (e instanceof Deno.errors.NotFound) {
@@ -25,9 +26,10 @@ class TwigCache {
         }
     }
 
-    async setCache(id, template) {
+    setCache(id, template) {
         try {
-            await Deno.writeTextFile(`${this.#cacheDir}/${id}.txt`, template);
+            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
+            Deno.writeTextFileSync(`${this.#cacheDir}/${hashId}.txt`, template);
         } catch (e) {
             console.log("Cache don't write", e);
         }
@@ -35,7 +37,8 @@ class TwigCache {
 
     getCache(id) {
         try {
-            const cacheJson = Deno.readTextFileSync(`${this.#cacheDir}/${id}.txt`);
+            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
+            const cacheJson = Deno.readTextFileSync(`${this.#cacheDir}/${hashId}.txt`);
             return JSON.parse(cacheJson);
         } catch (e) {
             if (e instanceof Deno.errors.NotFound){
@@ -50,13 +53,17 @@ class TwigCache {
         if (!(cached.hasOwnProperty("options"))) {
             cached.options = {
                 strictVariables: false,
-                autoescape: false,
-                allowInlineIncludes: false,
+                autoescape: true,
+                allowInlineIncludes: true,
                 rethrow: false
             };
         }
         cached.data = cached.tokens;
         return new TwigTemplate(cached);
+    }
+
+    emptyCacheDir(){
+        this.#twig.lib.emptyDirSync(this.#cacheDir);
     }
 }
 
