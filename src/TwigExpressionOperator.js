@@ -3,7 +3,8 @@
 // This file handles operator lookups and parsing.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
-import {twig} from "./twig.js"
+import {twig} from "./twig.js";
+import { twigFunctions } from "./TwigFunctions.js";
 
 class TwigExpressionOperator {
     operator = {
@@ -344,7 +345,7 @@ class TwigExpressionOperator {
                 break;
 
             case '..':
-                stack.push(twig.functions.range(a, b));
+                stack.push(twigFunctions.range(a, b));
                 break;
 
             default:

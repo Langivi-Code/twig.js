@@ -5,7 +5,8 @@
 import {TwigFilters} from "./twig.filters.js";
 import TwigError from "./TwigError.js";
 import {twig} from "./twig.js";
-import { twigExpression } from "./TwigExpression.js";
+import {twigExpression} from "./TwigExpression.js";
+import {twigFunctions} from "./TwigFunctions.js";
 class TwigCore {
     VERSION;
     compiler;
@@ -893,7 +894,7 @@ class TwigCore {
 
     // Extend Twig with a new function.
     extendFunction(fn, definition) {
-        this._function.extend(fn, definition);
+        twigFunctions.extend(fn, definition);
     }
 
     // Extend Twig with a new test.

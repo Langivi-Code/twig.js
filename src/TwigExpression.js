@@ -4,6 +4,7 @@ import TwigError from "./TwigError.js";
 import { TwigPromise } from './async/twig.promise.js';
 import {twig as Twig } from './twig.js';
 import {twigExpressionOperator} from './TwigExpressionOperator.js';
+import { twigFunctions } from './TwigFunctions.js';
 
 
 function parseParams(state, params, context) {
@@ -800,9 +801,9 @@ class TwigExpression {
 
                 return parseParams(state, token.params, context)
                     .then(params => {
-                        if (Twig.functions[fn]) {
+                        if (twigFunctions[fn]) {
                             // Get the function from the built-in functions
-                            value = Twig.functions[fn].apply(state, params);
+                            value = twigFunctions[fn].apply(state, params);
                         } else if (typeof context[fn] === 'function') {
                             // Get the function from the user/context defined functions
                             value = context[fn](...params);

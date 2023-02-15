@@ -1,6 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
-
+import { twigFunctions } from "../src/TwigFunctions.js";
 Deno.test('Twig.js Regression Tests ->', async (t) => {
     await t.step('#47 should not match variables starting with not', async () => {
         // Define and save a template
@@ -37,7 +37,7 @@ Deno.test('Twig.js Regression Tests ->', async (t) => {
 
     await t.step('#737 ternary expression should not override context', async () => {
         const str = `{% set classes = ['a', 'b'] %}{% set classes = classes ? classes|merge(['c']) : '' %}{{ dump(classes) }}`;
-        const expected = twig.functions.dump(['a', 'b', 'c']);
+        const expected = twigFunctions.dump(['a', 'b', 'c']);
         const testTemplate = await twig.twig({data: str});
         assertEquals(testTemplate.render(), expected);
     });
