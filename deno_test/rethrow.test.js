@@ -34,7 +34,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
         try {
             const template = await new Promise ( (res,rej) => {
                 twig.twig({
-                    path: './templates/error/compile/entry.twig',
+                    path: './deno_test/templates/error/compile/entry.twig',
                     async: false,
                     rethrow: true,
                     load(template){
@@ -48,7 +48,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
             throw new Error ("should not resolve")
         } catch (error) {
             assertEquals(error.hasOwnProperty('file'), true);
-            assertEquals(error.file,'./templates/error/compile/entry.twig');
+            assertEquals(error.file,'./deno_test/templates/error/compile/entry.twig');
         }
     });
 
@@ -56,7 +56,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
         try {
             const output = await new Promise ((res,rej) => {
                 twig.twig({
-                    path: './templates/error/parse/in-entry/entry.twig',
+                    path: './deno_test/templates/error/parse/in-entry/entry.twig',
                     async: false,
                     rethrow: true,
                     load(template){
@@ -71,7 +71,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
             throw new Error ("should not resolve")
         } catch (error) {
             assertEquals(error.hasOwnProperty('file'), true);
-            assertEquals(error.file, './templates/error/parse/in-entry/entry.twig');
+            assertEquals(error.file, './deno_test/templates/error/parse/in-entry/entry.twig');
         }
     });
 
@@ -79,7 +79,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
         try {
             const output = await new Promise ((res,rej) => {
                 twig.twig({
-                    path: './templates/error/parse/in-partial/entry.twig',
+                    path: './deno_test/templates/error/parse/in-partial/entry.twig',
                     async: false,
                     rethrow: true,
                     load(template){
@@ -94,7 +94,7 @@ Deno.test('Twig.js Rethrow ->', async (t) => {
             throw new Error ("should not resolve")
         } catch (error) {
             assertEquals(error.hasOwnProperty('file'), true);
-            assertEquals(error.file, 'templates/error/parse/in-entry/entry.twig');
+            assertEquals(error.file, 'deno_test/templates/error/parse/in-entry/entry.twig');
         }
     });
 });

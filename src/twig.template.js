@@ -1,6 +1,8 @@
 import {twig} from "./twig.js";
-import twigLogic from "./twig.logic.js";
-
+import {twigLib} from "./TwigLib.js";
+import {twigPath} from "./TwigPath.js";
+import TwigError from "./TwigError.js";
+import { AsyncTwig } from "./async/twig.async.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -12,25 +14,23 @@ export class TwigTemplate{
     path;
     url;
 
-    constructor(params){
-        const {data, id, base, path, url, name, method, options} = params;
-
-        // # What is stored in a Twig.Template
-        //
-        // The Twig Template hold several chucks of data.
-        //
-        //     {
-        //          id:     The token ID (if any)
-        //          tokens: The list of tokens that makes up this template.
-        //          base:   The base template (if any)
-        //            options:  {
-        //                Compiler/parser options
-        //
-        //                strict_variables: true/false
-        //                    Should missing variable/keys emit an error message. If false, they default to null.
-        //            }
-        //     }
-        //
+    // # What is stored in a Twig.Template
+    //
+    // The Twig Template hold several chucks of data.
+    //
+    //     {
+    //          id:     The token ID (if any)
+    //          tokens: The list of tokens that makes up this template.
+    //          base:   The base template (if any)
+    //            options:  {
+    //                Compiler/parser options
+    //
+    //                strict_variables: true/false
+    //                    Should missing variable/keys emit an error message. If false, they default to null.
+    //            }
+    //     }
+    //
+    constructor({data, id, base, path, url, name, method, options}){
 
         this.base = base;
         this.blocks = {
@@ -45,8 +45,9 @@ export class TwigTemplate{
         this.path = path;
         this.url = url;
 
-        if (twig.lib.is('String', data)) {
-            this.tokens = twig.prepare.call(this, data);
+        if (twigLib.is('String', data)) {
+            //Problematic place because it is transmitted this and afrer this form template
+            this.tokens = twig.prepare(data,this.options,this.id);
         } else {
             this.tokens = data;
         }
@@ -115,7 +116,7 @@ export class TwigTemplate{
 
         params = params || {};
 
-        return twig.async.potentiallyAsync(template, allowAsync, () => {
+        return AsyncTwig.potentiallyAsync(template, allowAsync, () => {
             const state = new twig.ParseState(template, params.blocks);
 
             return state.parseAsync(template.tokens, context)
@@ -139,7 +140,7 @@ export class TwigTemplate{
                             if(twig.cacher.findCacheFile(template.parentTemplate)){
                                 parentTemplate = twig.cacher.buildTemplateForCache(twig.cacher.getCache(template.parentTemplate))
                             }else{
-                                url = twig.path.parsePath(template, template.parentTemplate);
+                                url = twigPath.parsePath(template, template.parentTemplate);
 
                                 parentTemplate = twig.Templates.loadRemote(url, {
                                     method: template.getLoaderMethod(),
@@ -172,8 +173,7 @@ export class TwigTemplate{
         let url = null;
         let subTemplate;
         if (!this.url && this.options.allowInlineIncludes) {
-          
-            file = this.path ? twig.path.parsePath(this, file) : file;
+            file = this.path ? twigPath.parsePath(this, file) : file;
             subTemplate = twig.Templates.load(file);
 
             if (!subTemplate) {
@@ -186,7 +186,7 @@ export class TwigTemplate{
                 });
 
                 if (!subTemplate) {
-                    throw new twig.Error('Unable to find the template ' + file);
+                    throw new TwigError('Unable to find the template ' + file);
                 }
             }
 
@@ -195,7 +195,7 @@ export class TwigTemplate{
             return subTemplate;
         }
 
-        url = twig.path.parsePath(this, file);
+        url = twigPath.parsePath(this, file);
 
         // Load blocks from an external file
         subTemplate = twig.Templates.loadRemote(url, {

@@ -9,7 +9,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
             const error = error => console.log("ERROR", error);
             const template = await twig.twig({
                 id: "remote-no-extends",
-                path: "./templates/template.twig",
+                path: "./deno_test/templates/template.twig",
                 async: false,
                 load,
                 error
@@ -23,7 +23,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: "endblock-extended-syntax",
-                path: "./templates/blocks-extended-syntax.twig",
+                path: "./deno_test/templates/blocks-extended-syntax.twig",
                 async: false,
                 load(template){
                     res(template);
@@ -43,7 +43,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
             const testTemplate = await new Promise ((res,rej) => {
                 twig.twig({
                     id: "child-extends",
-                    path: "./templates/child.twig",
+                    path: "./deno_test/templates/child.twig",
                     load(template) {
                         res(template);
                     },
@@ -59,7 +59,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         const testTemplate = await new Promise((res,rej) => { 
             twig.twig({
                 id: "child-parent",
-                path: "./templates/child-parent.twig",
+                path: "./deno_test/templates/child-parent.twig",
                 load(template) {
                     res(template);
                 },
@@ -81,7 +81,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         const testTemplate = await new Promise ((res, rej) => {
             twig.twig({
                 id: "blocks-nested",
-                path: "./templates/blocks-nested.twig",
+                path: "./deno_test/templates/blocks-nested.twig",
                 load(template) {
                     res(template);
                 },
@@ -97,7 +97,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
                 id: "child-blocks-nested",
-                path: "./templates/child-blocks-nested.twig",
+                path: "./deno_test/templates/child-blocks-nested.twig",
                 load(template) {
                     res(template);
                 },
@@ -114,8 +114,8 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         async () => {
             const testTemplate = await new Promise ((res,rej) => {
                 twig.twig({
-                    base: "./templates",
-                    path: "./templates/a/child.twig",
+                    base: "./deno_test/templates",
+                    path: "./deno_test/templates/a/child.twig",
                     load(template) {
                         res(template);
                     },
@@ -168,7 +168,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
             const testTemplate = await new Promise((res,rej) => {
                 twig.twig({
                     id: "use",
-                    path: "./templates/use.twig",
+                    path: "./deno_test/templates/use.twig",
                     load(template) {
                         res(template);
                     },
@@ -188,7 +188,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         const testTemplate = await new Promise((res,rej) =>{
             twig.twig({
                 id: 'use-override-block',
-                path: './templates/use-override-block.twig',
+                path: './deno_test/templates/use-override-block.twig',
                 load(template) {
                   res(template);
                 },
@@ -204,7 +204,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
                 id: 'use-override-nested-block',
-                path: './templates/use-override-nested-block.twig',
+                path: './deno_test/templates/use-override-nested-block.twig',
                 load(template) {
                    res(template);
                 },
@@ -290,7 +290,7 @@ Deno.test("block function ->", async (t)=>{
     await t.step('should render block content from an included block', async ()=>{
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
-                path: './templates/block-function.twig',
+                path: './deno_test/templates/block-function.twig',
                 load(template){
                     res(template);
                 },
@@ -308,7 +308,7 @@ Deno.test("block function ->", async (t)=>{
     await t.step('should render block content from a parent block', async ()=>{
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
-                path: './templates/block-parent.twig',
+                path: './deno_test/templates/block-parent.twig',
                 load(template){
                     res(template);
                 },
@@ -326,7 +326,7 @@ Deno.test("block function ->", async (t)=>{
         let result;
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
-                path: './templates/block-outer-context.twig',
+                path: './deno_test/templates/block-outer-context.twig',
                 load(template){
                     res(template);
                 },

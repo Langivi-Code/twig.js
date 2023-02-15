@@ -1510,7 +1510,7 @@ var Twig = (function (Twig) {
     }
 
 })();
-// ## twig.lib.js
+// ## TwigLib.js
 //
 // This file contains 3rd party libraries used within twig.
 //
@@ -6132,7 +6132,7 @@ var Twig = (function (Twig) {
 //     Available under the BSD 2-Clause License
 //     https://github.com/justjohn/twig.js
 
-// ## twig.path.js
+// ## TwigPath.js
 //
 // This file handles path parsing
 var Twig = (function (Twig) {
@@ -6309,7 +6309,7 @@ var Twig = (function (Twig) {
 //     Available under the BSD 2-Clause License
 //     https://github.com/justjohn/twig.js
 
-// ## twig.exports.js
+// ## twig.core.js
 //
 // This file provides extension points and other hooks into the twig functionality.
 

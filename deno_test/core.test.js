@@ -1,5 +1,4 @@
 import { assertEquals, assertThrows } from "https://deno.land/std@0.143.0/testing/asserts.ts";
-import { Twig } from "../src/twig.exports.js";
 import { twig } from "../src/twig.js";
 
 Deno.test("Twig.js Core ->", async (t) => {
@@ -620,7 +619,7 @@ Deno.test('Imports ->', async (t)=>{
             allowInlineIncludes: true,
             async: false,
             rethrow: true,
-            data: '{% include \'./templates/simple.twig\' %}'
+            data: '{% include \'./deno_test/templates/simple.twig\' %}'
         });
         assertEquals(template.render(),"Twig.js!");
     });
@@ -631,7 +630,7 @@ Deno.test('Imports ->', async (t)=>{
             allowInlineIncludes: true,
             async: false,
             rethrow: true,
-            data: '{% include \'./templates/doesnt-exist-ever.twig\' %}'
+            data: '{% include \'./deno_test/templates/doesnt-exist-ever.twig\' %}'
         });
         assertThrows(()=>{template.render({})});
     });

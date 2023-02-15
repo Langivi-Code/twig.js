@@ -1,6 +1,8 @@
 // ## twig.compiler.js
 //
 // This file handles compiling templates into JS
+import TwigError from "./TwigError.js";
+
 export class TwigCompiler {
 
     constructor(Twig) {
@@ -15,7 +17,7 @@ export class TwigCompiler {
 
         if (options.module) {
             if (this.module[options.module] === undefined) {
-                throw new this.Twig.Error('Unable to find module type ' + options.module);
+                throw new TwigError('Unable to find module type ' + options.module);
             }
 
             output = this.module[options.module](id, tokens, options.twig);

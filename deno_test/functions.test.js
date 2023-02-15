@@ -349,7 +349,7 @@ Deno.test('Twig.js Functions ->', async (t) => {
 
     await t.step('should allow loading relative paths', async () => {
         twig.cacher.emptyCacheDir();
-        const testTemplate = await twig.twig({data: '{{ source("./templates/simple.twig") }}'});
+        const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/simple.twig") }}'});
         assertEquals(testTemplate.render(), 'Twig.js!');
     });
         

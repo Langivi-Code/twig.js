@@ -1,5 +1,6 @@
 import { assertEquals, assertThrows } from 'https://deno.land/std@0.143.0/testing/asserts.ts';
 import {twig} from "../src/twig.js";
+import { TwigPromise } from '../src/async/twig.promise.js';
 
 Deno.test('Twig.js Async',async (t)=>{
     twig.extendFunction('echoAsync', a => {
@@ -7,7 +8,7 @@ Deno.test('Twig.js Async',async (t)=>{
     });
 
     twig.extendFunction('echoAsyncInternal',  a => {
-        return new twig.Promise((resolve => {
+        return new TwigPromise((resolve => {
             setTimeout(() => {
                 resolve(a);
             }, 100);

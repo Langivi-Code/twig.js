@@ -6,7 +6,7 @@ Deno.test('Twig.js Loader ->', async (t) => {
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
                 id: 'fs-node-async',
-                path: './templates/test.twig',
+                path: './deno_test/templates/test.twig',
                 load(template) {
                     res(template);
                 },
@@ -25,7 +25,7 @@ Deno.test('Twig.js Loader ->', async (t) => {
         const template = await new Promise ((res,rej) => {
             twig.twig({
                 id: 'fs-node-sync',
-                path: './templates/test.twig',
+                path: './deno_test/templates/test.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -43,17 +43,17 @@ Deno.test('Twig.js Loader ->', async (t) => {
     });
 
     await t.step('source ->  should load the non-compiled template source code', async () => {
-        const template = await twig.twig({data: '{{ source("./templates/source.twig") }}'});
+        const template = await twig.twig({data: '{{ source("./deno_test/templates/source.twig") }}'});
         assertEquals(template.render(),'{% if isUserNew == true %}\n    Hello {{ name }}\n{% else %}\n    Welcome back {{ name }}\n{% endif %}\n');
     });
 
     await t.step('should indicate if there was a problem loading the template if \'ignore_missing\' is false', async () => {
-        const testTemplate = await twig.twig({data: '{{ source("./templates/non-existing-source.twig", false) }}'});
-        assertEquals(testTemplate.render(), 'Template "./templates/non-existing-source.twig" is not defined.');
+        const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/non-existing-source.twig", false) }}'});
+        assertEquals(testTemplate.render(), 'Template "./deno_test/templates/non-existing-source.twig" is not defined.');
     });
 
     await t.step('should NOT indicate if there was a problem loading the template if \'ignore_missing\' is true', async () => {
-        const testTemplate = await twig.twig({data: '{{ source("./templates/non-existing-source.twig", true) }}'});
+        const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/non-existing-source.twig", true) }}'});
         assertEquals(testTemplate.render(), '');
     });
 });
@@ -63,7 +63,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include',
-                path: './templates/include.twig',
+                path: './deno_test/templates/include.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -82,7 +82,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-relative',
-                path: './templates/include/relative.twig',
+                path: './deno_test/templates/include/relative.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -101,7 +101,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-array',
-                path: './templates/include-array.twig',
+                path: './deno_test/templates/include-array.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -120,7 +120,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-array-second-exists',
-                path: './templates/include-array-second-exists.twig',
+                path: './deno_test/templates/include-array-second-exists.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -139,7 +139,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-with',
-                path: './templates/include-with.twig',
+                path: './deno_test/templates/include-with.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -159,7 +159,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-only',
-                path: './templates/include-only.twig',
+                path: './deno_test/templates/include-only.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -178,7 +178,7 @@ Deno.test('Twig.js Include ->', async (t) => {
         await new Promise ((res,rej) => {
             twig.twig({
                 id: 'include-ignore-missing',
-                path: './templates/include-ignore-missing.twig',
+                path: './deno_test/templates/include-ignore-missing.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -198,7 +198,7 @@ Deno.test('Twig.js Include ->', async (t) => {
             const testTemplate = await new Promise( (res,rej) => {
                 twig.twig({
                     id: 'include-ignore-missing-missing',
-                    path: './templates/include-ignore-missing-missing.twig',
+                    path: './deno_test/templates/include-ignore-missing-missing.twig',
                     async: false,
                     rethrow: true,
                     load(template){
@@ -218,7 +218,7 @@ Deno.test('Twig.js Include ->', async (t) => {
     // await t.step('should fail including a nonexistent included template asynchronously', async () => {
     //    await twig.twig({
     //         id: 'include-ignore-missing-missing-async',
-    //         path: './templates/include-ignore-missing-missing-async.twig',
+    //         path: './deno_test/templates/include-ignore-missing-missing-async.twig',
     //         async: true,
     //         load(template) {
     //             assertEquals(!!templ,false);
@@ -235,7 +235,7 @@ Deno.test('Twig.js Extends ->', async (t) => {
     await t.step('should load the first template when passed an array', async () => {
         const template = await new Promise ((res,rej) => {
             twig.twig({
-                path: './templates/extender-array.twig',
+                path: './deno_test/templates/extender-array.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -253,7 +253,7 @@ Deno.test('Twig.js Extends ->', async (t) => {
     await t.step('should load the second template when passed an array where the first value does not exist', async () => {
         const template = await new Promise( (res,rej) => {
             twig.twig({
-                path: './templates/extender-array-second-exists.twig',
+                path: './deno_test/templates/extender-array-second-exists.twig',
                 async: false,
                 load(template){
                     res(template);
@@ -271,7 +271,7 @@ Deno.test('Twig.js Extends ->', async (t) => {
     await t.step('should silently fail when passed an array with no templates that exist', async () => {
         const template = await new Promise( (res,rej) => {
             twig.twig({
-                path: './templates/extender-array-none-exist.twig',
+                path: './deno_test/templates/extender-array-none-exist.twig',
                 async: false,
                 load(template){
                     res(template);

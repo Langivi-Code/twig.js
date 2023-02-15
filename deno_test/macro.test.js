@@ -7,7 +7,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "macro",
-                path: "./templates/macro.twig",
+                path: "./deno_test/templates/macro.twig",
                 async: false,
                 load(template) {
                     res(template);
@@ -26,7 +26,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "import-macro",
-                path: "./templates/import.twig",
+                path: "./deno_test/templates/import.twig",
                 async: false,
                 load(template) {
                     res(template);
@@ -45,7 +45,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "import-macro-self",
-                path: "./templates/macro-self.twig",
+                path: "./deno_test/templates/macro-self.twig",
                 async: false,
                 load(template) {
                     res(template);
@@ -67,7 +67,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "import-macro-self-twice",
-                path: "./templates/macro-self-twice.twig",
+                path: "./deno_test/templates/macro-self-twice.twig",
                 async: false,
                 load(template) {
                     res(template);
@@ -93,7 +93,7 @@ Deno.test("Twig.js Macro ->", async t => {
             await new Promise((res, rej) => {
                 twig.twig({
                     id: "import-wrapped-macro-self",
-                    path: "./templates/macro-wrapped.twig",
+                    path: "./deno_test/templates/macro-wrapped.twig",
                     async: false,
                     load(template) {
                         res(template);
@@ -120,7 +120,7 @@ Deno.test("Twig.js Macro ->", async t => {
             await new Promise((res, rej) => {
                 twig.twig({
                     id: "import-macro-context-self",
-                    path: "./templates/macro-context.twig",
+                    path: "./deno_test/templates/macro-context.twig",
                     async: false,
                     load(template) {
                         res(template);
@@ -147,7 +147,7 @@ Deno.test("Twig.js Macro ->", async t => {
             await new Promise((res, rej) => {
                 twig.twig({
                     id: "import-macro-defaults-self",
-                    path: "./templates/macro-defaults.twig",
+                    path: "./deno_test/templates/macro-defaults.twig",
                     async: false,
                     load(template) {
                         res(template);
@@ -170,7 +170,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "import-macro-inside-block",
-                path: "./templates/macro-blocks.twig",
+                path: "./deno_test/templates/macro-blocks.twig",
                 async: false,
                 load(template) {
                     res(template);
@@ -194,7 +194,7 @@ Deno.test("Twig.js Macro ->", async t => {
         await new Promise((res, rej) => {
             twig.twig({
                 id: "from-macro-import",
-                path: "./templates/from.twig",
+                path: "./deno_test/templates/from.twig",
                 async: false,
                 load(template) {
                     res(template);

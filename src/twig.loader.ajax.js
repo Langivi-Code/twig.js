@@ -1,3 +1,5 @@
+import TwigError from "./TwigError.js";
+
 export default function (Twig) {
     'use strict';
 
@@ -7,7 +9,7 @@ export default function (Twig) {
         const parser = this.parsers[params.parser] || this.parser.twig;
 
         if (typeof XMLHttpRequest === 'undefined') {
-            throw new Twig.Error('Unsupported platform: Unable to do ajax requests ' +
+            throw new TwigError('Unsupported platform: Unable to do ajax requests ' +
                                  'because there is no "XMLHTTPRequest" implementation');
         }
 

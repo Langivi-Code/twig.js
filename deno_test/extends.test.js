@@ -147,7 +147,7 @@ Deno.test('Twig.js Extensions ->', async (t) => {
     await t.step('should extend the parent context when extending', async () => {
         const testTemplate = await new Promise((res,rej) => {
             twig.twig({
-                path: './templates/extender.twig',
+                path: './deno_test/templates/extender.twig',
                 async: false,
                 load(tem){
                     res(tem);

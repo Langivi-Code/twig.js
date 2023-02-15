@@ -53,8 +53,8 @@ class TwigCache {
         if (!(cached.hasOwnProperty("options"))) {
             cached.options = {
                 strictVariables: false,
-                autoescape: true,
-                allowInlineIncludes: true,
+                autoescape: false,
+                allowInlineIncludes: false,
                 rethrow: false
             };
         }
