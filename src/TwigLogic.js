@@ -7,18 +7,20 @@ import TwigError from "./TwigError.js";
 import { AsyncTwig } from "./async/twig.async.js";
 import { TwigPromise } from "./async/twig.promise.js";
 import { twigExpression } from "./TwigExpression.js";
-export default function (Twig) {
-    'use strict';
+import { twig } from "./twig.js";
 
-    /**
-     * Namespace for logic handling.
-     */
-    Twig.logic = {};
+class TwigLogic {
 
-    /**
+    constructor(){
+        this.handler = {};
+        while (this.definitions.length > 0) {
+            this.extend(this.definitions.shift());
+        }
+    }
+     /**
      * Logic token types.
      */
-    Twig.logic.type = {
+    type = {
         if_: 'Twig.logic.type.if',
         endif: 'Twig.logic.type.endif',
         for_: 'Twig.logic.type.for',
@@ -73,19 +75,19 @@ export default function (Twig) {
     //
     //      parse:   A function that parses the compiled token into output (HTML / whatever the
     //               template represents).
-    Twig.logic.definitions = [
+    definitions = [
         {
             /**
              * If type logic tokens.
              *
              *  Format: {% if expression %}
              */
-            type: Twig.logic.type.if_,
+            type: this.type.if_,
             regex: /^if\s?([\s\S]+)$/,
             next: [
-                Twig.logic.type.else_,
-                Twig.logic.type.elseif,
-                Twig.logic.type.endif
+                this.type.else_,
+                this.type.elseif,
+                this.type.endif
             ],
             open: true,
             compile(token) {
@@ -105,7 +107,7 @@ export default function (Twig) {
                     .then(result => {
                         chain = true;
 
-                        if (Twig.lib.boolval(result)) {
+                        if (twig.lib.boolval(result)) {
                             chain = false;
 
                             return state.parseAsync(token.output, context);
@@ -127,12 +129,12 @@ export default function (Twig) {
              *
              *  Format: {% elseif expression %}
              */
-            type: Twig.logic.type.elseif,
+            type: this.type.elseif,
             regex: /^elseif\s?([^\s].*)$/,
             next: [
-                Twig.logic.type.else_,
-                Twig.logic.type.elseif,
-                Twig.logic.type.endif
+                this.type.else_,
+                this.type.elseif,
+                this.type.endif
             ],
             open: false,
             compile(token) {
@@ -150,7 +152,7 @@ export default function (Twig) {
 
                 return twigExpression.parseAsync.call(state, token.stack, context)
                     .then(result => {
-                        if (chain && Twig.lib.boolval(result)) {
+                        if (chain && twig.lib.boolval(result)) {
                             chain = false;
 
                             return state.parseAsync(token.output, context);
@@ -172,11 +174,11 @@ export default function (Twig) {
              *
              *  Format: {% else %}
              */
-            type: Twig.logic.type.else_,
+            type: this.type.else_,
             regex: /^else$/,
             next: [
-                Twig.logic.type.endif,
-                Twig.logic.type.endfor
+                this.type.endif,
+                this.type.endfor
             ],
             open: false,
             parse(token, context, chain) {
@@ -201,7 +203,7 @@ export default function (Twig) {
              *
              *  Format: {% endif %}
              */
-            type: Twig.logic.type.endif,
+            type: this.type.endif,
             regex: /^endif$/,
             next: [],
             open: false
@@ -212,11 +214,11 @@ export default function (Twig) {
              *
              *  Format: {% for expression %}
              */
-            type: Twig.logic.type.for_,
+            type: this.type.for_,
             regex: /^for\s+([a-zA-Z0-9_,\s]+)\s+in\s+([\S\s]+?)(?:\s+if\s+([^\s].*))?$/,
             next: [
-                Twig.logic.type.else_,
-                Twig.logic.type.endfor
+                this.type.else_,
+                this.type.endfor
             ],
             open: true,
             compile(token) {
@@ -319,7 +321,7 @@ export default function (Twig) {
 
                             // Merge in values that exist in context but have changed
                             // in inner_context.
-                            Twig.merge(context, innerContext, true);
+                            twig.merge(context, innerContext, true);
                         });
                 };
 
@@ -334,7 +336,7 @@ export default function (Twig) {
                             });
                         }
 
-                        if (Twig.lib.is('Object', result)) {
+                        if (twig.lib.is('Object', result)) {
                             if (result._keys === undefined) {
                                 keyset = Object.keys(result);
                             } else {
@@ -359,7 +361,7 @@ export default function (Twig) {
                         return {
                             chain: continueChain,
                             context,
-                            output: Twig.output.call(state.template, output)
+                            output: twig.output.call(state.template, output)
                         };
                     });
             }
@@ -370,7 +372,7 @@ export default function (Twig) {
              *
              *  Format: {% endfor %}
              */
-            type: Twig.logic.type.endfor,
+            type: this.type.endfor,
             regex: /^endfor$/,
             next: [],
             open: false
@@ -381,7 +383,7 @@ export default function (Twig) {
              *
              *  Format: {% set key = expression %}
              */
-            type: Twig.logic.type.set,
+            type: this.type.set,
             regex: /^set\s+([a-zA-Z0-9_,\s]+)\s*=\s*([\s\S]+)$/,
             next: [],
             open: true,
@@ -429,10 +431,10 @@ export default function (Twig) {
              *
              *  Format: {% set key %}
              */
-            type: Twig.logic.type.setcapture,
+            type: this.type.setcapture,
             regex: /^set\s+([a-zA-Z0-9_,\s]+)$/,
             next: [
-                Twig.logic.type.endset
+                this.type.endset
             ],
             open: true,
             compile(token) {
@@ -466,7 +468,7 @@ export default function (Twig) {
              *
              *  Format: {% endset %}
              */
-            type: Twig.logic.type.endset,
+            type: this.type.endset,
             regex: /^endset$/,
             next: [],
             open: false
@@ -477,10 +479,10 @@ export default function (Twig) {
              *
              *  Format: {% filter upper %} or {% filter lower|escape %}
              */
-            type: Twig.logic.type.filter,
+            type: this.type.filter,
             regex: /^filter\s+(.+)$/,
             next: [
-                Twig.logic.type.endfilter
+                this.type.endfilter
             ],
             open: true,
             compile(token) {
@@ -519,7 +521,7 @@ export default function (Twig) {
              *
              *  Format: {% endfilter %}
              */
-            type: Twig.logic.type.endfilter,
+            type: this.type.endfilter,
             regex: /^endfilter$/,
             next: [],
             open: false
@@ -530,10 +532,10 @@ export default function (Twig) {
              *
              *  Format: {% apply upper %} or {% apply lower|escape %}
              */
-            type: Twig.logic.type.apply,
+            type: this.type.apply,
             regex: /^apply\s+(.+)$/,
             next: [
-                Twig.logic.type.endapply
+                this.type.endapply
             ],
             open: true,
             compile(token) {
@@ -572,7 +574,7 @@ export default function (Twig) {
              *
              *  Format: {% endapply %}
              */
-            type: Twig.logic.type.endapply,
+            type: this.type.endapply,
             regex: /^endapply$/,
             next: [],
             open: false
@@ -583,7 +585,7 @@ export default function (Twig) {
              *
              *  Format: {% do expression %}
              */
-            type: Twig.logic.type.do,
+            type: this.type.do,
             regex: /^do\s+([\S\s]+)$/,
             next: [],
             open: true,
@@ -618,10 +620,10 @@ export default function (Twig) {
              *
              *  Format: {% block title %}
              */
-            type: Twig.logic.type.block,
+            type: this.type.block,
             regex: /^block\s+(\w+)$/,
             next: [
-                Twig.logic.type.endblock
+                this.type.endblock
             ],
             open: true,
             compile(token) {
@@ -634,7 +636,7 @@ export default function (Twig) {
                 const state = this;
                 let promise = TwigPromise.resolve();
 
-                state.template.blocks.defined[token.blockName] = new Twig.Block(state.template, token);
+                state.template.blocks.defined[token.blockName] = new twig.Block(state.template, token);
                 if (
                     state.template.parentTemplate === null ||
                     state.template.parentTemplate instanceof TwigTemplate
@@ -656,7 +658,7 @@ export default function (Twig) {
              *
              *  Format: {% block title expression %}
              */
-            type: Twig.logic.type.shortblock,
+            type: this.type.shortblock,
             regex: /^block\s+(\w+)\s+(.+)$/,
             next: [],
             open: true,
@@ -669,12 +671,12 @@ export default function (Twig) {
                     value: token.expression
                 }).stack;
 
-                return Twig.logic.handler[Twig.logic.type.block].compile.apply(template, [token]);
+                return twigLogic.handler[twigLogic.type.block].compile.apply(template, [token]);
             },
             parse(...args) {
                 const state = this;
 
-                return Twig.logic.handler[Twig.logic.type.block].parse.apply(state, args);
+                return twigLogic.handler[twigLogic.type.block].parse.apply(state, args);
             }
         },
         {
@@ -683,7 +685,7 @@ export default function (Twig) {
              *
              *  Format: {% endblock %}
              */
-            type: Twig.logic.type.endblock,
+            type: this.type.endblock,
             regex: /^endblock(?:\s+(\w+))?$/,
             next: [],
             open: false
@@ -694,7 +696,7 @@ export default function (Twig) {
              *
              *  Format: {% extends "template.twig" %}
              */
-            type: Twig.logic.type.extends_,
+            type: this.type.extends_,
             regex: /^extends\s+(.+)$/,
             next: [],
             open: true,
@@ -749,7 +751,7 @@ export default function (Twig) {
              *
              *  Format: {% use "template.twig" %}
              */
-            type: Twig.logic.type.use,
+            type: this.type.use,
             regex: /^use\s+(.+)$/,
             next: [],
             open: true,
@@ -774,7 +776,7 @@ export default function (Twig) {
 
                         const useTemplate = state.template.importFile(filePath);
 
-                        const useState = new Twig.ParseState(useTemplate);
+                        const useState = new twig.ParseState(useTemplate);
                         return useState.parseAsync(useTemplate.tokens)
                             .then(() => {
                                 state.template.blocks.imported = {
@@ -797,7 +799,7 @@ export default function (Twig) {
              *
              *  Format: {% includes "template.twig" [with {some: 'values'} only] %}
              */
-            type: Twig.logic.type.include,
+            type: this.type.include,
             regex: /^include\s+(.+?)(?:\s|$)(ignore missing(?:\s|$))?(?:with\s+([\S\s]+?))?(?:\s|$)(only)?$/,
             next: [],
             open: true,
@@ -914,10 +916,10 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.logic.type.spaceless,
+            type: this.type.spaceless,
             regex: /^spaceless$/,
             next: [
-                Twig.logic.type.endspaceless
+                this.type.endspaceless
             ],
             open: true,
 
@@ -933,7 +935,7 @@ export default function (Twig) {
                         // Replace all space between closing and opening html tags
                         let output = tokenOutput.replace(rBetweenTagSpaces, '><').trim();
                         // Rewrap output as a Twig.Markup
-                        output =  Twig.Markup(output);
+                        output =  twig.Markup(output);
                         return {
                             chain,
                             output
@@ -944,7 +946,7 @@ export default function (Twig) {
 
         // Add the {% endspaceless %} token
         {
-            type: Twig.logic.type.endspaceless,
+            type: this.type.endspaceless,
             regex: /^endspaceless$/,
             next: [],
             open: false
@@ -956,10 +958,10 @@ export default function (Twig) {
              * Format: {% macro input(name = default, value, type, size) %}
              *
              */
-            type: Twig.logic.type.macro,
+            type: this.type.macro,
             regex: /^macro\s+(\w+)\s*\(\s*((?:\w+(?:\s*=\s*([\s\S]+))?(?:,\s*)?)*)\s*\)$/,
             next: [
-                Twig.logic.type.endmacro
+                this.type.endmacro
             ],
             open: true,
             compile(token) {
@@ -1051,7 +1053,7 @@ export default function (Twig) {
              *
              * Format: {% endmacro %}
              */
-            type: Twig.logic.type.endmacro,
+            type: this.type.endmacro,
             regex: /^endmacro$/,
             next: [],
             open: false
@@ -1062,7 +1064,7 @@ export default function (Twig) {
             *
             * Format: {% import "template.twig" as form %}
             */
-            type: Twig.logic.type.import_,
+            type: this.type.import_,
             regex: /^import\s+(.+)\s+as\s+(\w+)$/,
             next: [],
             open: true,
@@ -1098,7 +1100,7 @@ export default function (Twig) {
                         return state.template.importFile(filePath || token.expression);
                     })
                     .then(importTemplate => {
-                        const importState = new Twig.ParseState(importTemplate);
+                        const importState = new twig.ParseState(importTemplate);
 
                         return importState.parseAsync(importTemplate.tokens).then(() => {
                             context[token.contextName] = importState.macros;
@@ -1114,7 +1116,7 @@ export default function (Twig) {
             *
             * Format: {% from "template.twig" import func as form %}
             */
-            type: Twig.logic.type.from,
+            type: this.type.from,
             regex: /^from\s+(.+)\s+import\s+([a-zA-Z0-9_, ]+)$/,
             next: [],
             open: true,
@@ -1159,7 +1161,7 @@ export default function (Twig) {
                             return state.template.importFile(filePath || token.expression);
                         })
                         .then(importTemplate => {
-                            const importState = new Twig.ParseState(importTemplate);
+                            const importState = new twig.ParseState(importTemplate);
 
                             return importState.parseAsync(importTemplate.tokens).then(() => {
                                 return importState.macros;
@@ -1189,10 +1191,10 @@ export default function (Twig) {
              *
              *  Format: {% embed "template.twig" [with {some: 'values'} only] %}
              */
-            type: Twig.logic.type.embed,
+            type: this.type.embed,
             regex: /^embed\s+(.+?)(?:\s+(ignore missing))?(?:\s+with\s+([\S\s]+?))?(?:\s+(only))?$/,
             next: [
-                Twig.logic.type.endembed
+                this.type.endembed
             ],
             open: true,
             compile(token) {
@@ -1287,7 +1289,7 @@ export default function (Twig) {
          *
          */
         {
-            type: Twig.logic.type.endembed,
+            type: this.type.endembed,
             regex: /^endembed$/,
             next: [],
             open: false
@@ -1298,10 +1300,10 @@ export default function (Twig) {
              *
              *  Format: {% with {some: 'values'} [only] %}
              */
-            type: Twig.logic.type.with,
+            type: this.type.with,
             regex: /^(?:with\s+([\S\s]+?))(?:\s|$)(only)?$/,
             next: [
-                Twig.logic.type.endwith
+                this.type.endwith
             ],
             open: true,
             compile(token) {
@@ -1357,7 +1359,7 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.logic.type.endwith,
+            type: this.type.endwith,
             regex: /^endwith$/,
             next: [],
             open: false
@@ -1368,7 +1370,7 @@ export default function (Twig) {
              *
              *  Format: {% deprecated 'Description' %}
              */
-            type: Twig.logic.type.deprecated,
+            type: this.type.deprecated,
             regex: /^deprecated\s+(.+)$/,
             next: [],
             open: true,
@@ -1381,20 +1383,14 @@ export default function (Twig) {
                 return {};
             }
         }
-
-    ];
-
-    /**
-     * Registry for logic handlers.
-     */
-    Twig.logic.handler = {};
+    ]
 
     /**
      * Define a new token type, available at Twig.logic.type.{type}
      */
-    Twig.logic.extendType = function (type, value) {
+    extendType(type, value) {
         value = value || ('Twig.logic.type' + type);
-        Twig.logic.type[type] = value;
+        this.type[type] = value;
     };
 
     /**
@@ -1416,37 +1412,32 @@ export default function (Twig) {
      *
      * @param {Object} definition The new logic expression.
      */
-    Twig.logic.extend = function (definition) {
+    extend(definition) {
         if (definition.type) {
-            Twig.logic.extendType(definition.type);
+            this.extendType(definition.type);
         } else {
             throw new TwigError('Unable to extend logic definition. No type provided for ' + definition);
         }
 
-        Twig.logic.handler[definition.type] = definition;
+        this.handler[definition.type] = definition;
     };
 
-    // Extend with built-in expressions
-    while (Twig.logic.definitions.length > 0) {
-        Twig.logic.extend(Twig.logic.definitions.shift());
-    }
-
-    /**
+     /**
      * Compile a logic token into an object ready for parsing.
      *
      * @param {Object} rawToken An uncompiled logic token.
      *
      * @return {Object} A compiled logic token, ready for parsing.
      */
-    Twig.logic.compile = function (rawToken) {
+     compile(rawToken) {
         const expression = rawToken.value.trim();
-        let token = Twig.logic.tokenize.call(this, expression);
-        const tokenTemplate = Twig.logic.handler[token.type];
+        let token = twigLogic.tokenize.call(this, expression);
+        const tokenTemplate = twigLogic.handler[token.type];
 
         // Check if the token needs compiling
         if (tokenTemplate.compile) {
             token = tokenTemplate.compile.call(this, token);
-            TwigCore.log.trace('Twig.logic.compile: ', 'Compiled logic token to ', token);
+            TwigCore.log.trace('twigLogic.compile: ', 'Compiled logic token to ', token);
         }
 
         return token;
@@ -1461,7 +1452,7 @@ export default function (Twig) {
      *
      * @return {Object} The matched token with type set to the token type and match to the regex match.
      */
-    Twig.logic.tokenize = function (expression) {
+    tokenize(expression) {
         let tokenTemplateType = null;
         let tokenType = null;
         let tokenRegex = null;
@@ -1473,11 +1464,11 @@ export default function (Twig) {
         // Ignore whitespace around expressions.
         expression = expression.trim();
 
-        for (tokenTemplateType in Twig.logic.handler) {
-            if (Object.hasOwnProperty.call(Twig.logic.handler, tokenTemplateType)) {
+        for (tokenTemplateType in twigLogic.handler) {
+            if (Object.hasOwnProperty.call(twigLogic.handler, tokenTemplateType)) {
                 // Get the type and regex for this template type
-                tokenType = Twig.logic.handler[tokenTemplateType].type;
-                tokenRegex = Twig.logic.handler[tokenTemplateType].regex;
+                tokenType = twigLogic.handler[tokenTemplateType].type;
+                tokenRegex = twigLogic.handler[tokenTemplateType].regex;
 
                 // Handle multiple regular expressions per type.
                 regexArray = tokenRegex;
@@ -1490,7 +1481,7 @@ export default function (Twig) {
                 for (regexI = 0; regexI < regexLen; regexI++) {
                     match = regexArray[regexI].exec(expression);
                     if (match !== null) {
-                        TwigCore.log.trace('Twig.logic.tokenize: ', 'Matched a ', tokenType, ' regular expression of ', match);
+                        TwigCore.log.trace('twigLogic.tokenize: ', 'Matched a ', tokenType, ' regular expression of ', match);
                         return {
                             type: tokenType,
                             match
@@ -1503,6 +1494,7 @@ export default function (Twig) {
         // No regex matches
         throw new TwigError('Unable to parse \'' + expression.trim() + '\'');
     };
+
 
     /**
      * Parse a logic token within a given context.
@@ -1524,11 +1516,11 @@ export default function (Twig) {
      * @param {boolean} chain Is this an open logic chain. If false, that means a
      *                        chain is closed and no further cases should be parsed.
      */
-    Twig.logic.parse = function (token, context, chain, allowAsync) {
+    parse(token, context, chain, allowAsync) {
         return AsyncTwig.potentiallyAsync(this, allowAsync, function () {
             TwigCore.log.debug('Twig.logic.parse: ', 'Parsing logic token ', token);
 
-            const tokenTemplate = Twig.logic.handler[token.type];
+            const tokenTemplate = twigLogic.handler[token.type];
             let result;
             const state = this;
 
@@ -1539,7 +1531,7 @@ export default function (Twig) {
             state.nestingStack.unshift(token);
             result = tokenTemplate.parse.call(state, token, context || {}, chain);
 
-            if (Twig.isPromise(result)) {
+            if (twig.isPromise(result)) {
                 result = result.then(result => {
                     state.nestingStack.shift();
 
@@ -1552,10 +1544,13 @@ export default function (Twig) {
             return result;
         });
     };
-    Twig.logic.parseAsync = function (token, context, chain) {
+
+    parseAsync(token, context, chain) {
         const state = this;
 
-        return Twig.logic.parse.call(state, token, context, chain, true);
+        return twigLogic.parse.call(state, token, context, chain, true);
     };
-    return Twig;
-};
+}
+
+const twigLogic = new TwigLogic();
+export{twigLogic};

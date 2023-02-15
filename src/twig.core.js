@@ -7,6 +7,7 @@ import TwigError from "./TwigError.js";
 import {twig} from "./twig.js";
 import {twigExpression} from "./TwigExpression.js";
 import {twigFunctions} from "./TwigFunctions.js";
+import { twigLogic } from "./TwigLogic.js";
 class TwigCore {
     VERSION;
     compiler;
@@ -403,11 +404,11 @@ class TwigCore {
 
             const compileLogic = (token) => {
                 // Compile the logic token
-                logicToken = this.logic.compile.call(this, token);
+                logicToken = twigLogic.compile.call(this, token);
 
                 type = logicToken.type;
-                open = this.logic.handler[type].open;
-                next = this.logic.handler[type].next;
+                open = twigLogic.handler[type].open;
+                next = twigLogic.handler[type].next;
 
                 TwigCore.log.trace('Twig.compile: ', 'Compiled logic token to ', logicToken,
                     ' next is: ', next, ' open is : ', open);
@@ -415,7 +416,7 @@ class TwigCore {
                 // Not a standalone token, check logic stack to see if this is expected
                 if (open !== undefined && !open) {
                     prevToken = stack.pop();
-                    prevTemplate = this.logic.handler[prevToken.type];
+                    prevTemplate = twigLogic.handler[prevToken.type];
 
                     if (!prevTemplate.next.includes(type)) {
                         throw new Error(type + ' not expected after a ' + prevToken.type);
@@ -912,7 +913,7 @@ class TwigCore {
 
     // Extend Twig with a new definition.
     extendTag(definition) {
-        this.logic.extend(definition);
+        twigLogic.extend(definition);
     };
 
     /**

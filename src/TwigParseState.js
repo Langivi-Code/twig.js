@@ -3,6 +3,7 @@ import {TwigCore} from "./twig.core.js";
 import {twig} from "./twig.js";
 import { AsyncTwig } from "./async/twig.async.js";
 import { twigExpression } from "./TwigExpression.js";
+import { twigLogic } from "./TwigLogic.js";
 
 function handleException(state, ex) {
     if (state.template.options.rethrow) {
@@ -190,7 +191,7 @@ export default class TwigParseState {
                     break;
 
                 case TwigCore.token.type.logic:
-                    return twig.logic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
+                    return twigLogic.parseAsync.call(state, token.token /* logicToken */, state.context, chain)
                         .then(parseTokenLogic);
                 case TwigCore.token.type.comment:
                     // Do nothing, comments should be ignored

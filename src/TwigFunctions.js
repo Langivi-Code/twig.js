@@ -5,7 +5,7 @@
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
 import {twig} from "./twig.js";
-
+import { twigLogic } from "./TwigLogic.js";
 
 /**
  * @constant
@@ -315,7 +315,7 @@ class TwigFunctions {
     parent() {
         const state = this;
 
-        return state.getBlock(state.getNestingStackToken(twig.logic.type.block).blockName, true).render(state, state.context);
+        return state.getBlock(state.getNestingStackToken(twigLogic.type.block).blockName, true).render(state, state.context);
     }
 
     attribute(object, method, params) {

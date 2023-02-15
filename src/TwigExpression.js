@@ -1078,7 +1078,7 @@ class TwigExpression {
      * @param {string} type The name of the new type.
      */
      extendType(type) {
-        this.type[type] = 'this.type.' + type;
+        this.type[type] = 'Twig.expression.type.' + type;
     };
 
 
