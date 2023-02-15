@@ -1,40 +1,31 @@
-// ## twig.expression.js
-//
-// This file handles tokenizing, compiling and parsing expressions.
 import { TwigCore } from './twig.core.js';
-import ExpressionOperator from './twig.expression.operator.js';
 import { AsyncTwig } from "./async/twig.async.js";
 import TwigError from "./TwigError.js";
 import { TwigPromise } from './async/twig.promise.js';
-export default function (Twig) {
-    'use strict';
+import {twig as Twig } from './twig.js';
+import {twigExpressionOperator} from './TwigExpressionOperator.js';
 
-    function parseParams(state, params, context) {
-        if (params) {
-            return Twig.expression.parseAsync.call(state, params, context);
-        }
 
-        return TwigPromise.resolve(false);
+function parseParams(state, params, context) {
+    if (params) {
+        return twigExpression.parseAsync.call(state, params, context);
     }
 
-    /**
-     * Namespace for expression handling.
-     */
-    Twig.expression = {};
+    return TwigPromise.resolve(false);
+}
 
-    ExpressionOperator(Twig);
-
-    /**
-     * Reserved word that can't be used as variable names.
-     */
-    Twig.expression.reservedWords = [
+class TwigExpression {
+    constructor (){
+        this.handler = {};
+        while (this.definitions.length > 0) {
+            this.extend(this.definitions.shift());
+        }
+    }
+    reservedWords = [
         'true', 'false', 'null', 'TRUE', 'FALSE', 'NULL', '_context', 'and', 'b-and', 'or', 'b-or', 'b-xor', 'in', 'not in', 'if', 'matches', 'starts', 'ends', 'with'
     ];
 
-    /**
-     * The type of tokens used in expressions.
-     */
-    Twig.expression.type = {
+    type = {
         comma: 'Twig.expression.type.comma',
         operator: {
             unary: 'Twig.expression.type.operator.unary',
@@ -72,44 +63,50 @@ export default function (Twig) {
         test: 'Twig.expression.type.test'
     };
 
-    Twig.expression.set = {
+    set = {
         // What can follow an expression (in general)
         operations: [
-            Twig.expression.type.filter,
-            Twig.expression.type.operator.unary,
-            Twig.expression.type.operator.binary,
-            Twig.expression.type.array.end,
-            Twig.expression.type.object.end,
-            Twig.expression.type.parameter.end,
-            Twig.expression.type.subexpression.end,
-            Twig.expression.type.comma,
-            Twig.expression.type.test
+            this.type.filter,
+            this.type.operator.unary,
+            this.type.operator.binary,
+            this.type.array.end,
+            this.type.object.end,
+            this.type.parameter.end,
+            this.type.subexpression.end,
+            this.type.comma,
+            this.type.test
         ],
         expressions: [
-            Twig.expression.type._function,
-            Twig.expression.type.bool,
-            Twig.expression.type.string,
-            Twig.expression.type.variable,
-            Twig.expression.type.number,
-            Twig.expression.type._null,
-            Twig.expression.type.context,
-            Twig.expression.type.parameter.start,
-            Twig.expression.type.array.start,
-            Twig.expression.type.object.start,
-            Twig.expression.type.subexpression.start,
-            Twig.expression.type.operator.unary
+            this.type._function,
+            this.type.bool,
+            this.type.string,
+            this.type.variable,
+            this.type.number,
+            this.type._null,
+            this.type.context,
+            this.type.parameter.start,
+            this.type.array.start,
+            this.type.object.start,
+            this.type.subexpression.start,
+            this.type.operator.unary
+        ],
+        operationsExtended: [
+            this.type.filter,
+            this.type.operator.unary,
+            this.type.operator.binary,
+            this.type.array.end,
+            this.type.object.end,
+            this.type.parameter.end,
+            this.type.subexpression.end,
+            this.type.comma,
+            this.type.test,
+            this.type.key.period,
+            this.type.key.brackets,
+            this.type.slice
         ]
     };
 
-    // Most expressions allow a '.' or '[' after them, so we provide a convenience set
-    Twig.expression.set.operationsExtended = Twig.expression.set.operations.concat([
-        Twig.expression.type.key.period,
-        Twig.expression.type.key.brackets,
-        Twig.expression.type.slice
-    ]);
-
-    // Some commonly used compile and parse functions.
-    Twig.expression.fn = {
+    fn = {
         compile: {
             push(token, stack, output) {
                 output.push(token);
@@ -129,27 +126,12 @@ export default function (Twig) {
         }
     };
 
-    // The regular expressions and compile/parse logic used to match tokens in expressions.
-    //
-    // Properties:
-    //
-    //      type:  The type of expression this matches
-    //
-    //      regex: One or more regular expressions that matche the format of the token.
-    //
-    //      next:  Valid tokens that can occur next in the expression.
-    //
-    // Functions:
-    //
-    //      compile: A function that compiles the raw regular expression match into a token.
-    //
-    //      parse:   A function that parses the compiled token into output.
-    //
-    Twig.expression.definitions = [
+
+    definitions = [
         {
-            type: Twig.expression.type.test,
+            type: this.type.test,
             regex: /^is\s+(not)?\s*([a-zA-Z_]\w*(\s?as)?)/,
-            next: Twig.expression.set.operations.concat([Twig.expression.type.parameter.start]),
+            next: this.set.operations.concat([this.type.parameter.start]),
             compile(token, stack, output) {
                 token.filter = token.match[2];
                 token.modifier = token.match[1];
@@ -174,10 +156,10 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.expression.type.comma,
+            type: this.type.comma,
             // Match a comma
             regex: /^,/,
-            next: Twig.expression.set.expressions.concat([Twig.expression.type.array.end, Twig.expression.type.object.end]),
+            next: this.set.expressions.concat([this.type.array.end, this.type.object.end]),
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
@@ -188,9 +170,9 @@ export default function (Twig) {
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken.type === Twig.expression.type.object.start ||
-                        stackToken.type === Twig.expression.type.parameter.start ||
-                        stackToken.type === Twig.expression.type.array.start) {
+                    if (stackToken.type === twigExpression.type.object.start ||
+                        stackToken.type === twigExpression.type.parameter.start ||
+                        stackToken.type === twigExpression.type.array.start) {
                         stack.push(stackToken);
                         break;
                     }
@@ -205,22 +187,22 @@ export default function (Twig) {
             /**
              * Match a number (integer or decimal)
              */
-            type: Twig.expression.type.number,
+            type: this.type.number,
             // Match a number
             regex: /^-?\d+(\.\d+)?/,
-            next: Twig.expression.set.operations,
+            next: this.set.operations,
             compile(token, stack, output) {
                 token.value = Number(token.value);
                 output.push(token);
             },
-            parse: Twig.expression.fn.parse.pushValue
+            parse: this.fn.parse.pushValue
         },
         {
-            type: Twig.expression.type.operator.binary,
+            type: this.type.operator.binary,
             // Match any of ??, ?:, +, *, /, -, %, ~, <, <=, >, >=, !=, ==, **, ?, :, and, b-and, or, b-or, b-xor, in, not in
             // and, or, in, not in, matches, starts with, ends with can be followed by a space or parenthesis
             regex: /(^\?\?|^\?:|^(b-and)|^(b-or)|^(b-xor)|^[+\-~%?]|^[:](?!\d\])|^[!=]==?|^[!<>]=?|^\*\*?|^\/\/?|^(and)[(|\s+]|^(or)[(|\s+]|^(in)[(|\s+]|^(not in)[(|\s+]|^(matches)|^(starts with)|^(ends with)|^\.\.)/,
-            next: Twig.expression.set.expressions,
+            next: this.set.expressions,
             transform(match, tokens) {
                 switch (match[0]) {
                     case 'and(':
@@ -239,17 +221,17 @@ export default function (Twig) {
 
                 token.value = token.value.trim();
                 const { value } = token;
-                const operator = Twig.expression.operator.lookup(value, token);
+                const operator = twigExpressionOperator.lookup(value, token);
 
-                TwigCore.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
+                TwigCore.log.trace('this.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
-                    (stack[stack.length - 1].type === Twig.expression.type.operator.unary || stack[stack.length - 1].type === Twig.expression.type.operator.binary) &&
+                    (stack[stack.length - 1].type === twigExpression.type.operator.unary || stack[stack.length - 1].type === twigExpression.type.operator.binary) &&
                     (
-                        (operator.associativity === Twig.expression.operator.leftToRight &&
+                        (operator.associativity === twigExpressionOperator.operator.leftToRight &&
                             operator.precidence >= stack[stack.length - 1].precidence) ||
 
-                        (operator.associativity === Twig.expression.operator.rightToLeft &&
+                        (operator.associativity === twigExpressionOperator.operator.rightToLeft &&
                             operator.precidence > stack[stack.length - 1].precidence)
                     )
                 ) {
@@ -266,15 +248,15 @@ export default function (Twig) {
                         //   when the assocated object is closed.
                         const keyToken = output.pop();
 
-                        if (keyToken.type === Twig.expression.type.string ||
-                            keyToken.type === Twig.expression.type.variable) {
+                        if (keyToken.type === twigExpression.type.string ||
+                            keyToken.type === twigExpression.type.variable) {
                             token.key = keyToken.value;
-                        } else if (keyToken.type === Twig.expression.type.number) {
+                        } else if (keyToken.type === twigExpression.type.number) {
                             // Convert integer keys into string keys
                             token.key = keyToken.value.toString();
                         } else if (keyToken.expression &&
-                            (keyToken.type === Twig.expression.type.parameter.end ||
-                                keyToken.type === Twig.expression.type.subexpression.end)) {
+                            (keyToken.type === twigExpression.type.parameter.end ||
+                                keyToken.type === twigExpression.type.subexpression.end)) {
                             token.params = keyToken.params;
                         } else {
                             throw new TwigError('Unexpected value before \':\' of ' + keyToken.type + ' = ' + keyToken.value);
@@ -294,7 +276,7 @@ export default function (Twig) {
                     stack.push(token);
                 } else if (token.params) {
                     // Handle "{(expression):value}"
-                    return Twig.expression.parseAsync.call(state, token.params, context)
+                    return twigExpression.parseAsync.call(state, token.params, context)
                         .then(key => {
                             token.key = key;
                             stack.push(token);
@@ -305,31 +287,31 @@ export default function (Twig) {
                             }
                         });
                 } else {
-                    Twig.expression.operator.parse(token.value, stack);
+                    twigExpressionOperator.parse(token.value, stack);
                 }
             }
         },
         {
-            type: Twig.expression.type.operator.unary,
+            type: this.type.operator.unary,
             // Match any of not
             regex: /(^not\s+)/,
-            next: Twig.expression.set.expressions,
+            next: this.set.expressions,
             compile(token, stack, output) {
                 delete token.match;
 
                 token.value = token.value.trim();
                 const { value } = token;
-                const operator = Twig.expression.operator.lookup(value, token);
+                const operator = twigExpressionOperator.lookup(value, token);
 
-                TwigCore.log.trace('Twig.expression.compile: ', 'Operator: ', operator, ' from ', value);
+                TwigCore.log.trace('this.compile: ', 'Operator: ', operator, ' from ', value);
 
                 while (stack.length > 0 &&
-                    (stack[stack.length - 1].type === Twig.expression.type.operator.unary || stack[stack.length - 1].type === Twig.expression.type.operator.binary) &&
+                    (stack[stack.length - 1].type === twigExpression.type.operator.unary || stack[stack.length - 1].type === twigExpression.type.operator.binary) &&
                     (
-                        (operator.associativity === Twig.expression.operator.leftToRight &&
+                        (operator.associativity === twigExpressionOperator.operator.leftToRight &&
                             operator.precidence >= stack[stack.length - 1].precidence) ||
 
-                        (operator.associativity === Twig.expression.operator.rightToLeft &&
+                        (operator.associativity === twigExpressionOperator.operator.rightToLeft &&
                             operator.precidence > stack[stack.length - 1].precidence)
                     )
                 ) {
@@ -340,17 +322,17 @@ export default function (Twig) {
                 stack.push(operator);
             },
             parse(token, stack) {
-                Twig.expression.operator.parse(token.value, stack);
+                twigExpressionOperator.parse(token.value, stack);
             }
         },
         {
             /**
              * Match a string. This is anything between a pair of single or double quotes.
              */
-            type: Twig.expression.type.string,
+            type: this.type.string,
             // See: http://blog.stevenlevithan.com/archives/match-quoted-string
             regex: /^(["'])(?:(?=(\\?))\2[\s\S])*?\1/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             compile(token, stack, output) {
                 let { value } = token;
                 delete token.match;
@@ -363,18 +345,18 @@ export default function (Twig) {
                 }
 
                 token.value = value.slice(1, -1).replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-                TwigCore.log.trace('Twig.expression.compile: ', 'String value: ', token.value);
+                TwigCore.log.trace('this.compile: ', 'String value: ', token.value);
                 output.push(token);
             },
-            parse: Twig.expression.fn.parse.pushValue
+            parse: this.fn.parse.pushValue
         },
         {
             /**
              * Match a subexpression set start.
              */
-            type: Twig.expression.type.subexpression.start,
+            type: this.type.subexpression.start,
             regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
-            next: Twig.expression.set.expressions.concat([Twig.expression.type.subexpression.end]),
+            next: this.set.expressions.concat([this.type.subexpression.end]),
             validate(match,tokens){
                 if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
@@ -388,15 +370,15 @@ export default function (Twig) {
                 output.push(token);
                 stack.push(token);
             },
-            parse: Twig.expression.fn.parse.push
+            parse: this.fn.parse.push
         },
         {
             /**
              * Match a subexpression set end.
              */
-            type: Twig.expression.type.subexpression.end,
+            type: this.type.subexpression.end,
             regex: /^\)/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             validate(match, tokens) {
                 // Iterate back through previous tokens to ensure we follow a subexpression start
                 let i = tokens.length - 1;
@@ -407,7 +389,7 @@ export default function (Twig) {
                 while (!foundSubexpressionStart && i >= 0) {
                     const token = tokens[i];
 
-                    foundSubexpressionStart = token.type === Twig.expression.type.subexpression.start;
+                    foundSubexpressionStart = token.type === twigExpression.type.subexpression.start;
 
                     // If we have previously found a subexpression end, then this subexpression start is the start of
                     // that subexpression, not the subexpression we are searching for
@@ -417,11 +399,11 @@ export default function (Twig) {
                     }
 
                     // Count parameter tokens to ensure we dont return truthy for a parameter opener
-                    if (token.type === Twig.expression.type.parameter.start) {
+                    if (token.type === twigExpression.type.parameter.start) {
                         unclosedParameterCount++;
-                    } else if (token.type === Twig.expression.type.parameter.end) {
+                    } else if (token.type === twigExpression.type.parameter.end) {
                         unclosedParameterCount--;
-                    } else if (token.type === Twig.expression.type.subexpression.end) {
+                    } else if (token.type === twigExpression.type.subexpression.end) {
                         nextSubexpressionStartInvalid = true;
                     }
 
@@ -440,14 +422,14 @@ export default function (Twig) {
                 const endToken = token;
 
                 stackToken = stack.pop();
-                while (stack.length > 0 && stackToken.type !== Twig.expression.type.subexpression.start) {
+                while (stack.length > 0 && stackToken.type !== twigExpression.type.subexpression.start) {
                     output.push(stackToken);
                     stackToken = stack.pop();
                 }
 
                 // Move contents of parens into preceding filter
                 const paramStack = [];
-                while (token.type !== Twig.expression.type.subexpression.start) {
+                while (token.type !== twigExpression.type.subexpression.start) {
                     // Add token to arguments stack
                     paramStack.unshift(token);
                     token = output.pop();
@@ -460,10 +442,10 @@ export default function (Twig) {
                 stackToken = stack[stack.length - 1];
 
                 if (stackToken === undefined ||
-                    (stackToken.type !== Twig.expression.type._function &&
-                        stackToken.type !== Twig.expression.type.filter &&
-                        stackToken.type !== Twig.expression.type.test &&
-                        stackToken.type !== Twig.expression.type.key.brackets)) {
+                    (stackToken.type !== twigExpression.type._function &&
+                        stackToken.type !== twigExpression.type.filter &&
+                        stackToken.type !== twigExpression.type.test &&
+                        stackToken.type !== twigExpression.type.key.brackets)) {
                     endToken.expression = true;
 
                     // Remove start and end token from stack
@@ -483,7 +465,7 @@ export default function (Twig) {
                 const state = this;
 
                 if (token.expression) {
-                    return Twig.expression.parseAsync.call(state, token.params, context)
+                    return twigExpression.parseAsync.call(state, token.params, context)
                         .then(value => {
                             stack.push(value);
                         });
@@ -496,40 +478,40 @@ export default function (Twig) {
             /**
              * Match a parameter set start.
              */
-            type: Twig.expression.type.parameter.start,
+            type: this.type.parameter.start,
             regex: /^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)|^\(/,
-            next: Twig.expression.set.expressions.concat([Twig.expression.type.parameter.end]),
+            next: this.set.expressions.concat([this.type.parameter.end]),
             validate(match, tokens) {
                 if(/^\({1}\[?\w*,?\s?\w*\]?\)\s{0,2}=>\s{0,2}([`\{$].*[`\}$]|\w*\s{0,2}[\+\-\/\*\=\!=)]\s{0,2}\w*)/.test(match)){
                     return false;
                 }
                 const lastToken = tokens[tokens.length - 1];
                 // We can't use the regex to test if we follow a space because expression is trimmed
-                return lastToken && (!Twig.expression.reservedWords.includes(lastToken.value.trim()));
+                return lastToken && (!twigExpression.reservedWords.includes(lastToken.value.trim()));
             },
-            compile: Twig.expression.fn.compile.pushBoth,
-            parse: Twig.expression.fn.parse.push
+            compile: this.fn.compile.pushBoth,
+            parse: this.fn.parse.push
         },
         {
             /**
              * Match a parameter set end.
              */
-            type: Twig.expression.type.parameter.end,
+            type: this.type.parameter.end,
             regex: /^\)/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             compile(token, stack, output) {
                 let stackToken;
                 const endToken = token;
 
                 stackToken = stack.pop();
-                while (stack.length > 0 && stackToken.type !== Twig.expression.type.parameter.start) {
+                while (stack.length > 0 && stackToken.type !== twigExpression.type.parameter.start) {
                     output.push(stackToken);
                     stackToken = stack.pop();
                 }
 
                 // Move contents of parens into preceding filter
                 const paramStack = [];
-                while (token.type !== Twig.expression.type.parameter.start) {
+                while (token.type !== twigExpression.type.parameter.start) {
                     // Add token to arguments stack
                     paramStack.unshift(token);
                     token = output.pop();
@@ -541,10 +523,10 @@ export default function (Twig) {
                 token = output[output.length - 1];
 
                 if (token === undefined ||
-                    (token.type !== Twig.expression.type._function &&
-                        token.type !== Twig.expression.type.filter &&
-                        token.type !== Twig.expression.type.test &&
-                        token.type !== Twig.expression.type.key.brackets)) {
+                    (token.type !== twigExpression.type._function &&
+                        token.type !== twigExpression.type.filter &&
+                        token.type !== twigExpression.type.test &&
+                        token.type !== twigExpression.type.key.brackets)) {
                     endToken.expression = true;
 
                     // Remove start and end token from stack
@@ -566,7 +548,7 @@ export default function (Twig) {
                 const state = this;
 
                 if (token.expression) {
-                    return Twig.expression.parseAsync.call(state, token.params, context)
+                    return twigExpression.parseAsync.call(state, token.params, context)
                         .then(value => {
                             stack.push(value);
                         });
@@ -575,7 +557,7 @@ export default function (Twig) {
                 while (stack.length > 0) {
                     value = stack.pop();
                     // Push values into the array until the start of the array
-                    if (value && value.type && value.type === Twig.expression.type.parameter.start) {
+                    if (value && value.type && value.type === twigExpression.type.parameter.start) {
                         arrayEnded = true;
                         break;
                     }
@@ -591,9 +573,9 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.expression.type.slice,
+            type: this.type.slice,
             regex: /^\[(\d*:\d*)\]/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             compile(token, stack, output) {
                 const sliceRange = token.match[1].split(':');
 
@@ -623,26 +605,26 @@ export default function (Twig) {
             /**
              * Match an array start.
              */
-            type: Twig.expression.type.array.start,
+            type: this.type.array.start,
             regex: /^\[/,
-            next: Twig.expression.set.expressions.concat([Twig.expression.type.array.end]),
-            compile: Twig.expression.fn.compile.pushBoth,
-            parse: Twig.expression.fn.parse.push
+            next: this.set.expressions.concat([this.type.array.end]),
+            compile: this.fn.compile.pushBoth,
+            parse: this.fn.parse.push
         },
         {
             /**
              * Match an array end.
              */
-            type: Twig.expression.type.array.end,
+            type: this.type.array.end,
             regex: /^\]/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken.type === Twig.expression.type.array.start) {
+                    if (stackToken.type === twigExpression.type.array.start) {
                         break;
                     }
 
@@ -659,7 +641,7 @@ export default function (Twig) {
                 while (stack.length > 0) {
                     value = stack.pop();
                     // Push values into the array until the start of the array
-                    if (value && value.type && value.type === Twig.expression.type.array.start) {
+                    if (value && value.type && value.type === twigExpression.type.array.start) {
                         arrayEnded = true;
                         break;
                     }
@@ -681,11 +663,11 @@ export default function (Twig) {
         //
         // Keys must be quoted (either single or double) and values can be any expression.
         {
-            type: Twig.expression.type.object.start,
+            type: this.type.object.start,
             regex: /^\{/,
-            next: Twig.expression.set.expressions.concat([Twig.expression.type.object.end]),
-            compile: Twig.expression.fn.compile.pushBoth,
-            parse: Twig.expression.fn.parse.push
+            next: this.set.expressions.concat([this.type.object.end]),
+            compile: this.fn.compile.pushBoth,
+            parse: this.fn.parse.push
         },
 
         // Token that represents the end of a Hash Map '}'
@@ -693,9 +675,9 @@ export default function (Twig) {
         // This is where the logic for building the internal
         // representation of a hash map is defined.
         {
-            type: Twig.expression.type.object.end,
+            type: this.type.object.end,
             regex: /^\}/,
-            next: Twig.expression.set.operationsExtended,
+            next: this.set.operationsExtended,
             compile(token, stack, output) {
                 let i = stack.length - 1;
                 let stackToken;
@@ -703,7 +685,7 @@ export default function (Twig) {
                 // Pop tokens off the stack until the start of the object
                 for (; i >= 0; i--) {
                     stackToken = stack.pop();
-                    if (stackToken && stackToken.type === Twig.expression.type.object.start) {
+                    if (stackToken && stackToken.type === twigExpression.type.object.start) {
                         break;
                     }
 
@@ -722,12 +704,12 @@ export default function (Twig) {
                 while (stack.length > 0) {
                     token = stack.pop();
                     // Push values into the array until the start of the object
-                    if (token && token.type && token.type === Twig.expression.type.object.start) {
+                    if (token && token.type && token.type === twigExpression.type.object.start) {
                         objectEnded = true;
                         break;
                     }
 
-                    if (token && token.type && (token.type === Twig.expression.type.operator.binary || token.type === Twig.expression.type.operator.unary) && token.key) {
+                    if (token && token.type && (token.type === twigExpression.type.operator.binary || token.type === twigExpression.type.operator.unary) && token.key) {
                         if (!hasValue) {
                             throw new TwigError('Missing value for key \'' + token.key + '\' in object definition.');
                         }
@@ -767,11 +749,11 @@ export default function (Twig) {
         //
         // Filter parsing is done in the Twig.filters namespace.
         {
-            type: Twig.expression.type.filter,
+            type: this.type.filter,
             // Match a | then a letter or _, then any number of letters, numbers, _ or -
             regex: /^\|\s?([a-zA-Z_][a-zA-Z0-9_-]*)/,
-            next: Twig.expression.set.operationsExtended.concat([
-                Twig.expression.type.parameter.start
+            next: this.set.operationsExtended.concat([
+                this.type.parameter.start
             ]),
             compile(token, stack, output) {
                 token.value = token.match[1];
@@ -791,13 +773,13 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.expression.type._function,
+            type: this.type._function,
             // Match any letter or _, then any number of letters, numbers, _ or - followed by (
             regex: /^([a-zA-Z_]\w*)\s*\(/,
-            next: Twig.expression.type.parameter.start,
+            next: this.type.parameter.start,
             validate(match) {
                 // Make sure this function is not a reserved word
-                return match[1] && (!Twig.expression.reservedWords.includes(match[1]));
+                return match[1] && (!twigExpression.reservedWords.includes(match[1]));
             },
             transform() {
                 return '(';
@@ -845,18 +827,18 @@ export default function (Twig) {
         // the value of 'undefined' if the given variable doesn't
         // exist in the context.
         {
-            type: Twig.expression.type.variable,
+            type: this.type.variable,
             // Match any letter or _, then any number of letters, numbers, _ or -
             regex: /((^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$\>\<\>=\<=]\s{0,2}\w*)|^[a-zA-Z_]\w*)/g,
-            next: Twig.expression.set.operationsExtended.concat([
-                Twig.expression.type.parameter.start
+            next: this.set.operationsExtended.concat([
+                this.type.parameter.start
             ]),
-            compile: Twig.expression.fn.compile.push,
+            compile: this.fn.compile.push,
             validate(match) {
                 if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$\>\<\>=\<=]\s{0,2}\w*)/g).test(match)) {
                     return true;
                 } else {
-                    return (!Twig.expression.reservedWords.includes(match[0]));
+                    return (!twigExpression.reservedWords.includes(match[0]));
                 }
             },
             parse(token, stack, context) {
@@ -865,7 +847,7 @@ export default function (Twig) {
                 if ((/(^\w*|^\({1}\[?\w*,?\s?\w*\]?\))\s{0,2}=>\s{0,2}([\{\`].*[\}\`]|\w*\s{0,2}[\+\-\*\/\=\!\=\`\{\}\$\>\<\>=\<=]\s{0,2}\w*)/g).test(token.value)) {
                     return stack.push(eval(token.value));
                 }
-                    return Twig.expression.resolveAsync.call(state, context[token.value], context)
+                    return twigExpression.resolveAsync.call(state, context[token.value], context)
                         .then(value => {
                             if (state.template.options.strictVariables && value === undefined) {
                                 throw new TwigError('Variable "' + token.value + '" does not exist.');
@@ -876,10 +858,10 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.expression.type.key.period,
+            type: this.type.key.period,
             regex: /^\.(\w+)/,
-            next: Twig.expression.set.operationsExtended.concat([
-                Twig.expression.type.parameter.start
+            next: this.set.operationsExtended.concat([
+                this.type.parameter.start
             ]),
             compile(token, stack, output) {
                 token.key = token.match[1];
@@ -925,7 +907,7 @@ export default function (Twig) {
                         }
 
                         // When resolving an expression we need to pass nextToken in case the expression is a function
-                        return Twig.expression.resolveAsync.call(state, value, context, params, nextToken, object);
+                        return twigExpression.resolveAsync.call(state, value, context, params, nextToken, object);
                     })
                     .then(result => {
                         stack.push(result);
@@ -933,10 +915,10 @@ export default function (Twig) {
             }
         },
         {
-            type: Twig.expression.type.key.brackets,
+            type: this.type.key.brackets,
             regex: /^\[([^\]:]*)\]/,
-            next: Twig.expression.set.operationsExtended.concat([
-                Twig.expression.type.parameter.start
+            next: this.set.operationsExtended.concat([
+                this.type.parameter.start
             ]),
             compile(token, stack, output) {
                 const match = token.match[1];
@@ -944,7 +926,7 @@ export default function (Twig) {
                 delete token.match;
 
                 // The expression stack for the key
-                token.stack = Twig.expression.compile({
+                token.stack = twigExpression.compile({
                     value: match
                 }).stack;
 
@@ -960,7 +942,7 @@ export default function (Twig) {
                 return parseParams(state, token.params, context)
                     .then(parameters => {
                         params = parameters;
-                        return Twig.expression.parseAsync.call(state, token.stack, context);
+                        return twigExpression.parseAsync.call(state, token.stack, context);
                     })
                     .then(key => {
                         object = stack.pop();
@@ -984,7 +966,7 @@ export default function (Twig) {
                         }
 
                         // When resolving an expression we need to pass nextToken in case the expression is a function
-                        return Twig.expression.resolveAsync.call(state, value, object, params, nextToken);
+                        return twigExpression.resolveAsync.call(state, value, object, params, nextToken);
                     })
                     .then(result => {
                         stack.push(result);
@@ -995,27 +977,27 @@ export default function (Twig) {
             /**
              * Match a null value.
              */
-            type: Twig.expression.type._null,
+            type: this.type._null,
             // Match a number
             regex: /^(null|NULL|none|NONE)/,
-            next: Twig.expression.set.operations,
+            next: this.set.operations,
             compile(token, stack, output) {
                 delete token.match;
                 token.value = null;
                 output.push(token);
             },
-            parse: Twig.expression.fn.parse.pushValue
+            parse: this.fn.parse.pushValue
         },
         {
             /**
              * Match the context
              */
-            type: Twig.expression.type.context,
+            type: this.type.context,
             regex: /^_context/,
-            next: Twig.expression.set.operationsExtended.concat([
-                Twig.expression.type.parameter.start
+            next: this.set.operationsExtended.concat([
+                this.type.parameter.start
             ]),
-            compile: Twig.expression.fn.compile.push,
+            compile: this.fn.compile.push,
             parse(token, stack, context) {
                 stack.push(context);
             }
@@ -1024,17 +1006,18 @@ export default function (Twig) {
             /**
              * Match a boolean
              */
-            type: Twig.expression.type.bool,
+            type: this.type.bool,
             regex: /^(true|TRUE|false|FALSE)/,
-            next: Twig.expression.set.operations,
+            next: this.set.operations,
             compile(token, stack, output) {
                 token.value = (token.match[0].toLowerCase() === 'true');
                 delete token.match;
                 output.push(token);
             },
-            parse: Twig.expression.fn.parse.pushValue
+            parse: this.fn.parse.pushValue
         }
     ];
+
 
     /**
      * Resolve a context value.
@@ -1044,7 +1027,7 @@ export default function (Twig) {
      * @param {string} key The context object key.
      * @param {Object} context The render context.
      */
-    Twig.expression.resolveAsync = function (value, context, params, nextToken, object) {
+    resolveAsync = function (value, context, params, nextToken, object) {
         const state = this;
 
         if (typeof value !== 'function') {
@@ -1062,12 +1045,12 @@ export default function (Twig) {
 
         Those parameters will also need parsing in case they are actually an expression to pass as parameters.
             */
-        if (nextToken && nextToken.type === Twig.expression.type.parameter.end) {
+        if (nextToken && nextToken.type === twigExpression.type.parameter.end) {
             // When parsing these parameters, we need to get them all back, not just the last item on the stack.
             const tokensAreParameters = true;
 
             promise = promise.then(() => {
-                return nextToken.params && Twig.expression.parseAsync.call(state, nextToken.params, context, tokensAreParameters);
+                return nextToken.params && twigExpression.parseAsync.call(state, nextToken.params, context, tokensAreParameters);
             })
                 .then(p => {
                     // Clean up the parentheses tokens on the next loop
@@ -1082,35 +1065,31 @@ export default function (Twig) {
         });
     };
 
-    Twig.expression.resolve = function (value, context, params, nextToken, object) {
+    resolve(value, context, params, nextToken, object) {
         return AsyncTwig.potentiallyAsync(this, false, function () {
-            return Twig.expression.resolveAsync.call(this, value, context, params, nextToken, object);
+            return twigExpression.resolveAsync.call(this, value, context, params, nextToken, object);
         });
     };
 
-    /**
-     * Registry for logic handlers.
-     */
-    Twig.expression.handler = {};
-
-    /**
+     /**
      * Define a new expression type, available at Twig.logic.type.{type}
      *
      * @param {string} type The name of the new type.
      */
-    Twig.expression.extendType = function (type) {
-        Twig.expression.type[type] = 'Twig.expression.type.' + type;
+     extendType(type) {
+        this.type[type] = 'this.type.' + type;
     };
+
 
     /**
      * Extend the expression parsing functionality with a new definition.
      *
      * Token definitions follow this format:
      *  {
-     *      type:     One of Twig.expression.type.[type], either pre-defined or added using
-     *                    Twig.expression.extendType
+     *      type:     One of this.type.[type], either pre-defined or added using
+     *                    this.extendType
      *
-     *      next:     Array of types from Twig.expression.type that can follow this token,
+     *      next:     Array of types from this.type that can follow this token,
      *
      *      regex:    A regex or array of regex's that should match the token.
      *
@@ -1123,27 +1102,25 @@ export default function (Twig) {
      *
      * @param {Object} definition A token definition.
      */
-    Twig.expression.extend = function (definition) {
+
+    extend(definition) {
         if (!definition.type) {
             throw new TwigError('Unable to extend logic definition. No type provided for ' + definition);
         }
 
-        Twig.expression.handler[definition.type] = definition;
+        this.handler[definition.type] = definition;
     };
 
-    // Extend with built-in expressions
-    while (Twig.expression.definitions.length > 0) {
-        Twig.expression.extend(Twig.expression.definitions.shift());
-    }
 
     /**
-     * Break an expression into tokens defined in Twig.expression.definitions.
+     * Break an expression into tokens defined in this.definitions.
      *
      * @param {string} expression The string to tokenize.
      *
      * @return {Array} An array of tokens.
      */
-    Twig.expression.tokenize = function (expression) {
+
+    tokenize(expression) {
         const tokens = [];
         // Keep an offset of the location in the expression for error messages.
         let expOffset = 0;
@@ -1167,7 +1144,7 @@ export default function (Twig) {
                 match[matchI] = args[matchI];
             }
 
-            TwigCore.log.trace('Twig.expression.tokenize',
+            TwigCore.log.trace('this.tokenize',
                 'Matched a ', type, ' regular expression of ', match);
 
             if (next && !next.includes(type)) {
@@ -1181,7 +1158,7 @@ export default function (Twig) {
                 return match[0];
             }
 
-            const handler = Twig.expression.handler[type];
+            const handler = twigExpression.handler[type];
 
             // Validate the token if a validation function is provided
             if (handler.validate && !handler.validate(match, tokens)) {
@@ -1209,14 +1186,14 @@ export default function (Twig) {
 
             return '';
         };
-        TwigCore.log.debug('Twig.expression.tokenize', 'Tokenizing expression ', expression);
+        TwigCore.log.debug('this.tokenize', 'Tokenizing expression ', expression);
 
         while (expression.length > 0) {
             expression = expression.trim();
-            for (type in Twig.expression.handler) {
-                if (Object.hasOwnProperty.call(Twig.expression.handler, type)) {
-                    tokenNext = Twig.expression.handler[type].next;
-                    regex = Twig.expression.handler[type].regex;
+            for (type in twigExpression.handler) {
+                if (Object.hasOwnProperty.call(twigExpression.handler, type)) {
+                    tokenNext = twigExpression.handler[type].next;
+                    regex = twigExpression.handler[type].regex;
                     TwigCore.log.trace('Checking type ', type, ' on ', expression);
                     matchFound = false;
                     if (Array.isArray(regex)) {
@@ -1244,9 +1221,10 @@ export default function (Twig) {
             }
         }
 
-        TwigCore.log.trace('Twig.expression.tokenize', 'Tokenized to ', tokens);
+        TwigCore.log.trace('this.tokenize', 'Tokenized to ', tokens);
         return tokens;
     };
+
 
     /**
      * Compile an expression token.
@@ -1255,44 +1233,44 @@ export default function (Twig) {
      *
      * @return {Object} The compiled token.
      */
-    Twig.expression.compile = function (rawToken) {
+    compile(rawToken) {
         const expression = rawToken.value;
         // Tokenize expression
-        const tokens = Twig.expression.tokenize(expression);
+        const tokens = twigExpression.tokenize(expression);
         let token = null;
         const output = [];
         const stack = [];
         let tokenTemplate = null;
 
-        TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', expression);
+        TwigCore.log.trace('this.compile: ', 'Compiling ', expression);
 
         // Push tokens into RPN stack using the Shunting-yard algorithm
         // See http://en.wikipedia.org/wiki/Shunting_yard_algorithm
 
         while (tokens.length > 0) {
             token = tokens.shift();
-            tokenTemplate = Twig.expression.handler[token.type];
-
-            TwigCore.log.trace('Twig.expression.compile: ', 'Compiling ', token);
+            tokenTemplate = twigExpression.handler[token.type];
+            TwigCore.log.trace('this.compile: ', 'Compiling ', token);
 
             // Compile the template
             tokenTemplate.compile(token, stack, output);
 
-            TwigCore.log.trace('Twig.expression.compile: ', 'Stack is', stack);
-            TwigCore.log.trace('Twig.expression.compile: ', 'Output is', output);
+            TwigCore.log.trace('this.compile: ', 'Stack is', stack);
+            TwigCore.log.trace('this.compile: ', 'Output is', output);
         }
 
         while (stack.length > 0) {
             output.push(stack.pop());
         }
 
-        TwigCore.log.trace('Twig.expression.compile: ', 'Final output is', output);
+        TwigCore.log.trace('this.compile: ', 'Final output is', output);
 
         rawToken.stack = output;
         delete rawToken.value;
 
         return rawToken;
     };
+
 
     /**
      * Parse an RPN expression stack within a context.
@@ -1304,7 +1282,7 @@ export default function (Twig) {
      *                  can be anything, String, Array, Object, etc... based on
      *                  the given expression.
      */
-    Twig.expression.parse = function (tokens, context, tokensAreParameters, allowAsync) {
+    parse(tokens, context, tokensAreParameters, allowAsync) {
         const state = this;
 
         // If the token isn't an array, make it one.
@@ -1315,7 +1293,7 @@ export default function (Twig) {
         // The output stack
         const stack = [];
         const loopTokenFixups = [];
-        const binaryOperator = Twig.expression.type.operator.binary;
+        const binaryOperator = twigExpression.type.operator.binary;
 
         return AsyncTwig.potentiallyAsync(state, allowAsync, () => {
             return AsyncTwig.forEach(tokens, (token, index) => {
@@ -1333,7 +1311,7 @@ export default function (Twig) {
                     nextToken = tokens[index + 1];
                 }
 
-                tokenTemplate = Twig.expression.handler[token.type];
+                tokenTemplate = twigExpression.handler[token.type];
 
                 if (tokenTemplate.parse) {
                     result = tokenTemplate.parse.call(state, token, stack, context, nextToken);
@@ -1373,12 +1351,11 @@ export default function (Twig) {
         });
     };
 
-
-    Twig.expression.parseAsync = function (tokens, context, tokensAreParameters) {
+    parseAsync (tokens, context, tokensAreParameters) {
         const state = this;
-
-        return Twig.expression.parse.call(state, tokens, context, tokensAreParameters, true);
+        return twigExpression.parse.call(state, tokens, context, tokensAreParameters, true);
     };
+}
 
-    return Twig;
-};
+const twigExpression = new TwigExpression();
+export{twigExpression}

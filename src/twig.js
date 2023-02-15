@@ -10,7 +10,6 @@
 //
 // This file handles creating the Twig library
 
-import expression from "./twig.expression.js";
 import functions from "./twig.functions.js";
 import {TwigLib} from "./TwigLib.js";
 import loaderajax from "./twig.loader.ajax.js";
@@ -41,7 +40,6 @@ function factory(twig) {
     twig.setTestsClass((t) => new TwigTests(t));
     twig.setCacheClass((t)=>new TwigCache(t));
     functions(twig);
-    expression(twig);
     logic(twig);
     loaderajax(twig);
     loaderfs(twig);

@@ -3,19 +3,15 @@
 // This file handles operator lookups and parsing.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
+import {twig} from "./twig.js"
 
-export default function (Twig) {
-    'use strict';
-
-    /**
-     * Operator associativity constants.
-     */
-    Twig.expression.operator = {
+class TwigExpressionOperator {
+    operator = {
         leftToRight: 'leftToRight',
         rightToLeft: 'rightToLeft'
     };
 
-    const containment = function (a, b) {
+    containment(a, b) {
         if (b === undefined || b === null) {
             return null;
         }
@@ -35,20 +31,16 @@ export default function (Twig) {
         return false;
     };
 
-    /**
-     * Get the precidence and associativity of an operator. These follow the order that C/C++ use.
-     * See http://en.wikipedia.org/wiki/Operators_in_C_and_C++ for the table of values.
-     */
-    Twig.expression.operator.lookup = function (operator, token) {
+    lookup(operator, token) {
         switch (operator) {
             case '..':
                 token.precidence = 20;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case ',':
                 token.precidence = 18;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             // Ternary
@@ -56,44 +48,44 @@ export default function (Twig) {
             case '?':
             case ':':
                 token.precidence = 16;
-                token.associativity = Twig.expression.operator.rightToLeft;
+                token.associativity = this.operator.rightToLeft;
                 break;
 
             // Null-coalescing operator
             case '??':
                 token.precidence = 15;
-                token.associativity = Twig.expression.operator.rightToLeft;
+                token.associativity = this.operator.rightToLeft;
                 break;
 
             case 'or':
                 token.precidence = 14;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'and':
                 token.precidence = 13;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'b-or':
                 token.precidence = 12;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'b-xor':
                 token.precidence = 11;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'b-and':
                 token.precidence = 10;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case '==':
             case '!=':
                 token.precidence = 9;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case '<':
@@ -103,14 +95,14 @@ export default function (Twig) {
             case 'not in':
             case 'in':
                 token.precidence = 8;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case '~': // String concatination
             case '+':
             case '-':
                 token.precidence = 6;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case '//':
@@ -119,27 +111,27 @@ export default function (Twig) {
             case '/':
             case '%':
                 token.precidence = 5;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'not':
                 token.precidence = 3;
-                token.associativity = Twig.expression.operator.rightToLeft;
+                token.associativity = this.operator.rightToLeft;
                 break;
 
             case 'matches':
                 token.precidence = 8;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'starts with':
                 token.precidence = 8;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             case 'ends with':
                 token.precidence = 8;
-                token.associativity = Twig.expression.operator.leftToRight;
+                token.associativity = this.operator.leftToRight;
                 break;
 
             default:
@@ -150,12 +142,7 @@ export default function (Twig) {
         return token;
     };
 
-    /**
-     * Handle operations on the RPN stack.
-     *
-     * Returns the updated stack.
-     */
-    Twig.expression.operator.parse = function (operator, stack) {
+    parse(operator, stack) {
         TwigCore.log.trace('Twig.expression.operator.parse: ', 'Handling ', operator);
         let a;
         let b;
@@ -209,7 +196,7 @@ export default function (Twig) {
 
                 break;
             case '?:':
-                if (Twig.lib.boolval(a)) {
+                if (twig.lib.boolval(a)) {
                     stack.push(a);
                 } else {
                     stack.push(b);
@@ -224,7 +211,7 @@ export default function (Twig) {
                     c = undefined;
                 }
 
-                if (Twig.lib.boolval(a)) {
+                if (twig.lib.boolval(a)) {
                     stack.push(b);
                 } else {
                     stack.push(c);
@@ -275,7 +262,7 @@ export default function (Twig) {
 
             case 'not':
             case '!':
-                stack.push(!Twig.lib.boolval(b));
+                stack.push(!twig.lib.boolval(b));
                 break;
 
             case '<':
@@ -313,7 +300,7 @@ export default function (Twig) {
                 break;
 
             case 'or':
-                stack.push(Twig.lib.boolval(a) || Twig.lib.boolval(b));
+                stack.push(twig.lib.boolval(a) || twig.lib.boolval(b));
                 break;
 
             case 'b-or':
@@ -325,7 +312,7 @@ export default function (Twig) {
                 break;
 
             case 'and':
-                stack.push(Twig.lib.boolval(a) && Twig.lib.boolval(b));
+                stack.push(twig.lib.boolval(a) && twig.lib.boolval(b));
                 break;
 
             case 'b-and':
@@ -337,11 +324,11 @@ export default function (Twig) {
                 break;
 
             case 'not in':
-                stack.push(!containment(a, b));
+                stack.push(!this.containment(a, b));
                 break;
 
             case 'in':
-                stack.push(containment(a, b));
+                stack.push(this.containment(a, b));
                 break;
 
             case 'matches':
@@ -357,13 +344,14 @@ export default function (Twig) {
                 break;
 
             case '..':
-                stack.push(Twig.functions.range(a, b));
+                stack.push(twig.functions.range(a, b));
                 break;
 
             default:
                 throw new TwigError('Failed to parse operator: ' + operator + ' is an unknown operator.');
         }
     };
+}
 
-    return Twig;
-};
+const twigExpressionOperator = new TwigExpressionOperator();
+export {twigExpressionOperator};

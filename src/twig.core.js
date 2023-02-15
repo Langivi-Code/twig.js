@@ -5,6 +5,7 @@
 import {TwigFilters} from "./twig.filters.js";
 import TwigError from "./TwigError.js";
 import {twig} from "./twig.js";
+import { twigExpression } from "./TwigExpression.js";
 class TwigCore {
     VERSION;
     compiler;
@@ -391,7 +392,7 @@ class TwigCore {
 
             const compileOutput =  (token) => {
               
-                twig.expression.compile.call(this, token);
+                twigExpression.compile.call(this, token);
                 if (stack.length > 0) {
                     intermediateOutput.push(token);
                 } else {
@@ -745,6 +746,10 @@ class TwigCore {
 
     setTestsClass(testssSetter) {
         this.tests = testssSetter(this);
+        return this;
+    }
+    setExpression(expressionSetter) {
+        this.expression = expressionSetter(this);
         return this;
     }
 

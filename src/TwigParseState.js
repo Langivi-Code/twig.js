@@ -2,6 +2,7 @@ import TwigError from "./TwigError.js";
 import {TwigCore} from "./twig.core.js";
 import {twig} from "./twig.js";
 import { AsyncTwig } from "./async/twig.async.js";
+import { twigExpression } from "./TwigExpression.js";
 
 function handleException(state, ex) {
     if (state.template.options.rethrow) {
@@ -202,7 +203,7 @@ export default class TwigParseState {
                 case TwigCore.token.type.output:
                     TwigCore.log.debug('Twig.ParseState.parse: ', 'Output token: ', token.stack);
                     // Parse the given expression in the given context
-                    return twig.expression.parseAsync.call(state, token.stack, state.context)
+                    return twigExpression.parseAsync.call(state, token.stack, state.context)
                         .then(outputPush);
                 default:
                     break;
