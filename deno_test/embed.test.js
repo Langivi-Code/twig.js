@@ -115,6 +115,7 @@ Deno.test('Twig.js Embed ->', async (t)=>{
     });
 
    await t.step('should support complex nested embeds', async()=>{
+        twig.cacher.emptyCacheDir();
         await twig.twig({
             data: '<{% block header %}outer-header{% endblock %}><{% block footer %}outer-footer{% endblock %}>',
             id: 'embed-outer.twig'
@@ -132,7 +133,6 @@ Deno.test('Twig.js Embed ->', async (t)=>{
     });
     
    await t.step('should support multiple inheritance and embeds', async()=>{
-        twig.cacher.emptyCacheDir();
         await twig.twig({
             data: '<{% block header %}base-header{% endblock %}>{% block body %}<base-body>{% endblock %}<{% block footer %}base-footer{% endblock %}>',
             id: 'base.twig'

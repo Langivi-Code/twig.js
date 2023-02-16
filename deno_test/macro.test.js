@@ -207,7 +207,7 @@ Deno.test("Twig.js Macro ->", async t => {
         // Load the template
         const testTemplate = await twig.twig({ ref: "from-macro-import" });
         assertEquals(
-            testTemplate.render({}).trim(),
+            await testTemplate.render({}).trim(),
             'Hello Twig.js<div class="field"><input type="text" name="text" value="" size="20" /></div><div class="field red"><input type="text" name="password" value="" size="20" /></div>'
         );
     });

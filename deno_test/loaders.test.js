@@ -78,9 +78,10 @@ Deno.test('Twig.js Loaders ->', async (t) => {
         });
 
         await t.step('should remove a registered loader', async () => {
-            twig.extend(Twig => {
+            const TwigTest = twig.extend(Twig => {
                 Twig.Templates.unRegisterLoader('custom');
-                assertEquals(Twig.Templates.loaders.hasOwnProperty('custom'),false);
+                return Twig;
             });
+            assertEquals(TwigTest.Templates.loaders.hasOwnProperty('custom'),false);
         });
 });

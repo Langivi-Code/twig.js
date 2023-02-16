@@ -43,7 +43,7 @@ Deno.test('Twig.js Path ->', async (t) => {
         assertEquals(relativePath({path: 'test/test.twig'}), ('test/'));
     });
 
-    await t.step('should use the base if base is specified', function () {
+    await t.step('should use the base if base is specified', async function () {
         assertEquals(relativePath({path: 'test/test.twig', base: 'myTest'}), ('myTest/'));
     });
    

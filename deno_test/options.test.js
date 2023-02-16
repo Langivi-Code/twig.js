@@ -74,7 +74,7 @@ Deno.test('Twig.js Optional Functionality ->', async (t) => {
 
     await t.step('For undefined array keys', async () => {
         try {
-            array.render({test: [1, 2, 3]});
+            await array.render({test: [1, 2, 3]});
             throw new Error('should have thrown an error.');
         } catch (error) {
             assertEquals(error.message, 'Key "10" for array with keys "0, 1, 2" does not exist.');
