@@ -5,7 +5,7 @@ node() {
     }
 
     stage("Prepare") {
-        denoImage = docker.image("denoland/deno:ubuntu-1.28.2");
+        denoImage = docker.image("denoland/deno:ubuntu-1.30.3");
         denoImage.inside("-u 0") {
             parallel([
                     test   : {
