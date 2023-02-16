@@ -11,7 +11,7 @@ node() {
                     test   : {
                         stage("Test") {
                             ansiColor('xterm') {
-                               def  stdout = sh(returnStdout: true, script: "deno test --unstable --allow-read --allow-write --allow-env --allow-net --allow-ffi")
+                               def  stdout = sh(returnStdout: true, script: "deno test --unstable --allow-read --allow-write --allow-env --allow-net --allow-ffi --trace-ops")
                               echo stdout;
 
                             }
