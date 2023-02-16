@@ -21,7 +21,7 @@ export default function (Twig) {
         if (params.async) {
             return (async function () {
                 try {
-                    if ( Deno.statSync(params.path).isFile) {
+                    if ( (await Deno.stat(params.path)).isFile) {
                         let data = await Deno.readTextFile(params.path);
                         return parseTemplateFn(data);
                     }
