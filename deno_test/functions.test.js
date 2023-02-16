@@ -339,6 +339,7 @@ Deno.test('Twig.js Functions ->', async (t) => {
     });
 
     await t.step('should support the \'max\' function', async () => {
+        twig.cacher.emptyCacheDir();
         let testTemplate = await twig.twig({data: '{{ max([2, 1, 3, 5, 4]) }}'});
         assertEquals(testTemplate.render(), '5');
         testTemplate = await twig.twig({data: '{{ max(2, 1, 3, 5, 4) }}'});
@@ -348,7 +349,6 @@ Deno.test('Twig.js Functions ->', async (t) => {
     });
 
     await t.step('should allow loading relative paths', async () => {
-        twig.cacher.emptyCacheDir();
         const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/simple.twig") }}'});
         assertEquals(testTemplate.render(), 'Twig.js!');
     });

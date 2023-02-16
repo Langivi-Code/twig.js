@@ -613,6 +613,16 @@ Deno.test('Context ->', async (t) => {
 });
 
 Deno.test('Imports ->', async (t)=>{
+    await t.step('should throw when trying to load an inline include and the file does not exist', async()=> {
+        /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
+        const template = await twig.twig({
+            allowInlineIncludes: true,
+            async: false,
+            rethrow: true,
+            data: '{% include \'./deno_test/templates/doesnt-exist-ever.twig\' %}'
+        });
+        assertThrows(()=>{template.render({})});
+    });
     await t.step('should load an inline include when the file exists', async(t) => {
         /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
         const template = await twig.twig({
@@ -624,14 +634,4 @@ Deno.test('Imports ->', async (t)=>{
         assertEquals(template.render(),"Twig.js!");
     });
 
-    await t.step('should throw when trying to load an inline include and the file does not exist', async()=> {
-        /* eslint-disable-next-line no-use-extend-native/no-use-extend-native */
-        const template = await twig.twig({
-            allowInlineIncludes: true,
-            async: false,
-            rethrow: true,
-            data: '{% include \'./deno_test/templates/doesnt-exist-ever.twig\' %}'
-        });
-        assertThrows(()=>{template.render({})});
-    });
 });
