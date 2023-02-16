@@ -3,6 +3,10 @@ import {twigLib} from "./TwigLib.js";
 import {twigPath} from "./TwigPath.js";
 import TwigError from "./TwigError.js";
 import { AsyncTwig } from "./async/twig.async.js";
+import { twigTemplates } from "./twig.templates.js";
+import { twigCache } from "./twig.cache.js";
+import { twigCompiler } from "./twig.compiler.js";
+import TwigParseState from "./TwigParseState.js";
 export class TwigTemplate{
     base;
     blocks;
@@ -53,7 +57,7 @@ export class TwigTemplate{
         }
 
         if (id !== undefined) {
-            twig.Templates.save(this);
+            twigTemplates.save(this);
         }
     }
 
@@ -117,7 +121,7 @@ export class TwigTemplate{
         params = params || {};
 
         return AsyncTwig.potentiallyAsync(template, allowAsync, () => {
-            const state = new twig.ParseState(template, params.blocks);
+            const state = new TwigParseState(template, params.blocks);
 
             return state.parseAsync(template.tokens, context)
                 .then(output => {
@@ -129,7 +133,7 @@ export class TwigTemplate{
 
                         if (template.options.allowInlineIncludes) {
                             // The template is provided inline
-                            parentTemplate = twig.Templates.load(template.parentTemplate);
+                            parentTemplate = twigTemplates.load(template.parentTemplate);
                             if (parentTemplate) {
                                 parentTemplate.options = template.options;
                             }
@@ -137,12 +141,12 @@ export class TwigTemplate{
 
                         // Check for the template file via include
                         if (!parentTemplate) {
-                            if(twig.cacher.findCacheFile(template.parentTemplate)){
-                                parentTemplate = twig.cacher.buildTemplateForCache(twig.cacher.getCache(template.parentTemplate))
+                            if(twigCache.findCacheFile(template.parentTemplate)){
+                                parentTemplate = twigCache.buildTemplateForCache(twigCache.getCache(template.parentTemplate))
                             }else{
                                 url = twigPath.parsePath(template, template.parentTemplate);
 
-                                parentTemplate = twig.Templates.loadRemote(url, {
+                                parentTemplate = twigTemplates.loadRemote(url, {
                                     method: template.getLoaderMethod(),
                                     base: template.base,
                                     async: false,
@@ -174,10 +178,10 @@ export class TwigTemplate{
         let subTemplate;
         if (!this.url && this.options.allowInlineIncludes) {
             file = this.path ? twigPath.parsePath(this, file) : file;
-            subTemplate = twig.Templates.load(file);
+            subTemplate = twigTemplates.load(file);
 
             if (!subTemplate) {
-                subTemplate = twig.Templates.loadRemote(url, {
+                subTemplate = twigTemplates.loadRemote(url, {
                     id: file,
                     method: this.getLoaderMethod(),
                     async: false,
@@ -198,7 +202,7 @@ export class TwigTemplate{
         url = twigPath.parsePath(this, file);
 
         // Load blocks from an external file
-        subTemplate = twig.Templates.loadRemote(url, {
+        subTemplate = twigTemplates.loadRemote(url, {
             method: this.getLoaderMethod(),
             base: this.base,
             async: false,
@@ -223,7 +227,7 @@ export class TwigTemplate{
 
     compile(){
         // Compile the template into raw JS
-        return twig.compiler.compile(this, options);
+        return twigCompiler.compile(this, options);
     }
 
     renderAsync(context, params){

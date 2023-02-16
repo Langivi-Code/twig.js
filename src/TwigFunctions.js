@@ -4,8 +4,9 @@
 // This file handles parsing filters.
 import { TwigCore } from "./twig.core.js";
 import TwigError from "./TwigError.js";
-import {twig} from "./twig.js";
-import { twigLogic } from "./TwigLogic.js";
+import { TwigLogic } from "./TwigLogic.js";
+import { twigTemplates } from "./twig.templates.js";
+import { twigLib } from "./TwigLib.js";
 
 /**
  * @constant
@@ -70,7 +71,7 @@ class TwigFunctions {
 
     country_timezones(arg){
         if(typeof arg === 'string'){
-            const clm = twig.lib.clm;
+            const clm = twigLib.clm;
             const country = clm.getCountryByAlpha2(arg);
             if(country){
                 return `${country.name}/${country.alpha2}`;
@@ -205,15 +206,15 @@ class TwigFunctions {
         let dateObj;
         if (date === undefined || date === null || date === '') {
             dateObj = new Date();
-        } else if (twig.lib.is('Date', date)) {
+        } else if (twigLib.is('Date', date)) {
             dateObj = date;
-        } else if (twig.lib.is('String', date)) {
+        } else if (twigLib.is('String', date)) {
             if (date.match(/^\d+$/)) {
                 dateObj = new Date(date * 1000);
             } else {
-                dateObj = new Date(twig.lib.strtotime(date) * 1000);
+                dateObj = new Date(twigLib.strtotime(date) * 1000);
             }
-        } else if (twig.lib.is('Number', date)) {
+        } else if (twigLib.is('Number', date)) {
             // Timestamp
             dateObj = new Date(date * 1000);
         } else {
@@ -242,16 +243,16 @@ class TwigFunctions {
         let loader;
         const path = name;
         const state = this;
-        if(twig.lib.is("Object",name) ) {
+        if(twigLib.is("Object",name) ) {
             return name.render();
         }
-        if (twig.lib.is("Object", secondArg)) {
+        if (twigLib.is("Object", secondArg)) {
             paramsInclude = secondArg;
-        }else if (twig.lib.is("Boolean",secondArg)){
+        }else if (twigLib.is("Boolean",secondArg)){
             ignoreMissing = secondArg;
         }
 
-        if(twig.lib.is("Boolean",thirdArg)){
+        if(twigLib.is("Boolean",thirdArg)){
             ignoreMissing = thirdArg;
         }
         // If we are running in a node.js environment, set the loader to 'fs'.
@@ -280,7 +281,7 @@ class TwigFunctions {
         //
         // on exception, log it
         try {
-            templateTwig = twig.Templates.loadRemote(name, paramsLoad);
+            templateTwig = twigTemplates.loadRemote(name, paramsLoad);
             // If the template is undefined or null, set the template to an empty string and do NOT flip the
             // boolean indicating we found the template
             //
@@ -305,7 +306,7 @@ class TwigFunctions {
         }
         const params = this.context;
         templateTwig.options = { ...this.options };
-        if(twig.lib.is("Object",paramsInclude)){
+        if(twigLib.is("Object",paramsInclude)){
             state.context = {...state.context, ...paramsInclude};
         }
 
@@ -315,11 +316,11 @@ class TwigFunctions {
     parent() {
         const state = this;
 
-        return state.getBlock(state.getNestingStackToken(twigLogic.type.block).blockName, true).render(state, state.context);
+        return state.getBlock(state.getNestingStackToken(TwigLogic.type.block).blockName, true).render(state, state.context);
     }
 
     attribute(object, method, params) {
-        if (twig.lib.is('Object', object)) {
+        if (twigLib.is('Object', object)) {
             if (Object.hasOwnProperty.call(object, method)) {
                 if (typeof object[method] === 'function') {
                     return object[method].apply(undefined, params);
@@ -334,21 +335,21 @@ class TwigFunctions {
     }
 
     max(values, ...args) {
-        if (twig.lib.is('Object', values)) {
+        if (twigLib.is('Object', values)) {
             delete values._keys;
-            return twig.lib.max(values);
+            return twigLib.max(values);
         }
 
-        return Reflect.apply(twig.lib.max, null, [values, ...args]);
+        return Reflect.apply(twigLib.max, null, [values, ...args]);
     }
 
     min(values, ...args) {
-        if (twig.lib.is('Object', values)) {
+        if (twigLib.is('Object', values)) {
             delete values._keys;
-            return twig.lib.min(values);
+            return twigLib.min(values);
         }
 
-        return Reflect.apply(twig.lib.min, null, [values, ...args]);
+        return Reflect.apply(twigLib.min, null, [values, ...args]);
     }
 
     /* eslint-disable-next-line camelcase */
@@ -359,7 +360,7 @@ class TwigFunctions {
             template = '';
         }
 
-        return twig.Templates.parsers.twig({
+        return twigTemplates.parsers.twig({
             options: state.template.options,
             data: template
         });
@@ -375,19 +376,19 @@ class TwigFunctions {
             return min + Math.floor((max - min + 1) * random / LIMIT_INT31);
         }
 
-        if (twig.lib.is('Number', value)) {
+        if (twigLib.is('Number', value)) {
             return getRandomNumber(value);
         }
 
-        if (twig.lib.is('String', value)) {
+        if (twigLib.is('String', value)) {
             return value.charAt(getRandomNumber(value.length - 1));
         }
 
-        if (twig.lib.is('Array', value)) {
+        if (twigLib.is('Array', value)) {
             return value[getRandomNumber(value.length - 1)];
         }
 
-        if (twig.lib.is('Object', value)) {
+        if (twigLib.is('Object', value)) {
             const keys = Object.keys(value);
             return value[keys[getRandomNumber(keys.length - 1)]];
         }
@@ -433,7 +434,7 @@ class TwigFunctions {
         //
         // on exception, log it
         try {
-            templateSource = twig.Templates.loadRemote(name, params);
+            templateSource = twigTemplates.loadRemote(name, params);
 
             // If the template is undefined or null, set the template to an empty string and do NOT flip the
             // boolean indicating we found the template

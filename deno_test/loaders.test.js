@@ -1,6 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 import { TwigTemplate } from "../src/twig.template.js";
+import { twigTemplates } from "../src/twig.templates.js";
 
 Deno.test('Twig.js Loaders ->', async (t) => {
     // Encodings
@@ -24,8 +25,8 @@ Deno.test('Twig.js Loaders ->', async (t) => {
                         return template;
                     }
                 };
-                Twig.Templates.registerLoader('custom', obj.loader, obj);
-                assertEquals(Twig.Templates.loaders.hasOwnProperty('custom'), true);
+                twigTemplates.registerLoader('custom', obj.loader, obj);
+                assertEquals(twigTemplates.loaders.hasOwnProperty('custom'), true);
             });
         });
 
@@ -79,8 +80,8 @@ Deno.test('Twig.js Loaders ->', async (t) => {
 
         await t.step('should remove a registered loader', async () => {
             twig.extend(Twig => {
-                Twig.Templates.unRegisterLoader('custom');
-                assertEquals(Twig.Templates.loaders.hasOwnProperty('custom'),false);
+                twigTemplates.unRegisterLoader('custom');
+                assertEquals(twigTemplates.loaders.hasOwnProperty('custom'),false);
             });
         });
 });

@@ -1,12 +1,8 @@
 // ## twig.tests.js
 //
 // This file handles expression tests. (is empty, is not defined, etc...)
-export class TwigTests {
-    #twig
-
-    constructor(twig) {
-        this.#twig = twig;
-    }
+import { twigLib } from "./TwigLib.js";
+class TwigTests {
 
     empty(value) {
         if (value === null || value === undefined) {
@@ -76,10 +72,12 @@ export class TwigTests {
 
 
     iterable(value) {
-        return value && (this.#twig.lib.is('Array', value) || this.#twig.lib.is('Object', value));
+        return value && (twigLib.is('Array', value) || twigLib.is('Object', value));
     }
 
     /*
     Constant ?
      */
 }
+const twigTest = new TwigTests();
+export{twigTest};

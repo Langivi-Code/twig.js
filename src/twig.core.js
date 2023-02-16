@@ -8,17 +8,15 @@ import {twig} from "./twig.js";
 import {twigExpression} from "./TwigExpression.js";
 import {twigFunctions} from "./TwigFunctions.js";
 import { twigLogic } from "./TwigLogic.js";
+import { twigTemplates } from "./twig.templates.js";
+import { twigFilters } from "./twig.filters.js";
+import { twigCache } from "./twig.cache.js"; 
+import { twigTest } from "./twig.tests.js";
 class TwigCore {
     VERSION;
-    compiler;
-    filters;
     _function;
-    tests;
     logic;
-    lib;
     path;
-    Templates;
-    cacher;
     // Default caching to true for the improved performance it offers
     cache = true;
     trace = false;
@@ -637,7 +635,7 @@ class TwigCore {
                 (str.twigMarkup !== true && str.twigMarkup !== strategy) &&
                 !(strategy === 'html' && str.twigMarkup === 'html_attr')
             ) {
-                str = twig.filters.escape(str, [strategy]);
+                str = twigFilters.escape(str, [strategy]);
             }
 
             return str;
@@ -665,7 +663,7 @@ class TwigCore {
     validateId (id) {
         if (id === 'prototype') {
             throw new TwigError(id + ' is not a valid twig identifier');
-        } else if (this.cache && this.cacher.findCacheFile(id)) {
+        } else if (this.cache && twigCache.findCacheFile(id)) {
             throw new  TwigError('There is already a template with the ID ' + id);
         }
 
@@ -712,7 +710,7 @@ class TwigCore {
     validateId(id) {
         if (id === 'prototype') {
             throw new TwigError(id + ' is not a valid twig identifier');
-        } else if (this.cache && this.cacher.findCacheFile(id)) {
+        } else if (this.cache && twigCache.findCacheFile(id)) {
             throw new TwigError('There is already a template with the ID ' + id);
         }
 
@@ -723,41 +721,6 @@ class TwigCore {
         this.VERSION = version;
         // Express 3 handler
         this.__express = this.renderFile;
-    }
-
-
-    setCompile(compilerSetter) {
-        this.compiler = compilerSetter(this);
-        return this;
-    }
-
-    setFilterClass(filterSetter) {
-        this.filters = filterSetter(this);
-        return this;
-    }
-
-    setLibClass(libSetter) {
-        this.lib = libSetter(this);
-        return this;
-    }
-
-    setTemplateStoreClass(tsSetter) {
-        this.Templates = tsSetter(this);
-        return this;
-    }
-
-    setTestsClass(testssSetter) {
-        this.tests = testssSetter(this);
-        return this;
-    }
-    setExpression(expressionSetter) {
-        this.expression = expressionSetter(this);
-        return this;
-    }
-
-    setCacheClass(cacherSetter) {
-        this.cacher = cacherSetter(this);
-        return this;
     }
 
     merge(target, source, onlyChanged) {
@@ -804,7 +767,7 @@ class TwigCore {
         }
 
         if (params.data !== undefined) {
-            return this.Templates.parsers.twig({
+            return twigTemplates.parsers.twig({
                 data: params.data,
                 path: params.hasOwnProperty('path') ? params.path : undefined,
                 module: params.module,
@@ -818,15 +781,15 @@ class TwigCore {
                 throw new TwigError('Both ref and id cannot be set on a twig.js template.');
             }
 
-            return this.Templates.load(params.ref);
+            return twigTemplates.load(params.ref);
         }
 
         if (params.method !== undefined) {
-            if (!this.Templates.isRegisteredLoader(params.method)) {
+            if (!twigTemplates.isRegisteredLoader(params.method)) {
                 throw new TwigError('Loader for "' + params.method + '" is not defined.');
             }
             try{
-                const template = await this.Templates.loadRemote(params.name || params.href || params.path || id || undefined, {
+                const template = await twigTemplates.loadRemote(params.name || params.href || params.path || id || undefined, {
                      id,
                      method: params.method,
                      parser: params.parser || 'twig',
@@ -844,7 +807,7 @@ class TwigCore {
 
         if (params.href !== undefined) {
             try{
-                const template = await this.Templates.loadRemote(params.href, {
+                const template = await twigTemplates.loadRemote(params.href, {
                 id,
                 method: 'ajax',
                 parser: params.parser || 'twig',
@@ -862,7 +825,7 @@ class TwigCore {
 
         if (params.path !== undefined) {
             try{ 
-                const template = await this.Templates.loadRemote(params.path, {
+                const template = await twigTemplates.loadRemote(params.path, {
                 id,
                 method: 'fs',
                 parser: params.parser || 'twig',
@@ -881,16 +844,16 @@ class TwigCore {
 
     filter(filter, value, params) {
         const state = this;
-        if (!this.filters[filter]) {
+        if (!twigFilters[filter]) {
             throw new TwigError('Unable to find filter ' + filter);
         }
 
-        return this.filters[filter](value, params);
+        return twigFilters[filter](value, params);
     }
 
     // Extend Twig with a new filter.
     extendFilter(filter, definition) {
-        TwigFilters.addFilter(this.filters, filter, definition)
+        TwigFilters.addFilter(twigFilters, filter, definition)
     }
 
     // Extend Twig with a new function.
@@ -898,17 +861,12 @@ class TwigCore {
         twigFunctions.extend(fn, definition);
     }
 
-    // Extend Twig with a new test.
-    extendTest(test, definition) {
-        this.tests[test] = definition;
-    }
-
     test(test, value, params) {
-        if (!this.tests[test]) {
+        if (!twigTest[test]) {
             throw this.Error('Test ' + test + ' is not defined.');
         }
 
-        return this.tests[test](value, params);
+        return twigTest[test](value, params);
     };
 
     // Extend Twig with a new definition.

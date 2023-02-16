@@ -1,6 +1,9 @@
 import TwigError from "./TwigError.js";
-
-export class TwigTemplates {
+import { twigCache } from "./twig.cache.js";
+import loaderajax from "./twig.loader.ajax.js";
+import loaderfs from "./twig.loader.fs.js";
+import { TwigTemplate } from "./twig.template.js";
+class TwigTemplates {
     // Namespace for template storage and retrieval
 
     /**
@@ -15,12 +18,18 @@ export class TwigTemplates {
      */
     parsers;
 
-    #twig;
 
-    constructor(twig) {
+    constructor() {
         this.loaders = {};
         this.parsers = {};
-        this.#twig = twig;
+        loaderajax(this);
+        loaderfs(this);
+        this.registerParser('twig', params => {
+            return new TwigTemplate(params);
+        });
+        this.registerParser('source', params => {
+            return params.data || '';
+        })
     }
 
     /**
@@ -155,10 +164,10 @@ export class TwigTemplates {
         }
         
         const jsonTemplate = JSON.stringify(template);
-        if (await this.#twig.cacher.findCacheFile(template.id)) {
+        if (await twigCache.findCacheFile(template.id)) {
             return;
         } else {
-            await this.#twig.cacher.setCache(template.id,jsonTemplate);
+            await twigCache.setCache(template.id,jsonTemplate);
         }
     }
 
@@ -170,10 +179,10 @@ export class TwigTemplates {
      * @return {Twig.Template} A twig.js template stored with the provided ID.
      */
     load(id) {
-        if(!this.#twig.cacher.findCacheFile(id)){
+        if(!twigCache.findCacheFile(id)){
             return null;
         }
-        return this.#twig.cacher.buildTemplateForCache(this.#twig.cacher.getCache(id));
+        return twigCache.buildTemplateForCache(twigCache.getCache(id));
     };
 
     /**
@@ -205,11 +214,11 @@ export class TwigTemplates {
         }
 
         let cached;
-        if(this.#twig.cacher.findCacheFile(id)){
-            cached = this.#twig.cacher.getCache(id);
+        if(twigCache.findCacheFile(id)){
+            cached = twigCache.getCache(id);
         }
         if (cached) {
-            const buildcache = this.#twig.cacher.buildTemplateForCache(cached);
+            const buildcache = twigCache.buildTemplateForCache(cached);
             if(!params.async ){
                 return buildcache;
             }
@@ -225,3 +234,7 @@ export class TwigTemplates {
         return loader.call(this,location,params);
     }
 }
+
+const twigTemplates = new TwigTemplates();
+
+export {twigTemplates};
