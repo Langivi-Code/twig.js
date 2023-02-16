@@ -4,13 +4,22 @@ node() {
         checkout scm
     }
 
-  
-    stage("Test") {
-        ansiColor('xterm') {
-            def  stdout = sh(returnStdout: true, script: "deno test --unstable --allow-read --allow-write --allow-env --allow-net --allow-ffi")
-                echo stdout;
+    stage("Prepare") {
+        denoImage = docker.image("denoland/deno:ubuntu-1.28.2");
+        denoImage.inside("-u 0") {
+            parallel([
+                    test   : {
+                        stage("Test") {
+                            ansiColor('xterm') {
+                               def  stdout = sh(returnStdout: true, script: "deno test --unstable --allow-read --allow-write --allow-env --allow-net --allow-ffi")
+                              echo stdout;
 
-            }
+                            }
+                        }
+                    }
+            ]);
+
+
+        }
     }
 }
-        
