@@ -5,11 +5,11 @@ class TwigCache {
 
     constructor(twig) {
         this.#twig = twig;
-        this.#twig.lib.ensureDir(this.#cacheDir);
+        this.#twig.lib.ensureDirSync(this.#cacheDir);
     }
 
     set cacheDir(dir){
-        this.#twig.lib.ensureDir(dir);
+        this.#twig.lib.ensureDirSync(dir);
         this.#cacheDir = dir;
     }
 
