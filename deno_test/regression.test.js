@@ -39,6 +39,6 @@ Deno.test('Twig.js Regression Tests ->', async (t) => {
         const str = `{% set classes = ['a', 'b'] %}{% set classes = classes ? classes|merge(['c']) : '' %}{{ dump(classes) }}`;
         const expected = twigFunctions.dump(['a', 'b', 'c']);
         const testTemplate = await twig.twig({data: str});
-        assertEquals(testTemplate.render(), expected);
+        assertEquals(await testTemplate.render(), expected);
     });
 });

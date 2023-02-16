@@ -515,7 +515,7 @@ Deno.test('Other Operators ->', async (t) => {
 
     await t.step('should support keys as expressions in function parameters', async () => {
         const testTemplate = await twig.twig({data: '{{ func({(foo): \'stuff\'}) }}'});
-        const output = testTemplate.render({
+        const output = await testTemplate.render({
             func() {
                 return 'ok!';
             },

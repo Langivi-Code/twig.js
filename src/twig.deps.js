@@ -24,10 +24,10 @@ import showdown from "showdown";
 import slug from "slug";
 import timeZoneName from "timeZoneName";
 import {createHash} from "hasher";
-import {ensureDir} from "ensureDir";
+import {ensureDirSync} from "ensureDirSync";
 import {emptyDirSync} from "emptyDirSync";
 
 
 const require = createRequire(Deno.realPathSync("."));
-export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, encode, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName,createHash,ensureDir, emptyDirSync}
+export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, encode, Currencies, datauri, lookup, fromUint8Array, datetime, turndown, DOMParser, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName,createHash,ensureDirSync, emptyDirSync}
 export default require;
