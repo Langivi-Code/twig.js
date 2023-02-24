@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      New function and filter
+    </title>
+  </head>
+  <body>
+    <h1><a href="http://localhost:3000/filters">Filters</a></h1>
+    <h1><a href="http://localhost:3000/functions">Functions</a></h1>
+    <h1><a href="http://localhost:3000/tests">Tests</a></h1>
+    <h1><a href="http://localhost:3000/tags">Tags</a></h1>
+    <main>
+      <div>
+        <p>
+          Function constant
+        </p>
+        <p>
+          set constant - {{ constant('class', 'new class') }}
+        </p>
+        <p>
+          get constant - {{ constant('class') }}
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+       <div>
+        <p>
+          Function Country TimeZone
+        </p>
+        <p>
+          {{ country_timezones('FR') }}
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Function html_classes
+        </p>
+        <p class="{{ html_classes('a-class', 'another-class') }}">
+          Class
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Function include
+        </p>
+        {{ include('view/header.twig') }}
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter convert_encoding
+        </p>
+        {% set data = 'ENCODING STRING ' %}
+        {{ data|convert_encoding('UTF-8', 'cesu8') }}
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      
+      <div>
+        <p>
+          Filter country_name
+        </p>
+        <p>
+          {{ 'FR'|country_name }}
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter currency_name
+        </p>
+        <p>
+          {{ 'EUR'|currency_name }}
+        </p>
+        <p>
+          {{ 'JPY'|currency_name }}
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter currency_symbol
+        </p>
+        <p>
+          {{ 'EUR'|currency_symbol }}
+        </p>
+        <p>
+          {{ 'JPY'|currency_symbol }}
+        </p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter data_uri
+        </p>
+        <p>{{ '<b>foobar</b>'|data_uri("text/html") }}</p>
+        {# <p>{{  './newImage.png'|data_uri("text/html") }}</p> #}
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter filter 
+        </p>
+        <div>
+        {% set sizes = [34, 36, 38, 40, 42] %} 
+        {{ sizes|filter(v => v > 38)|join(', ') }}
+        </div>
+        <div>
+        {% for v in sizes|filter(v => v > 38) -%}
+            {{ v }}
+        {% endfor %}
+        </div>
+         <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter format_currency
+        </p>
+        <p>{{ '1000000'|format_currency('EUR') }}</p>
+        <p>{{ '12.345'|format_currency('EUR', {rounding_mode: 'floor'}) }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter format_date
+        </p>
+        <p>{{ '2019-08-07'|format_date('short', 'none', 'fr') }}</p>
+        <p>{{ '2019-08-07 '|format_date('full', 'full', 'fr') }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter format_datetime
+        </p>
+        <p>{{ '2019-08-08 23:39:12'|format_datetime() }}</p>
+        <p>{{ '2019-08-07 23:39:12'|format_datetime('none', 'short', 'fr') }}</p>
+        <p>{{ '2019-08-07 23:39:12'|format_datetime('short', 'none', 'fr') }}</p>
+        <p>{{ '2019-08-17 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter format_number
+        </p>
+        <p>{{ '12.345'|format_number }}</p>
+        <p>{{ '12.345'|format_number({maximumFractionDigits: 2}) }}</p>
+        <p>{{ '1000000'|format_number({minimumFractionDigits: 4}) }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div> 
+      <div>
+        <p>
+          Filter format_time
+        </p>
+        <p>{{ '2019-08-07 23:39:12'|format_datetime('none', 'short', 'fr') }}</p>
+        <p>{{ '2019-08-07 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
+         <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter html_to_markdown
+        </p>
+        <p>{% apply html_to_markdown %}
+            <html>
+             <h1>Hello!</h1>
+            </html>
+            {% endapply %}
+        </p>
+        <p>
+        {{ include('view/header.twig')|html_to_markdown }}
+        </p>
+         <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter language_name
+        </p>
+        <p>{{ 'de'|language_name }}</p>
+        <p>{{ 'de'|language_name('fr') }}</p>
+        <p>{{ 'fr_CA'|language_name('fr_FR') }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>
+          Filter locale_name
+        </p>
+        <p>{{ 'de'|locale_name }}</p>
+        <p>{{ 'de'|locale_name('fr') }}</p>
+        <p>{{ 'fr_CA'|locale_name('fr_FR') }}</p>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+       <div>
+        <p>
+          Filter map
+        </p>
+        <div>
+        {% set people = [
+            {first: "Bob", last: "Smith"},
+            {first: "Alice", last: "Dupond"},
+        ] %}
+
+        {{ people|map(p => `${p.first} ${p.last}`)|join(', ') }}
+        </div>
+        <div>
+            {% set peoples = {
+                "Bob": "Smith",
+                "Alice": "Dupond",
+            } %}
+
+            {{ peoples|map(([key, value]) => `${key} ${value}`)|join(', ') }}
+        </div>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>Filter markdown_to_html </p>
+        {% apply markdown_to_html %}
+            # hello, markdown!
+        {% endapply %}
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>Filter reduce</p>
+        <div>
+            {% set numbers = [1, 2, 3] %}
+            {{ numbers|reduce((carry, v) => carry + v) }}
+        </div>
+        <div>
+            {{ numbers|reduce((carry, v) => carry + v, 10) }}
+        </div>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>Filter slug </p>
+        <div>{{ 'Wôrķšƥáçè sèťtïñğš'|slug }}</div>
+        <div>{{ 'Wôrķšƥáçè sèťtïñğš'|slug('/') }}</div>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+      <div>
+        <p>Filter timezone_name </p>
+        <div>
+            {{ 'Europe/Paris'|timezone_name }}
+        </div>
+        <div>
+           {{ 'America/Los_Angeles'|timezone_name }}
+        </div>
+        <hr style="border-top: 2px dotted black" />
+      </div>
+    </main>
+  </body>
+</html>
