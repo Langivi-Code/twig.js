@@ -135,10 +135,10 @@
         <p>
           Filter format_datetime
         </p>
-        <p>{{ '2019-08-07 23:39:12'|format_datetime() }}</p>
+        <p>{{ '2019-08-08 23:39:12'|format_datetime() }}</p>
         <p>{{ '2019-08-07 23:39:12'|format_datetime('none', 'short', 'fr') }}</p>
         <p>{{ '2019-08-07 23:39:12'|format_datetime('short', 'none', 'fr') }}</p>
-        <p>{{ '2019-08-07 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
+        <p>{{ '2019-08-17 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
         <hr style="border-top: 2px dotted black" />
       </div>
       <div>
@@ -158,7 +158,7 @@
         <p>{{ '2019-08-07 23:39:12'|format_datetime('full', 'full', 'fr') }}</p>
          <hr style="border-top: 2px dotted black" />
       </div>
-      {# <div>
+      <div>
         <p>
           Filter html_to_markdown
         </p>
@@ -172,7 +172,7 @@
         {{ include('view/header.twig')|html_to_markdown }}
         </p>
          <hr style="border-top: 2px dotted black" />
-      </div> #}
+      </div>
       <div>
         <p>
           Filter language_name
