@@ -15,21 +15,18 @@ class TwigCache {
 
     findCacheFile(id) {
         try {
-            const hashId = twigLib.hasher("md5").update(id).toString();
-            Deno.statSync(`${this.#cacheDir}/${hashId}.txt`);
+            const hashId = twigLib.hasher(id);
+            twigLib.statSync(`${this.#cacheDir}/${hashId}.txt`);
             return true;
         } catch (e) {
-            if (e instanceof Deno.errors.NotFound) {
-                return false;
-            }
-            throw e;
+            return false;
         }
     }
 
     setCache(id, template) {
         try {
-            const hashId = twigLib.hasher("md5").update(id).toString();
-            Deno.writeTextFileSync(`${this.#cacheDir}/${hashId}.txt`, template);
+            const hashId = twigLib.hasher(id);
+            twigLib.writeFileSync(`${this.#cacheDir}/${hashId}.txt`, template);
         } catch (e) {
             console.log("Cache don't write", e);
         }
@@ -37,8 +34,8 @@ class TwigCache {
 
     getCache(id) {
         try {
-            const hashId = twigLib.hasher("md5").update(id).toString();
-            const cacheJson = Deno.readTextFileSync(`${this.#cacheDir}/${hashId}.txt`);
+            const hashId = twigLib.hasher(id);
+            const cacheJson = twigLib.readFileSync(`${this.#cacheDir}/${hashId}.txt`);
             return JSON.parse(cacheJson);
         } catch (e) {
             if (e instanceof Deno.errors.NotFound){
@@ -63,7 +60,7 @@ class TwigCache {
     }
 
     emptyCacheDir(){
-        twigLib.emptyDirSync(this.#cacheDir);
+        twigLib.emptyDir(this.#cacheDir);
     }
 }
 

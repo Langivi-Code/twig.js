@@ -31,7 +31,7 @@ export class TwigFilters {
         if (typeof value !== 'string') {
             return value;
         }
-        const currency = twigLib.currenciesMap.names.get(value);
+        const currency = twigLib.currenciesMap.Currencies.names.get(value);
         return currency;
     }
 
@@ -39,7 +39,7 @@ export class TwigFilters {
         if (typeof value !== 'string') {
             return value;
         }
-        const symbol = twigLib.currenciesMap.symbols.get(value);
+        const symbol = twigLib.currenciesMap.Currencies.symbols.get(value);
         return symbol;
     }
     upper(value) {
@@ -91,7 +91,7 @@ export class TwigFilters {
         if (params.length !== 2) {
             throw new TwigError("Two parameters expected");
         }
-        const encode = twigLib.encode(value, params[1]);
+        const encode = twigLib.iconv.encode(value, params[1]);
         return encode.toString();
     }
 
@@ -244,7 +244,7 @@ export class TwigFilters {
         result = result.replace('\'', '%27');
         return result;
     }
-    data_uri(value) {
+    data_uri(value,type) {
         if (!value) {
             return;
         }
@@ -252,7 +252,7 @@ export class TwigFilters {
             return `data:"text/html";base64,${btoa(value)}`;
         } else {
             const content = Deno.readFileSync(value);
-            const data = `data:${twigLib.lookup(value)};base64,${twigLib.fromUint8Array(content)}`;
+            const data = twigLib.datauri.getBase64DataURI(content,type);
             return data;
         }
     }
@@ -424,43 +424,33 @@ export class TwigFilters {
         const format = params && Boolean(params.length) ? params[0] : 'F j, Y H:i';
         return twigLib.date(format.replace(/\\\\/g, '\\'), date);
     }
-    format_date(value, [formatdate, timezone, local]) {
-        let date = twigLib.datetime(value);
+    format_date(value, [ formatdate, local]) {
+        let date = new Date(value);
         let formate = "";
-        if (local) {
-            date = date.setLocale(local);
-        } else if (timezone) {
-            date = date.toZonedTime(timezone);
-        }
         switch (formatdate) {
             case "none":
                 break;
             case "short":
-                formate += "dd/MM/YYYY";
+                formate += "dd/MM/yyyy";
                 break;
             case "full":
-                formate += "wwww d MMMM YYYY"
+                formate += "wwww d MMMM yyyy"
         }
 
-        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
+        const resultDate = formate.length ? twigLib.dateFns.format(date,formate, {local:!local?local:"default"}) :  twigLib.dateFns.format(date,"MMM d, yyyy, hh:mm:ss a ",{local:!local?local:"default"});
         return resultDate;
     }
-    format_datetime(value, [formatdate, formattime, local, timezone]) {
-        let date = twigLib.datetime(value);
+    format_datetime(value, [formatdate, formattime, local ]) {
+        const date= new Date(value);
         let formate = "";
-        if (local) {
-            date = date.setLocale(local);
-        } else if (timezone) {
-            date = date.toZonedTime(timezone);
-        }
         switch (formatdate) {
             case "none":
                 break;
             case "short":
-                formate += "dd/MM/YYYY";
+                formate += "dd/MM/yyyy";
                 break;
             case "full":
-                formate += "wwww d MMMM YYYY"
+                formate += "EEEE d MMMM yyyy"
         }
         switch (formattime) {
             case "none":
@@ -469,15 +459,15 @@ export class TwigFilters {
                 formate += " HH:mm";
                 break;
             case "full":
-                formate += "HH:mm:ss ZZZ"
+                formate += "HH:mm:ss zzz"
                 break;
         }
-        const resultDate = formate.length ? date.format(formate) : date.format("MMM d, YYYY, hh:mm:ss a ");
+        const resultDate = formate.length ? twigLib.dateFns.format(date,formate,{local: !local?local:"default"}) : twigLib.dateFns.format(date,"MMM d, yyyy, hh:mm:ss a ", {local:!local?local:"default"});
         return resultDate;
     }
 
     format_time(value, [formattime, timezone, local]) {
-        let date = twigLib.datetime(value);
+        let date = twigLib.dateTime(value);
         let formate = "";
         if (local) {
             date = date.setLocale(local);
@@ -502,12 +492,8 @@ export class TwigFilters {
         if (!is("String", value)) {
             return;
         }
-        const parseString = new twigLib.domParser();
-        const TurndownService = new twigLib.turndown();
-        const domDoc = parseString.parseFromString(value, 'text/html');
-        if (!domDoc) { throw `failed to parse doc` }
-        const mark = TurndownService.turndown(domDoc);
-        return mark;
+        const parseString = twigLib.converter.convert(value);
+        return parseString;
     }
     markdown_to_html(value) {
         if(!twigLib.is("String",value)){
