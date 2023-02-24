@@ -7,12 +7,14 @@
 //
 let importPath = "";
 let fs;
+let fsProm;
 let ensureDir;
 let emptyDir;
 try {
     if (globalThis?.performance?.nodeTiming?.name == "node") {
         importPath = "./twig.deps.node.js";
         fs = await import("fs");
+        fsProm = await import("node:fs/promises")
         emptyDir = await import("emptydir");
     } else if (globalThis?.Deno?.version.hasOwnProperty("deno")) {
         importPath = "./twig.deps.js";
@@ -168,7 +170,7 @@ class TwigLib {
             if (this.isDeno()) {
                 return await Deno.readTextFile(path);
             } else if (this.isNode()) {
-                return fs.readFileSync(path, "utf8");
+                return await fsProm.readFile(path, "utf8");
             }
         } catch (e) {
             console.log(e);
@@ -195,8 +197,7 @@ class TwigLib {
         if (this.isDeno()) {
             return !!(await Deno.stat(path));
         } else if (this.isNode()) {
-            const fileStat = fs.statSync(path);
-            console.log("FILE STATE NODE", fileStat);
+            const fileStat = await fsProm.stat(path);
             return fileStat.isFile();
         }
     }

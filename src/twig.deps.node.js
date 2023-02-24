@@ -10,7 +10,7 @@ import boolval from 'locutus/php/var/boolval.js';
 import clm from 'country-locale-map';
 import iconv from "iconv-lite";
 import currencies from 'currencies-map';
-import datauri from "datauria";
+import datauri from "dauria";
 import dateFns from "date-fns";
 import converter from "html-to-markdown";
 import {langToLang} from "language-name-to-language-name";

@@ -24,6 +24,6 @@ import md5 from "hasher";
 
 
 
-const require = createRequire(Deno.realPathSync("."));
+export const requireNode = createRequire(Deno.realPathSync("."));
 export { sprintf, vsprintf, strip_tags, round, min, max, date, strtotime, boolval, clm, iconv, currencies, datauri, dateFns, converter, langToLang, getLanguageName,getLanguageNameWithCountry,showdown,slug, timeZoneName, md5}
-export default require;
+
