@@ -1,5 +1,6 @@
 import { assertEquals, assertArrayIncludes } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigCache } from "../src/twig.cache.js";
 
 Deno.test('Twig.js Functions ->', async (t) => {
     // Add some test functions to work with
@@ -348,7 +349,7 @@ Deno.test('Twig.js Functions ->', async (t) => {
     });
 
     await t.step('should allow loading relative paths', async () => {
-        twig.cacher.emptyCacheDir();
+        twigCache.emptyCacheDir();
         const testTemplate = await twig.twig({data: '{{ source("./deno_test/templates/simple.twig") }}'});
         assertEquals(testTemplate.render(), 'Twig.js!');
     });

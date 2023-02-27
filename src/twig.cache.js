@@ -1,35 +1,32 @@
 import { TwigTemplate } from "./twig.template.js";
+import { twigLib } from "./TwigLib.js";
 class TwigCache {
-    #twig;
+    
     #cacheDir = "./.twig_cache";
 
-    constructor(twig) {
-        this.#twig = twig;
-        this.#twig.lib.ensureDir(this.#cacheDir);
+    constructor() {
+        twigLib.ensureDir(this.#cacheDir);
     }
 
     set cacheDir(dir){
-        this.#twig.lib.ensureDir(dir);
+        twigLib.ensureDir(dir);
         this.#cacheDir = dir;
     }
 
     findCacheFile(id) {
         try {
-            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
-            Deno.statSync(`${this.#cacheDir}/${hashId}.txt`);
+            const hashId = twigLib.hasher(id);
+            twigLib.fileStatSync(`${this.#cacheDir}/${hashId}.txt`);
             return true;
         } catch (e) {
-            if (e instanceof Deno.errors.NotFound) {
-                return false;
-            }
-            throw e;
+            return false;
         }
     }
 
     setCache(id, template) {
         try {
-            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
-            Deno.writeTextFileSync(`${this.#cacheDir}/${hashId}.txt`, template);
+            const hashId = twigLib.hasher(id);
+            twigLib.writeFileSync(`${this.#cacheDir}/${hashId}.txt`, template);
         } catch (e) {
             console.log("Cache don't write", e);
         }
@@ -37,8 +34,8 @@ class TwigCache {
 
     getCache(id) {
         try {
-            const hashId = this.#twig.lib.hasher("md5").update(id).toString();
-            const cacheJson = Deno.readTextFileSync(`${this.#cacheDir}/${hashId}.txt`);
+            const hashId = twigLib.hasher(id);
+            const cacheJson = twigLib.readFileSync(`${this.#cacheDir}/${hashId}.txt`);
             return JSON.parse(cacheJson);
         } catch (e) {
             if (e instanceof Deno.errors.NotFound){
@@ -63,8 +60,10 @@ class TwigCache {
     }
 
     emptyCacheDir(){
-        this.#twig.lib.emptyDirSync(this.#cacheDir);
+        twigLib.emptyDir(this.#cacheDir);
     }
 }
 
-export {TwigCache};
+const twigCache = new TwigCache(); 
+
+export {twigCache};

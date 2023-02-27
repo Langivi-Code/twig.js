@@ -1,7 +1,15 @@
 // ## TwigPath.js
 //
 // This file handles path parsing
-import requireNode from "./twig.deps.js";
+import {twigLib} from "./TwigLib.js";
+let require;
+if(twigLib.isDeno()){
+    const {requireNode} = await import("./twig.deps.js")
+    require = requireNode;
+} else if (twigLib.isNode()) {
+   require = await import ("path");
+}
+
 import TwigError from "./TwigError.js";
 export class TwigPath {
 
@@ -72,8 +80,12 @@ export class TwigPath {
             }
         } else if (template.path) {
             // Get the system-specific path separator
-
-            var path = requireNode('path');
+            var path;
+            if(twigLib.isDeno()){
+                path = require('path');
+            }else if (twigLib.isNode()){
+                path = require;
+            }
 
             const sep = path.sep || sepChr;
             const relative = new RegExp('^\\.{1,2}' + sep.replace('\\', '\\\\'));

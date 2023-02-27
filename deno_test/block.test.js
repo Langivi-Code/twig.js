@@ -1,5 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
+import { twigCache } from "../src/twig.cache.js";
 
 Deno.test("Twig.js Blocks ->", async (t) => {
     await t.step(
@@ -245,7 +246,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
     await t.step(
         'should allow "use" in template with "extends"',
         async t => {
-            twig.cacher.emptyCacheDir();
+            twigCache.emptyCacheDir();
             await twig.twig({
                 id: 'blocks.twig',
                 data: '{% block content "blocks.twig" %}'
@@ -266,7 +267,7 @@ Deno.test("Twig.js Blocks ->", async (t) => {
     await t.step(
         'should allow "use" in template with "extends" and nested blocks',
         async () => {
-            twig.cacher.emptyCacheDir();
+            twigCache.emptyCacheDir();
             await twig.twig({
                 id: 'blocks.twig',
                 data: '{% block sidebar %}blocks-sidebar{% endblock %}{% block header %}blocks-header{% endblock %}{% block content %}blocks-content{% endblock %}{% block footer %}blocks-footer{% endblock %}{% block masthead %}<blocks-masthead>{% endblock %}'

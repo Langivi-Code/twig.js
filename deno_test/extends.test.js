@@ -1,6 +1,7 @@
 import { assertEquals, assertObjectMatch } from "https://deno.land/std@0.143.0/testing/asserts.ts";
 import { twig } from "../src/twig.js";
 import { twigExpression } from "../src/TwigExpression.js";
+import TwigExpression from "../src/TwigExpression.js";
 
 Deno.test('Twig.js Extensions ->', async (t) => {
 
@@ -18,7 +19,7 @@ Deno.test('Twig.js Extensions ->', async (t) => {
 
                     // Compile the expression.
                     token.stack = Reflect.apply(twigExpression.compile, this, [{
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: expression
                     }]).stack;
 
@@ -67,7 +68,7 @@ Deno.test('Twig.js Extensions ->', async (t) => {
 
                     // Turn the string expression into tokens.
                     token.stack = Reflect.apply(twigExpression.compile, this, [{
-                        type: twigExpression.type.expression,
+                        type: TwigExpression.type.expression,
                         value: expression
                     }]).stack;
 
