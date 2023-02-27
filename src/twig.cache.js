@@ -16,7 +16,7 @@ class TwigCache {
     findCacheFile(id) {
         try {
             const hashId = twigLib.hasher(id);
-            twigLib.statSync(`${this.#cacheDir}/${hashId}.txt`);
+            twigLib.fileStatSync(`${this.#cacheDir}/${hashId}.txt`);
             return true;
         } catch (e) {
             return false;
